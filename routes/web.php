@@ -13,14 +13,14 @@ use App\Http\Controllers\AdminController;
 
 function getDummyBooks() {
     return collect([
-        ['id' => 1, 'book_id' => 'B001', 'judul' => 'Laskar Pelangi', 'penulis' => 'Andrea Hirata', 'genre' => 'Drama', 'status' => 'Tersedia', 'cover' => 'Laskar_Pelangi_Sampul.jpg'],
-        ['id' => 2, 'book_id' => 'B002', 'judul' => 'Filosofi Teras', 'penulis' => 'Henry Manampiring', 'genre' => 'Self-Dev', 'status' => 'Dipinjam', 'cover' => 'filosofi_teras.webp'],
-        ['id' => 3, 'book_id' => 'B003', 'judul' => 'Akuntansi Dasar', 'penulis' => 'Erlangga', 'genre' => 'Edukasi', 'status' => 'Tersedia', 'cover' => 'Cover_akutansi.jpg'],
-        ['id' => 4, 'book_id' => 'B004', 'judul' => 'Hujan', 'penulis' => 'Tere Liye', 'genre' => 'Romance', 'status' => 'Tersedia', 'cover' => 'cover_hujan.jpg'],
-        ['id' => 5, 'book_id' => 'B005', 'judul' => 'Bandung After Rain', 'penulis' => 'Viva.co', 'genre' => 'Romance', 'status' => 'Tersedia', 'cover' => 'bandung.after.rain.jpg'],
-        ['id' => 6, 'book_id' => 'B006', 'judul' => 'AI For Everyone', 'penulis' => 'Andrew Ng', 'genre' => 'Technology', 'status' => 'Tersedia', 'cover' => 'cover_AI.byerlangga.jpg'],
-        ['id' => 7, 'book_id' => 'B007', 'judul' => 'Malioboro at Midnight', 'penulis' => 'Skysphire', 'genre' => 'Romance', 'status' => 'Dipinjam', 'cover' => 'maliboro.cover.jpg'],
-        ['id' => 8, 'book_id' => 'B008', 'judul' => 'Bumi', 'penulis' => 'Tere Liye', 'genre' => 'Fantasi', 'status' => 'Tersedia', 'cover' => 'cover_buku_bumi.jpg'],
+        ['id' => 1, 'book_id' => 'B001', 'judul' => 'Laskar Pelangi', 'penulis' => 'Andrea Hirata', 'genre' => 'Drama', 'status' => 'Tersedia', 'cover' => 'Laskar_Pelangi_Sampul.jpg', 'tahun_terbit' => '2005'],
+        ['id' => 2, 'book_id' => 'B002', 'judul' => 'Filosofi Teras', 'penulis' => 'Henry Manampiring', 'genre' => 'Self-Dev', 'status' => 'Dipinjam', 'cover' => 'filosofi_teras.webp', 'tahun_terbit' => '2018'],
+        ['id' => 3, 'book_id' => 'B003', 'judul' => 'Akuntansi Dasar', 'penulis' => 'Erlangga', 'genre' => 'Edukasi', 'status' => 'Tersedia', 'cover' => 'Cover_akutansi.jpg', 'tahun_terbit' => '2020'],
+        ['id' => 4, 'book_id' => 'B004', 'judul' => 'Hujan', 'penulis' => 'Tere Liye', 'genre' => 'Romance', 'status' => 'Tersedia', 'cover' => 'cover_hujan.jpg', 'tahun_terbit' => '2016'],
+        ['id' => 5, 'book_id' => 'B005', 'judul' => 'Bandung After Rain', 'penulis' => 'Viva.co', 'genre' => 'Romance', 'status' => 'Tersedia', 'cover' => 'bandung.after.rain.jpg', 'tahun_terbit' => '2019'],
+        ['id' => 6, 'book_id' => 'B006', 'judul' => 'AI For Everyone', 'penulis' => 'Andrew Ng', 'genre' => 'Technology', 'status' => 'Tersedia', 'cover' => 'cover_AI.byerlangga.jpg', 'tahun_terbit' => '2021'],
+        ['id' => 7, 'book_id' => 'B007', 'judul' => 'Malioboro at Midnight', 'penulis' => 'Skysphire', 'genre' => 'Romance', 'status' => 'Dipinjam', 'cover' => 'maliboro.cover.jpg', 'tahun_terbit' => '2023'],
+        ['id' => 8, 'book_id' => 'B008', 'judul' => 'Bumi', 'penulis' => 'Tere Liye', 'genre' => 'Fantasi', 'status' => 'Tersedia', 'cover' => 'cover_buku_bumi.jpg', 'tahun_terbit' => '2014'],
     ]);
 }
 
@@ -79,7 +79,8 @@ Route::get('/katalog', function (Request $request) {
     if ($query) {
         $hasilBuku = $semuaBuku->filter(function ($item) use ($query) {
             return str_contains(strtolower($item['judul']), strtolower($query)) || 
-                   str_contains(strtolower($item['penulis']), strtolower($query));
+                   str_contains(strtolower($item['penulis']), strtolower($query)) ||
+                   str_contains(strtolower($item['genre']), strtolower($query));
         });
     } else {
         $hasilBuku = $semuaBuku;
@@ -92,15 +93,28 @@ Route::get('/search', function (Request $request) {
     $semuaBuku = getDummyBooks()->map(fn($item) => (object)$item);
 
     $query = $request->input('query');
-    if ($query) {
-        $books = $semuaBuku->filter(function ($book) use ($query) {
-            return str_contains(strtolower($book->judul), strtolower($query)) || 
-                   str_contains(strtolower($book->penulis), strtolower($query));
+    $category = $request->input('category');
+
+    if ($query || $category) {
+        $books = $semuaBuku->filter(function ($book) use ($query, $category) {
+            $matchQuery = true;
+            if ($query) {
+                $matchQuery = str_contains(strtolower($book->judul), strtolower($query)) || 
+                              str_contains(strtolower($book->penulis), strtolower($query)) ||
+                              str_contains(strtolower($book->genre), strtolower($query));
+            }
+            
+            $matchCategory = !$category || strtolower($book->genre) === strtolower($category);
+
+            return $matchQuery && $matchCategory;
         });
     } else {
         $books = collect(); 
     }
-    return view('user.pages.search', compact('books'));
+
+    $categories = $semuaBuku->pluck('genre')->unique()->values();
+
+    return view('user.pages.search', compact('books', 'categories'));
 })->name('search');
 
 Route::get('/katalog/{id}', function ($id) {
