@@ -37,9 +37,9 @@
                                 class="w-full px-4 py-3.5 border border-white bg-white/50 rounded-2xl focus:outline-none focus:ring-4 focus:ring-red-100 font-medium text-sm transition-all">
                         </div>
                         <div>
-                            <label class="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2 ml-1">Book ID (Read Only)</label>
-                            <input type="text" value="{{ $buku['id'] }}" readonly 
-                                class="w-full px-4 py-3.5 border border-white bg-gray-100/50 rounded-2xl text-gray-500 font-medium text-sm cursor-not-allowed">
+                            <label class="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2 ml-1">Book ID</label>
+                            <input type="text" name="book_id" value="{{ $buku['book_id'] ?? '' }}" required
+                                class="w-full px-4 py-3.5 border border-white bg-white/50 rounded-2xl focus:outline-none focus:ring-4 focus:ring-red-100 font-medium text-sm transition-all">
                         </div>
                     </div>
 
@@ -60,6 +60,21 @@
                                 <option value="Tersedia" {{ $buku['status'] == 'Tersedia' ? 'selected' : '' }}>Available</option>
                                 <option value="Dipinjam" {{ $buku['status'] == 'Dipinjam' ? 'selected' : '' }}>Borrowed</option>
                             </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2 ml-1">Publication Year</label>
+                            <input type="text" name="tahun_terbit" value="{{ $buku['tahun_terbit'] ?? '' }}" placeholder="e.g., 2024"
+                                class="w-full px-4 py-3.5 border border-white bg-white/50 rounded-2xl focus:outline-none focus:ring-4 focus:ring-red-100 font-medium text-sm transition-all">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2 ml-1">Edition (Cetakan)</label>
+                            <input type="text" name="cetakan" value="{{ $buku['cetakan'] ?? '' }}" placeholder="e.g., Cetakan Pertama"
+                                class="w-full px-4 py-3.5 border border-white bg-white/50 rounded-2xl focus:outline-none focus:ring-4 focus:ring-red-100 font-medium text-sm transition-all">
+                        </div>
+                        <div class="sm:col-span-2">
+                            <label class="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2 ml-1">Language / Translation (Bahasa)</label>
+                            <input type="text" name="bahasa" value="{{ $buku['bahasa'] ?? 'Indonesia' }}" placeholder="e.g., Indonesia atau Terjemahan Inggris"
+                                class="w-full px-4 py-3.5 border border-white bg-white/50 rounded-2xl focus:outline-none focus:ring-4 focus:ring-red-100 font-medium text-sm transition-all">
                         </div>
                     </div>
 

@@ -13,14 +13,14 @@ use App\Http\Controllers\AdminController;
 
 function getDummyBooks() {
     return collect([
-        ['id' => 1, 'book_id' => 'B001', 'judul' => 'Laskar Pelangi', 'penulis' => 'Andrea Hirata', 'genre' => 'Drama', 'status' => 'Tersedia', 'cover' => 'Laskar_Pelangi_Sampul.jpg', 'tahun_terbit' => '2005'],
-        ['id' => 2, 'book_id' => 'B002', 'judul' => 'Filosofi Teras', 'penulis' => 'Henry Manampiring', 'genre' => 'Self-Dev', 'status' => 'Dipinjam', 'cover' => 'filosofi_teras.webp', 'tahun_terbit' => '2018'],
-        ['id' => 3, 'book_id' => 'B003', 'judul' => 'Akuntansi Dasar', 'penulis' => 'Erlangga', 'genre' => 'Edukasi', 'status' => 'Tersedia', 'cover' => 'Cover_akutansi.jpg', 'tahun_terbit' => '2020'],
-        ['id' => 4, 'book_id' => 'B004', 'judul' => 'Hujan', 'penulis' => 'Tere Liye', 'genre' => 'Romance', 'status' => 'Tersedia', 'cover' => 'cover_hujan.jpg', 'tahun_terbit' => '2016'],
-        ['id' => 5, 'book_id' => 'B005', 'judul' => 'Bandung After Rain', 'penulis' => 'Viva.co', 'genre' => 'Romance', 'status' => 'Tersedia', 'cover' => 'bandung.after.rain.jpg', 'tahun_terbit' => '2019'],
-        ['id' => 6, 'book_id' => 'B006', 'judul' => 'AI For Everyone', 'penulis' => 'Andrew Ng', 'genre' => 'Technology', 'status' => 'Tersedia', 'cover' => 'cover_AI.byerlangga.jpg', 'tahun_terbit' => '2021'],
-        ['id' => 7, 'book_id' => 'B007', 'judul' => 'Malioboro at Midnight', 'penulis' => 'Skysphire', 'genre' => 'Romance', 'status' => 'Dipinjam', 'cover' => 'maliboro.cover.jpg', 'tahun_terbit' => '2023'],
-        ['id' => 8, 'book_id' => 'B008', 'judul' => 'Bumi', 'penulis' => 'Tere Liye', 'genre' => 'Fantasi', 'status' => 'Tersedia', 'cover' => 'cover_buku_bumi.jpg', 'tahun_terbit' => '2014'],
+        ['id' => 1, 'book_id' => 'B001', 'judul' => 'Laskar Pelangi', 'penulis' => 'Andrea Hirata', 'genre' => 'Drama', 'status' => 'Tersedia', 'cover' => 'Laskar_Pelangi_Sampul.jpg', 'tahun_terbit' => '2005', 'cetakan' => 'Cetakan Pertama', 'bahasa' => 'Indonesia'],
+        ['id' => 2, 'book_id' => 'B002', 'judul' => 'Filosofi Teras', 'penulis' => 'Henry Manampiring', 'genre' => 'Self-Dev', 'status' => 'Dipinjam', 'cover' => 'filosofi_teras.webp', 'tahun_terbit' => '2018', 'cetakan' => 'Cetakan Ketiga', 'bahasa' => 'Indonesia'],
+        ['id' => 3, 'book_id' => 'B003', 'judul' => 'Akuntansi Dasar', 'penulis' => 'Erlangga', 'genre' => 'Edukasi', 'status' => 'Tersedia', 'cover' => 'Cover_akutansi.jpg', 'tahun_terbit' => '2020', 'cetakan' => 'Cetakan Pertama', 'bahasa' => 'Indonesia'],
+        ['id' => 4, 'book_id' => 'B004', 'judul' => 'Hujan', 'penulis' => 'Tere Liye', 'genre' => 'Romance', 'status' => 'Tersedia', 'cover' => 'cover_hujan.jpg', 'tahun_terbit' => '2016', 'cetakan' => 'Cetakan Ke-12', 'bahasa' => 'Indonesia'],
+        ['id' => 5, 'book_id' => 'B005', 'judul' => 'Bandung After Rain', 'penulis' => 'Viva.co', 'genre' => 'Romance', 'status' => 'Tersedia', 'cover' => 'bandung.after.rain.jpg', 'tahun_terbit' => '2019', 'cetakan' => 'Cetakan Kedua', 'bahasa' => 'Indonesia'],
+        ['id' => 6, 'book_id' => 'B006', 'judul' => 'AI For Everyone', 'penulis' => 'Andrew Ng', 'genre' => 'Technology', 'status' => 'Tersedia', 'cover' => 'cover_AI.byerlangga.jpg', 'tahun_terbit' => '2021', 'cetakan' => 'Cetakan Pertama', 'bahasa' => 'Inggris (Terjemahan)'],
+        ['id' => 7, 'book_id' => 'B007', 'judul' => 'Malioboro at Midnight', 'penulis' => 'Skysphire', 'genre' => 'Romance', 'status' => 'Dipinjam', 'cover' => 'maliboro.cover.jpg', 'tahun_terbit' => '2023', 'cetakan' => 'Cetakan Pertama', 'bahasa' => 'Indonesia'],
+        ['id' => 8, 'book_id' => 'B008', 'judul' => 'Bumi', 'penulis' => 'Tere Liye', 'genre' => 'Fantasi', 'status' => 'Tersedia', 'cover' => 'cover_buku_bumi.jpg', 'tahun_terbit' => '2014', 'cetakan' => 'Cetakan Keenam', 'bahasa' => 'Indonesia'],
     ]);
 }
 
@@ -35,7 +35,6 @@ Route::get('/', function () {
 Route::get('/contact', [HomeController::class, 'contact']);
 Route::get('/dashboard', [DashboardController::class, 'index']);
 Route::get('/profile', [RiwayatController::class, 'tampilkanRiwayat'])->name('profile');
-Route::get('/register', [AuthController::class, 'showRegister'])->name('register');
 
 Route::get('/admin/profile', [AdminController::class, 'profile'])->name('admin.profile');
 
@@ -59,8 +58,6 @@ Route::get('/login', function () {
 
 Route::post('/login', [LoginController::class, 'login'])->name('login.post');
 
-Route::get('/register', [AuthController::class, 'showRegister'])->name('register');
-Route::post('/register', [AuthController::class, 'register']);
 
 Route::post('/logout', function (Request $request) {
     Auth::logout();

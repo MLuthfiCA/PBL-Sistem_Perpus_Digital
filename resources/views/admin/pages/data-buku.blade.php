@@ -57,6 +57,18 @@
                                 <option value="Dipinjam">Borrowed</option>
                             </select>
                         </div>
+                        <div>
+                            <label class="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2 ml-1">Publication Year</label>
+                            <input type="text" name="tahun_terbit" placeholder="e.g., 2024" class="w-full px-4 py-3 border border-white bg-white/50 rounded-2xl focus:outline-none focus:ring-4 focus:ring-red-100 font-medium text-sm">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2 ml-1">Edition (Cetakan)</label>
+                            <input type="text" name="cetakan" placeholder="e.g., Cetakan Pertama" class="w-full px-4 py-3 border border-white bg-white/50 rounded-2xl focus:outline-none focus:ring-4 focus:ring-red-100 font-medium text-sm">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2 ml-1">Language / Translation (Bahasa)</label>
+                            <input type="text" name="bahasa" placeholder="e.g., Indonesia atau Terjemahan Inggris" class="w-full px-4 py-3 border border-white bg-white/50 rounded-2xl focus:outline-none focus:ring-4 focus:ring-red-100 font-medium text-sm">
+                        </div>
                     </div>
                     <div class="pt-6">
                         <button type="submit" class="w-full md:w-auto px-8 py-3.5 rounded-xl bg-burgundy-500 text-white font-bold shadow-lg shadow-red-100 hover:bg-maroon transition-all text-sm">

@@ -28,19 +28,23 @@ class BukuController extends Controller
         $request->validate([
             'judul' => 'required|string|max:255',
             'penulis' => 'required|string|max:255',
+            'book_id' => 'required|string|max:50',
             'genre' => 'required|string',
             'status' => 'required|string',
             'tahun_terbit' => 'nullable|string|max:4',
             'cetakan' => 'nullable|string|max:50',
+            'bahasa' => 'nullable|string|max:100',
         ]);
 
         $buku->update([
             'judul' => $request->judul,
             'penulis' => $request->penulis,
+            'book_id' => $request->book_id,
             'genre' => $request->genre,
             'status' => $request->status,
             'tahun_terbit' => $request->tahun_terbit,
             'cetakan' => $request->cetakan,
+            'bahasa' => $request->bahasa,
         ]);
 
         return redirect()->route('katalog')->with('success', 'Data berhasil diupdate');
@@ -65,6 +69,7 @@ class BukuController extends Controller
             'status' => 'required|string',
             'tahun_terbit' => 'nullable|string|max:4',
             'cetakan' => 'nullable|string|max:50',
+            'bahasa' => 'nullable|string|max:100',
             'cover_input' => 'nullable|image|max:2048'
         ]);
 
@@ -84,6 +89,7 @@ class BukuController extends Controller
                 'status' => $request->status,
                 'tahun_terbit' => $request->tahun_terbit,
                 'cetakan' => $request->cetakan,
+                'bahasa' => $request->bahasa ?? 'Indonesia',
                 'cover' => $coverName,
             ]);
 

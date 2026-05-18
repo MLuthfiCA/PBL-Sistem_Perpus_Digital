@@ -63,8 +63,7 @@
             </div>
             @else
             <div class="hidden sm:flex items-center gap-2">
-                <a href="{{ route('login') }}" class="text-sm font-bold text-gray-500 hover:text-burgundy-500 px-4 transition-colors">Log In</a>
-                <a href="{{ route('register') }}" class="px-5 py-2.5 rounded-xl bg-burgundy-500 text-white text-sm font-bold shadow-lg shadow-red-100 hover:bg-burgundy-600 transition-all hover:-translate-y-0.5">Register</a>
+                <a href="{{ route('login') }}" class="px-5 py-2.5 rounded-xl bg-burgundy-500 text-white text-sm font-bold shadow-lg shadow-red-100 hover:bg-burgundy-600 transition-all hover:-translate-y-0.5">Log In</a>
             </div>
             @endif
 
@@ -111,8 +110,7 @@
 
             @if(!session()->has('user'))
             <div class="mt-4 pt-4 border-t border-gray-100 flex flex-col gap-3">
-                <a href="{{ route('login') }}" class="text-center w-full px-5 py-3 rounded-xl text-gray-600 font-bold bg-gray-50 hover:bg-gray-100 transition-colors">Log In</a>
-                <a href="{{ route('register') }}" class="text-center w-full px-5 py-3 rounded-xl bg-burgundy-500 text-white font-bold shadow-lg shadow-red-100 hover:bg-burgundy-600 transition-all">Register</a>
+                <a href="{{ route('login') }}" class="text-center w-full px-5 py-3 rounded-xl bg-burgundy-500 text-white font-bold shadow-lg shadow-red-100 hover:bg-burgundy-600 transition-all">Log In</a>
             </div>
             @else
             <div class="mt-4 pt-4 border-t border-gray-100 flex flex-col gap-3">

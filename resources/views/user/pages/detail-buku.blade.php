@@ -55,6 +55,18 @@
                     <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2">Availability</p>
                     <p class="text-lg font-bold {{ $buku['status'] == 'Tersedia' ? 'text-green-600' : 'text-red-500' }}">{{ $buku['status'] == 'Tersedia' ? 'Available' : 'Borrowed' }}</p>
                 </div>
+                <div class="glass-panel p-6 border-white/40 bg-white/20">
+                    <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2">Publication Year</p>
+                    <p class="text-lg font-bold text-gray-700">{{ $buku['tahun_terbit'] ?? 'N/A' }}</p>
+                </div>
+                <div class="glass-panel p-6 border-white/40 bg-white/20">
+                    <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2">Edition (Cetakan)</p>
+                    <p class="text-lg font-bold text-gray-700">{{ $buku['cetakan'] ?? 'N/A' }}</p>
+                </div>
+                <div class="glass-panel p-6 border-white/40 bg-white/20 sm:col-span-2">
+                    <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2">Language / Translation (Bahasa)</p>
+                    <p class="text-lg font-bold text-gray-700">{{ $buku['bahasa'] ?? 'Indonesia' }}</p>
+                </div>
             </div>
 
             <div class="prose prose-red max-w-none">
