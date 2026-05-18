@@ -25,11 +25,22 @@ class BukuController extends Controller
     {
         $buku = Buku::findOrFail($id);
 
+        $request->validate([
+            'judul' => 'required|string|max:255',
+            'penulis' => 'required|string|max:255',
+            'genre' => 'required|string',
+            'status' => 'required|string',
+            'tahun_terbit' => 'nullable|string|max:4',
+            'cetakan' => 'nullable|string|max:50',
+        ]);
+
         $buku->update([
             'judul' => $request->judul,
             'penulis' => $request->penulis,
             'genre' => $request->genre,
             'status' => $request->status,
+            'tahun_terbit' => $request->tahun_terbit,
+            'cetakan' => $request->cetakan,
         ]);
 
         return redirect()->route('katalog')->with('success', 'Data berhasil diupdate');
@@ -52,6 +63,8 @@ class BukuController extends Controller
             'genre' => 'required|string',
             'book_id' => 'required|string|max:50',
             'status' => 'required|string',
+            'tahun_terbit' => 'nullable|string|max:4',
+            'cetakan' => 'nullable|string|max:50',
             'cover_input' => 'nullable|image|max:2048'
         ]);
 
@@ -69,6 +82,8 @@ class BukuController extends Controller
                 'genre' => $request->genre,
                 'book_id' => $request->book_id,
                 'status' => $request->status,
+                'tahun_terbit' => $request->tahun_terbit,
+                'cetakan' => $request->cetakan,
                 'cover' => $coverName,
             ]);
 

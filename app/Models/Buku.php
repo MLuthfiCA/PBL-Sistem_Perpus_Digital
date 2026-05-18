@@ -16,6 +16,7 @@ class Buku extends Model
         'isbn',
         'penerbit',
         'tahun_terbit',
+        'cetakan',
         'kategori',
         'stok',
         'status',

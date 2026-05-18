@@ -143,9 +143,36 @@ Route::post('/pengajuan', [BukuController::class, 'storePeminjaman'])->name('pen
 
 
 // --- AREA ADMIN ---
-Route::get('/admin/about', function () {
-    return view('admin.pages.about');
-})->name('admin.about');
+Route::get('/admin/search', function (Request $request) {
+    $semuaBuku = getDummyBooks()->map(fn($item) => (object)$item);
+
+    $query = $request->input('query');
+
+        $category = $request->input('category');
+
+    if ($query || $category) {
+        $books = $semuaBuku->filter(function ($book) use ($query, $category) {
+            $matchQuery = true;
+            if ($query) {
+                $q = strtolower((string)$query);
+                $matchQuery = str_contains(strtolower((string)($book->judul ?? '')), $q) || 
+                              str_contains(strtolower((string)($book->book_id ?? '')), $q) ||
+                              str_contains(strtolower((string)($book->penulis ?? '')), $q) ||
+                              str_contains((string)($book->id ?? ''), $q);
+            }
+            
+            $matchCategory = !$category || strtolower((string)($book->genre ?? '')) === strtolower((string)$category);
+
+            return $matchQuery && $matchCategory;
+        });
+    } else {
+        $books = collect();
+    }
+
+    $categories = $semuaBuku->pluck('genre')->unique()->values();
+
+    return view('admin.pages.search', compact('books', 'categories'));
+})->name('admin.search');
 
 Route::prefix('admin')->group(function () {
 
