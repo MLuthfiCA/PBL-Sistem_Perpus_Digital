@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Peminjaman;
 use Illuminate\Database\Eloquent\Model;
 
 class Buku extends Model
