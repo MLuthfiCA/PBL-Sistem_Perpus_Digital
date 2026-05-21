@@ -61,7 +61,7 @@
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
         @forelse($books as $index => $book)
             <div class="glass-panel p-4 flex flex-col group animate-fade-up border-white/60" style="--delay: {{ $index * 100 }}ms; animation-delay: var(--delay);">
-                <a href="{{ route('katalog.detail', $book->id) }}" class="relative h-64 rounded-2xl mb-4 overflow-hidden bg-gradient-to-br from-red-50 to-rose-100 flex items-center justify-center border border-white/20 group-hover:shadow-2xl transition-all duration-500">
+                <a href="{{ route('katalog.detail', $book->buku_id) }}" class="relative h-64 rounded-2xl mb-4 overflow-hidden bg-gradient-to-br from-red-50 to-rose-100 flex items-center justify-center border border-white/20 group-hover:shadow-2xl transition-all duration-500">
                     @if(isset($book->cover))
                         <img src="{{ asset('images/'.$book->cover) }}" class="h-4/5 object-contain shadow-2xl transform group-hover:scale-110 group-hover:rotate-2 transition-transform duration-700" onerror=`this.src='{{ asset('images/readspace-library.png') }}'`>
                     @else
@@ -71,13 +71,13 @@
                     @endif
                 </a>
                 
-                <a href="{{ route('katalog.detail', $book->id) }}" class="group/title">
+                <a href="{{ route('katalog.detail', $book->buku_id) }}" class="group/title">
                     <h3 class="font-bold text-gray-800 line-clamp-1 mb-1 group-hover/title:text-burgundy-500 transition-colors">{{ $book->judul }}</h3>
                 </a>
                 <p class="text-xs text-gray-400 mb-6 font-medium">{{ $book->penulis }}</p>
                 
                 <div class="mt-auto">
-                    <a href="{{ route('katalog.detail', $book->id) }}" class="block text-center bg-burgundy-500 text-white py-3 rounded-2xl font-bold shadow-lg shadow-red-100 hover:bg-maroon transition-all">View Details</a>
+                    <a href="{{ route('katalog.detail', $book->buku_id) }}" class="block text-center bg-burgundy-500 text-white py-3 rounded-2xl font-bold shadow-lg shadow-red-100 hover:bg-maroon transition-all">View Details</a>
                 </div>
             </div>
         @empty

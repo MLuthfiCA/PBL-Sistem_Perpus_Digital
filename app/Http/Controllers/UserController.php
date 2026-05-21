@@ -15,6 +15,12 @@ class UserController extends Controller
         return view('admin.pages.users.index', compact('users'));
     }
 
+    // Show form for creating a new user
+    public function create()
+    {
+        return view('admin.pages.users.create');
+    }
+
     // Store new user
     public function store(Request $request)
     {
@@ -55,6 +61,12 @@ class UserController extends Controller
 
         $user->update($validated);
         return redirect()->route('admin.users.index')->with('success', 'User berhasil diperbarui');
+    }
+
+    public function show($id)
+    {
+        $user = User::findOrFail($id);
+        return view('admin.pages.users.edit', compact('user'));
     }
 
     public function edit($id)

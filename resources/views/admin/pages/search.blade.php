@@ -74,12 +74,12 @@
 
                 <!-- Admin Action Overlay (Desktop only) -->
                 <div class="absolute inset-0 bg-burgundy-900/40 opacity-0 md:group-hover:opacity-100 transition-opacity hidden md:flex items-center justify-center gap-3 backdrop-blur-[2px]">
-                    <a href="{{ route('admin.edit_buku', $buku->id) }}" class="p-3 bg-white rounded-xl text-burgundy-500 shadow-xl hover:scale-110 transition-transform" title="Edit Buku">
+                    <a href="{{ route('admin.edit_buku', $buku->buku_id) }}"class="p-3 bg-white rounded-xl text-burgundy-500 shadow-xl hover:scale-110 transition-transform" title="Edit Buku">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
                         </svg>
                     </a>
-                    <form action="{{ route('admin.delete', $buku->id) }}" method="POST" onsubmit="return confirm('Hapus buku ini dari katalog?')">
+                    <form action="{{ route('admin.delete', $buku->buku_id) }}" method="POST" onsubmit="return confirm('Hapus buku ini dari katalog?')">
                         @csrf
                         @method('DELETE')
                         <button type="submit" class="p-3 bg-white rounded-xl text-red-500 shadow-xl hover:scale-110 transition-transform" title="Hapus Buku">
@@ -96,12 +96,12 @@
             
             <div class="mt-auto pt-5 border-t border-red-50 flex items-center justify-between">
                 <span class="px-2 py-1 rounded bg-white/80 text-[10px] font-bold text-burgundy-500 uppercase tracking-tighter border border-red-100">{{ $buku->genre }}</span>
-                <span class="hidden md:inline text-[10px] font-bold text-gray-300 uppercase tracking-widest">ID: {{ $buku->book_id ?? '#00'.$buku->id }}</span>
-                
+                <span class="hidden md:inline text-[10px] font-bold text-gray-300 uppercase tracking-widest">ID: {{ $buku->buku_id ?? '#00'.$buku->bid }}</span>
+
                 <!-- Mobile Actions -->
                 <div class="flex md:hidden items-center gap-1.5">
-                    <a href="{{ route('admin.edit_buku', $buku->id) }}" class="text-burgundy-500 font-bold text-[10px] bg-red-50 px-2 py-1.5 rounded-lg border border-red-100 uppercase tracking-widest">Edit</a>
-                    <form action="{{ route('admin.delete', $buku->id) }}" method="POST" onsubmit="return confirm('Hapus buku ini dari katalog?')">
+                    <a href="{{ route('admin.edit_buku', $buku->buku_id) }}" class="text-burgundy-500 font-bold text-[10px] bg-red-50 px-2 py-1.5 rounded-lg border border-red-100 uppercase tracking-widest">Edit</a>
+                    <form action="{{ route('admin.delete', $buku->buku_id) }}" method="POST" onsubmit="return confirm('Hapus buku ini dari katalog?')">
                         @csrf
                         @method('DELETE')
                         <button type="submit" class="text-red-500 font-bold text-[10px] bg-red-50 px-2 py-1.5 rounded-lg border border-red-100 uppercase tracking-widest">Del</button>

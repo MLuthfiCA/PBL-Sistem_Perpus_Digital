@@ -41,7 +41,7 @@
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 md:gap-8">
             @forelse($Buku as $index => $buku)
             <x-ui.glass-card class="p-4 flex flex-col group animate-fade-up border-white/60" style="animation-delay: {{ $index * 100 }}ms">
-                <div class="relative h-64 rounded-2xl mb-5 overflow-hidden bg-gradient-to-br from-red-50 to-rose-100 flex items-center justify-center border border-white/20">
+                <a href="{{ route('admin.katalog.detail', $buku['id']) }}" class="relative h-64 rounded-2xl mb-5 overflow-hidden bg-gradient-to-br from-red-50 to-rose-100 flex items-center justify-center border border-white/20 block">
                     <!-- Real Image from images folder -->
                     <img src="{{ asset('images/' . ($buku['cover'] ?? 'readspace-library.png')) }}" 
                         class="h-4/5 object-contain shadow-2xl transform group-hover:scale-110 group-hover:rotate-2 transition-transform duration-700"
@@ -55,12 +55,18 @@
 
                     <!-- Admin Action Overlay (Desktop only) -->
                     <div class="absolute inset-0 bg-burgundy-900/40 opacity-0 md:group-hover:opacity-100 transition-opacity hidden md:flex items-center justify-center gap-3 backdrop-blur-[2px]">
-                        <a href="{{ route('admin.edit_buku', $buku['id']) }}" class="p-3 bg-white rounded-xl text-burgundy-500 shadow-xl hover:scale-110 transition-transform" title="Edit Buku">
+                        <span class="p-3 bg-white rounded-xl text-burgundy-500 shadow-xl hover:scale-110 transition-transform" title="Lihat Detail">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                            </svg>
+                        </span>
+                        <a href="{{ route('admin.edit_buku', $buku['id']) }}" class="p-3 bg-white rounded-xl text-burgundy-500 shadow-xl hover:scale-110 transition-transform" title="Edit Buku" onclick="event.stopPropagation()">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
                             </svg>
                         </a>
-                        <form action="{{ route('admin.delete', $buku['id']) }}" method="POST" onsubmit="return confirm('Hapus buku ini dari katalog?')">
+                        <form action="{{ route('admin.delete', $buku['id']) }}" method="POST" onsubmit="event.stopPropagation(); return confirm('Hapus buku ini dari katalog?')">
                             @csrf
                             @method('DELETE')
                             <button type="submit" class="p-3 bg-white rounded-xl text-red-500 shadow-xl hover:scale-110 transition-transform" title="Hapus Buku">
@@ -70,9 +76,9 @@
                             </button>
                         </form>
                     </div>
-                </div>
+                </a>
                 
-                <h3 class="font-bold text-gray-800 line-clamp-1 mb-1 text-lg group-hover:text-burgundy-500 transition-colors">{{ $buku['judul'] }}</h3>
+                <a href="{{ route('admin.katalog.detail', $buku['id']) }}" class="font-bold text-gray-800 line-clamp-1 mb-1 text-lg group-hover:text-burgundy-500 transition-colors block">{{ $buku['judul'] }}</a>
                 <p class="text-xs text-gray-400 mb-6 font-medium">{{ $buku['penulis'] }}</p>
                 
                 <div class="mt-auto pt-5 border-t border-red-50 flex items-center justify-between">
@@ -121,13 +127,13 @@
                         <tr class="group hover:bg-red-50/30 transition-colors duration-300">
                             <td class="px-8 py-6">
                                 <div class="flex items-center gap-5">
-                                    <div class="w-12 h-16 bg-white rounded-xl shadow-md flex items-center justify-center overflow-hidden border border-white group-hover:scale-110 transition-transform duration-500">
-                                        <img src="{{ asset('images/' . ($buku['cover'] ?? 'readspace-library.png')) }}" class="w-full h-full object-cover">
-                                    </div>
+                                    <a href="{{ route('admin.katalog.detail', $buku['id']) }}" class="w-12 h-16 bg-white rounded-xl shadow-md flex items-center justify-center overflow-hidden border border-white group-hover:scale-110 transition-transform duration-500">
+                                        <img src="{{ asset('images/' . ($buku['cover'] ?? 'readspace-library.png')) }}" class="w-full h-full object-cover" onerror="this.src='{{ asset('images/readspace-library.png') }}'">
+                                    </a>
                                     <div>
-                                        <span class="font-bold text-gray-800">{{ $buku['judul'] }}</span>
+                                        <a href="{{ route('admin.katalog.detail', $buku['id']) }}" class="font-bold text-gray-800 hover:text-burgundy-500 transition-colors">{{ $buku['judul'] }}</a>
                                         <p class="text-xs text-gray-400 font-medium">{{ $buku['penulis'] }}</p>
-                                        <span class="text-[10px] font-bold text-gray-300 uppercase tracking-widest mt-1 block">ID: {{ $buku['book_id'] ?? '#00'.$buku['id'] }}</span>
+                                        <span class="text-[10px] font-bold text-gray-300 uppercase tracking-widest mt-1 block">ID: {{ 'B-' . str_pad($buku['id'], 3, '0', STR_PAD_LEFT) }}</span>
                                     </div>
                                 </div>
                             </td>

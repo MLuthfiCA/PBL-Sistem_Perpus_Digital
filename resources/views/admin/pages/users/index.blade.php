@@ -10,6 +10,20 @@
         </a>
     </x-ui.page-header>
 
+    @if(session('success'))
+    <div class="flex items-center gap-3 px-6 py-4 bg-green-50 border border-green-200 rounded-2xl text-green-700 font-medium text-sm">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+        {{ session('success') }}
+    </div>
+    @endif
+
+    @if($errors->any())
+    <div class="flex items-start gap-3 px-6 py-4 bg-red-50 border border-red-200 rounded-2xl text-red-700 font-medium text-sm">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-red-500 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01M12 3a9 9 0 100 18A9 9 0 0012 3z"/></svg>
+        <ul class="list-disc list-inside">@foreach($errors->all() as $e)<li>{{ $e }}</li>@endforeach</ul>
+    </div>
+    @endif
+
     <div class="p-6 bg-white/80 rounded-2xl shadow-xl">
         <div class="overflow-x-auto">
             <table class="w-full text-left border-collapse">

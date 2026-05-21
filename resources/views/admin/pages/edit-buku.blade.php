@@ -18,7 +18,7 @@
     </div>
 
     <x-ui.glass-card class="p-8 border-white/60 shadow-2xl shadow-red-50">
-        <form action="{{ route('admin.update_buku', $buku['id']) }}" method="POST" enctype="multipart/form-data">
+        <form action="{{ route('admin.update', $buku['id']) }}" method="POST" enctype="multipart/form-data">
             @csrf
             @method('PUT')
             <div class="grid grid-cols-1 md:grid-cols-3 gap-8">

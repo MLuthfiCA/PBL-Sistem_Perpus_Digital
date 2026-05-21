@@ -174,6 +174,7 @@ Route::prefix('admin')->group(function () {
             return [
                 'id' => $buku->buku_id,
                 'buku_id' => $buku->buku_id,
+                'book_id' => $buku->buku_id,
                 'judul' => $buku->judul,
                 'penulis' => $buku->penulis,
                 'genre' => $buku->genre,
@@ -192,8 +193,9 @@ Route::prefix('admin')->group(function () {
         return view('admin.pages.katalog-admin', compact('Buku'));
     })->name('admin.katalog');
 
-    // Route edit, update, dan delete tetap seperti sebelumnya
-    Route::get('/katalog/{id}/edit', [BukuController::class, 'edit'])->name('admin.edit');
+    // Route detail, edit, update, dan delete
+    Route::get('/katalog/{id}', [BukuController::class, 'showAdmin'])->name('admin.katalog.detail');
+    Route::get('/katalog/{id}/edit', [BukuController::class, 'edit'])->name('admin.edit_buku');
     Route::put('/katalog/{id}', [BukuController::class, 'update'])->name('admin.update');
     Route::delete('/katalog/{id}', [BukuController::class, 'destroy'])->name('admin.delete');
     
@@ -208,14 +210,4 @@ Route::prefix('admin')->group(function () {
     Route::post('/peminjaman/{id}/bayar', [AdminController::class, 'bayarDenda'])->name('admin.peminjaman.bayar');
 });
 
-// --- ROUTE UNTUK HALAMAN EDIT BUKU ---
-Route::get('/admin/buku/{id}/edit', function ($id) {
-    $buku = Buku::where('buku_id', $id)->firstOrFail();
 
-    return view('admin.pages.edit-buku', compact('buku'));
-})->name('admin.edit_buku'); 
-
-// Route untuk proses updatenya
-Route::put('/admin/buku/{id}', function ($id) {
-    return redirect()->route('admin.katalog')->with('success', 'Buku berhasil diupdate!');
-})->name('admin.update_buku');

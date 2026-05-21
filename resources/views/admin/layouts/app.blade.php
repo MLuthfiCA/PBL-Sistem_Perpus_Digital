@@ -122,7 +122,7 @@
                         <ul class="space-y-4">
                             <li><a href="{{ route('admin.katalog') }}" class="text-gray-500 hover:text-burgundy-500 text-sm transition-colors">Dashboard</a></li>
                             <li><a href="{{ route('admin.buku.create') }}" class="text-gray-500 hover:text-burgundy-500 text-sm transition-colors">Add Book</a></li>
-                            <li><a href="{{ route('admin.users') }}" class="text-gray-500 hover:text-burgundy-500 text-sm transition-colors">User Data</a></li>
+                            <li><a href="{{ route('admin.users.index') }}" class="text-gray-500 hover:text-burgundy-500 text-sm transition-colors">User Data</a></li>
                             <li><a href="{{ route('admin.search') }}" class="text-gray-500 hover:text-burgundy-500 text-sm transition-colors">Search</a></li>
                         </ul>
                     </div>
