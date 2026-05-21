@@ -8,25 +8,25 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::create('borrowings', function (Blueprint $table) {
+        Schema::create('peminjaman', function (Blueprint $table) {
 
             // Primary key internal database
-            $table->id('borrowing_id');
+            $table->id('peminjaman_id');
 
             // Kode transaksi
-            $table->string('borrowing_code')->unique();
+            $table->string('kode_peminjaman')->unique();
 
             // Peminjam (mahasiswa)
             $table->foreignId('user_id')->constrained('users', 'user_id')->onDelete('cascade');
 
             // Tanggal pinjam
-            $table->date('borrowing_date');
+            $table->date('tanggal_pinjam');
 
             // Batas pengembalian
-            $table->date('return_limit');
+            $table->date('batas_kembali');
 
             // Tanggal kembali
-            $table->date('return_date')->nullable();
+            $table->date('tanggal_kembali')->nullable();
 
             // Status
             $table->enum('status', [
@@ -36,16 +36,16 @@ return new class extends Migration
             ])->default('borrowed');
 
             // Denda
-            $table->decimal('fine', 10, 2)->default(0);
+            $table->decimal('denda', 10, 2)->default(0);
 
             // Status pembayaran denda
-            $table->enum('fine_status', [
+            $table->enum('status_denda', [
                 'unpaid',
                 'paid'
             ])->default('unpaid');
 
             // Catatan
-            $table->text('notes')->nullable();
+            $table->text('catatan')->nullable();
 
             $table->timestamps();
 
@@ -56,6 +56,6 @@ return new class extends Migration
 
     public function down(): void
     {
-        Schema::dropIfExists('borrowings');
+        Schema::dropIfExists('peminjaman');
     }
 };

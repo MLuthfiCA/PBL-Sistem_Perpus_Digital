@@ -12,16 +12,19 @@ class Peminjaman extends Model
     use HasFactory;
 
     protected $table = 'peminjamans';
+    protected $primaryKey = 'peminjaman_id';
 
     protected $fillable = [
         'user_id',
         'buku_id',
+        'kode_peminjaman',
         'tanggal_pinjam',
         'batas_kembali',
         'tanggal_kembali',
         'status',
         'denda',
         'status_denda',
+        'catatan',
     ];
 
     public function user()

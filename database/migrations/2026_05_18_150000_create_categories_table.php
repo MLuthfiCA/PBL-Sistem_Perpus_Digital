@@ -8,19 +8,19 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::create('categories', function (Blueprint $table) {
+        Schema::create('kategori', function (Blueprint $table) {
 
             // Primary key internal database
-            $table->id('category_id');
+            $table->id('kategori_id');
 
             // Nama kategori
-            $table->string('name')->unique();
+            $table->string('nama_kategori')->unique();
 
             // Slug URL
             $table->string('slug')->unique();
 
             // Deskripsi kategori
-            $table->text('description')->nullable();
+            $table->text('deskripsi')->nullable();
 
             $table->timestamps();
 
@@ -31,6 +31,6 @@ return new class extends Migration
 
     public function down(): void
     {
-        Schema::dropIfExists('categories');
+        Schema::dropIfExists('kategori');
     }
 };

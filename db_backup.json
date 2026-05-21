@@ -1,0 +1,140 @@
+{
+    "buku": [
+        {
+            "id": 1,
+            "book_id": null,
+            "judul": "Laskar Pelangi",
+            "penulis": "Andrea Hirata",
+            "genre": "Drama",
+            "isbn": "978-979-3062-79-1",
+            "penerbit": "Bentang Pustaka",
+            "tahun_terbit": "2005",
+            "cetakan": null,
+            "kategori": "Novel",
+            "stok": 5,
+            "status": "Tersedia",
+            "deskripsi": null,
+            "cover": null,
+            "tampil_katalog": 1,
+            "created_at": "2026-04-27 06:13:34",
+            "updated_at": "2026-05-01 03:16:33"
+        },
+        {
+            "id": 2,
+            "book_id": null,
+            "judul": "Bumi",
+            "penulis": "Tere Liye",
+            "genre": "Fantasi",
+            "isbn": "978-602-03-3295-6",
+            "penerbit": "Gramedia Pustaka Utama",
+            "tahun_terbit": "2014",
+            "cetakan": null,
+            "kategori": "Novel",
+            "stok": 3,
+            "status": "Tersedia",
+            "deskripsi": null,
+            "cover": null,
+            "tampil_katalog": 1,
+            "created_at": "2026-04-27 06:13:34",
+            "updated_at": "2026-05-18 13:21:21"
+        },
+        {
+            "id": 3,
+            "book_id": null,
+            "judul": "Filosofi Teras",
+            "penulis": "Henry Manampiring",
+            "genre": "Self-Dev",
+            "isbn": "978-602-412-518-9",
+            "penerbit": "Kompas",
+            "tahun_terbit": "2018",
+            "cetakan": null,
+            "kategori": "Self Improvement",
+            "stok": 10,
+            "status": "Tersedia",
+            "deskripsi": null,
+            "cover": null,
+            "tampil_katalog": 1,
+            "created_at": "2026-04-27 06:13:34",
+            "updated_at": "2026-04-27 06:13:34"
+        }
+    ],
+    "peminjamans": [
+        {
+            "id": 1,
+            "user_id": 1,
+            "buku_id": 3,
+            "tanggal_pinjam": "2026-04-17",
+            "batas_kembali": "2026-04-24",
+            "tanggal_kembali": "2026-04-24",
+            "status": "dikembalikan",
+            "denda": 0,
+            "status_denda": "lunas",
+            "created_at": "2026-04-27 06:13:34",
+            "updated_at": "2026-04-27 06:13:34"
+        },
+        {
+            "id": 2,
+            "user_id": 1,
+            "buku_id": 1,
+            "tanggal_pinjam": "2026-04-22",
+            "batas_kembali": "2026-04-29",
+            "tanggal_kembali": "2026-05-01",
+            "status": "dikembalikan",
+            "denda": 0,
+            "status_denda": "lunas",
+            "created_at": "2026-04-27 06:13:34",
+            "updated_at": "2026-05-01 03:16:33"
+        },
+        {
+            "id": 3,
+            "user_id": 1,
+            "buku_id": 2,
+            "tanggal_pinjam": "2026-04-27",
+            "batas_kembali": "2026-05-04",
+            "tanggal_kembali": "2026-05-18",
+            "status": "dikembalikan",
+            "denda": 75000,
+            "status_denda": "lunas",
+            "created_at": "2026-04-27 06:13:34",
+            "updated_at": "2026-05-18 13:21:27"
+        }
+    ],
+    "users": [
+        {
+            "id": 1,
+            "username": "rayyan123",
+            "name": "Rayyan",
+            "email": "rayyan@student.polibatam.ac.id",
+            "email_verified_at": null,
+            "password": "$2y$12$w8zfDFuV5gBvziMW8X0sX.s9XmmHdp94\/HtTDk0\/ojO.NdHzAGcFq",
+            "role": "mahasiswa",
+            "remember_token": null,
+            "created_at": "2026-04-27 06:03:58",
+            "updated_at": "2026-04-27 06:03:58"
+        },
+        {
+            "id": 2,
+            "username": "admin",
+            "name": "Admin Readspace",
+            "email": "admin@readspace.com",
+            "email_verified_at": null,
+            "password": "$2y$12$43aI91WpKks8CKNkq0.sA.y8Kw.ivYppLcAEqHM7BsTpqr8v6fVI2",
+            "role": "admin",
+            "remember_token": null,
+            "created_at": "2026-05-10 09:30:44",
+            "updated_at": "2026-05-10 09:30:44"
+        },
+        {
+            "id": 3,
+            "username": "student",
+            "name": "Student Readspace",
+            "email": "student@readspace.com",
+            "email_verified_at": null,
+            "password": "$2y$12$VqSB6yLGk6y\/ctuq.vWPMO2Bil4AgJnT1US7N3ZspVm.BdHsFOY8O",
+            "role": "mahasiswa",
+            "remember_token": null,
+            "created_at": "2026-05-10 09:30:45",
+            "updated_at": "2026-05-10 09:30:45"
+        }
+    ]
+}

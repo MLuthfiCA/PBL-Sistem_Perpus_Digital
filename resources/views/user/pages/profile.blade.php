@@ -37,8 +37,8 @@
             @forelse($peminjaman ?? [] as $p)
             @php /** @var \App\Models\Peminjaman $p */ @endphp
             <div class="glass-panel p-6 border-white/60 shadow-lg shadow-red-50 hover:shadow-xl transition-all group border-l-4 border-l-burgundy-500">
-                <h3 class="font-bold text-gray-800 text-lg mb-1">{{ $p->buku->judul }}</h3>
-                <p class="text-xs text-gray-400 font-medium mb-4">Book ID: #{{ $p->buku->id }}</p>
+                <h3 class="font-bold text-gray-800 text-lg mb-1">{{ $p->buku?->judul ?? 'Unknown Book' }}</h3>
+                <p class="text-xs text-gray-400 font-medium mb-4">Book ID: #{{ $p->buku?->buku_id ?? $p->buku?->id ?? 'N/A' }}</p>
                 
                 <div class="flex justify-between items-center text-sm border-t border-red-50 pt-4">
                     <div>
@@ -103,8 +103,8 @@
                         @php /** @var \App\Models\Peminjaman $k */ @endphp
                         <tr class="hover:bg-red-50/30 transition-colors">
                             <td class="px-8 py-6">
-                                <p class="font-bold text-gray-800">{{ $k->buku->judul }}</p>
-                                <p class="text-[10px] text-gray-400">{{ $k->buku->penulis }}</p>
+                                <p class="font-bold text-gray-800">{{ $k->buku?->judul ?? 'Unknown Book' }}</p>
+                                <p class="text-[10px] text-gray-400">{{ $k->buku?->penulis ?? 'Unknown Author' }}</p>
                             </td>
                             <td class="px-8 py-6 text-sm text-gray-500 font-medium">#{{ $k->id }}</td>
                             <td class="px-8 py-6 text-center">

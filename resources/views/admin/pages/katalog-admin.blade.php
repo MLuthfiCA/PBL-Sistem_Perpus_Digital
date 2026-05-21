@@ -45,11 +45,12 @@
                     <!-- Real Image from images folder -->
                     <img src="{{ asset('images/' . ($buku['cover'] ?? 'readspace-library.png')) }}" 
                         class="h-4/5 object-contain shadow-2xl transform group-hover:scale-110 group-hover:rotate-2 transition-transform duration-700"
-                        onerror="this.src='{{ asset('images/readspace-library.png') }}'">
+                        data-fallback="{{ asset('images/readspace-library.png') }}"
+                        onerror="this.src=this.dataset.fallback" alt="Book Cover">
                     
                     <!-- Availability Badge -->
                     <div class="absolute top-4 right-4 px-3 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-widest backdrop-blur-xl {{ $buku['status'] == 'Tersedia' ? 'bg-green-500/10 text-green-600 border border-green-200' : 'bg-red-500/10 text-red-600 border border-red-200' }}">
-                        {{ $buku['status'] == 'Tersedia' ? 'AVAILABLE' : 'BORROWED' }}
+                        {{ $buku['status'] == 'Tersedia' ? 'TERSEDIA' : 'DIPINJAM' }}
                     </div>
 
                     <!-- Admin Action Overlay (Desktop only) -->

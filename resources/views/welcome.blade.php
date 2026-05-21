@@ -155,5 +155,32 @@
             data: {
                 labels: ['Self-Dev', 'Technology', 'Literature', 'Psychology'],
                 datasets: [{
-                    data
+                    data: [25, 18, 15, 22],
+                    backgroundColor: ['#800020', '#800000', '#9C27B0', '#FF69B4'],
+                    borderColor: '#fff',
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            color: '#666',
+                            font: { size: 12, weight: 'bold' }
+                        }
+                    },
+                    datalabels: {
+                        color: '#fff',
+                        font: { weight: 'bold' }
+                    }
+                }
+            }
+        });
+    });
+</script>
+
+@endsection
                     

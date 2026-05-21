@@ -38,7 +38,7 @@
                     
                     <!-- Availability Badge -->
                     <div class="absolute top-4 right-4 px-3 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-widest backdrop-blur-xl {{ $buku['status'] == 'Tersedia' ? 'bg-green-500/10 text-green-600 border border-green-200' : 'bg-red-500/10 text-red-600 border border-red-200' }}">
-                        {{ $buku['status'] == 'Tersedia' ? 'AVAILABLE' : 'BORROWED' }}
+                        {{ $buku['status'] == 'Tersedia' ? 'TERSEDIA' : 'DIPINJAM' }}
                     </div>
                 </a>
                 
@@ -101,7 +101,7 @@
                                 <div class="flex items-center gap-2.5">
                                     <div class="w-2.5 h-2.5 rounded-full {{ $buku['status'] == 'Tersedia' ? 'bg-green-500 shadow-lg shadow-green-200' : 'bg-red-400 shadow-lg shadow-red-100' }}"></div>
                                     <span class="text-sm font-bold {{ $buku['status'] == 'Tersedia' ? 'text-green-600' : 'text-red-400' }}">
-                                        {{ $buku['status'] == 'Tersedia' ? 'Available' : 'Borrowed' }}
+                                        {{ $buku['status'] == 'Tersedia' ? 'TERSEDIA' : 'DIPINJAM' }}
                                     </span>
                                 </div>
                             </td>

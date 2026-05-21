@@ -11,17 +11,18 @@ class BorrowingDetail extends Model
 {
     use HasFactory;
 
-    protected $primaryKey = 'borrowing_detail_id';
+    protected $table = 'borrowing_details';
+    protected $primaryKey = 'detail_peminjaman_id';
 
     protected $fillable = [
-        'borrowing_id',
-        'book_id',
-        'quantity',
-        'due_date',
-        'return_condition',
-        'fine_per_item',
-        'returned_at',
-        'notes',
+        'peminjaman_id',
+        'buku_id',
+        'jumlah',
+        'batas_kembali_buku',
+        'kondisi_kembali',
+        'denda_per_item',
+        'dikembalikan_pada',
+        'catatan',
     ];
 
     // =========================

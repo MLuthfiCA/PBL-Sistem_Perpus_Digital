@@ -10,49 +10,65 @@ use App\Models\Peminjaman;
 class BukuController extends Controller
 {
     public function edit($id)
-{
-    $Buku = collect([
-        ['id' => 1, 'judul' => 'Laskar Pelangi', 'penulis' => 'Andrea Hirata', 'genre' => 'Drama'],
-        ['id' => 2, 'judul' => 'Bumi', 'penulis' => 'Tere Liye', 'genre' => 'Fantasi'],
-    ]);
-
-    $buku = $Buku->firstWhere('id', $id);
-
-    return view('admin.pages.edit-buku', compact('buku'));
-}
+    {
+        $buku = Buku::where('buku_id', $id)->firstOrFail();
+        
+        // Transform ke array untuk view
+        return view('admin.pages.edit-buku', [
+            'buku' => [
+                'id' => $buku->buku_id,
+                'buku_id' => $buku->buku_id,
+                'judul' => $buku->judul,
+                'penulis' => $buku->penulis,
+                'genre' => $buku->genre,
+                'isbn' => $buku->isbn,
+                'penerbit' => $buku->penerbit,
+                'tahun_terbit' => $buku->tahun_terbit,
+                'cetakan' => $buku->cetakan,
+                'bahasa' => $buku->bahasa,
+                'status' => $buku->status,
+                'cover' => $buku->cover,
+                'stok' => $buku->stok,
+            ]
+        ]);
+    }
 
     public function update(Request $request, $id)
     {
-        $buku = Buku::findOrFail($id);
+        $buku = Buku::where('buku_id', $id)->firstOrFail();
 
-        $request->validate([
+        // Validate book data
+        $validated = $request->validate([
             'judul' => 'required|string|max:255',
             'penulis' => 'required|string|max:255',
-            'book_id' => 'required|string|max:50',
-            'genre' => 'required|string',
-            'status' => 'required|string',
+            'isbn' => 'nullable|string|max:50',
+            'genre' => 'required|string|max:255',
+            'penerbit' => 'nullable|string|max:255',
             'tahun_terbit' => 'nullable|string|max:4',
-            'cetakan' => 'nullable|string|max:50',
-            'bahasa' => 'nullable|string|max:100',
+            'cetakan' => 'nullable|string|max:255',
+            'bahasa' => 'nullable|string|max:255',
+            'stok' => 'nullable|integer|min:0',
+            'status' => 'required|in:Tersedia,Dipinjam',
+            'deskripsi' => 'nullable|string',
+            'cover' => 'nullable|image|max:2048',
         ]);
 
-        $buku->update([
-            'judul' => $request->judul,
-            'penulis' => $request->penulis,
-            'book_id' => $request->book_id,
-            'genre' => $request->genre,
-            'status' => $request->status,
-            'tahun_terbit' => $request->tahun_terbit,
-            'cetakan' => $request->cetakan,
-            'bahasa' => $request->bahasa,
-        ]);
+        // Handle cover upload if present
+        if ($request->hasFile('cover')) {
+            $coverName = time() . '_' . $request->file('cover')->getClientOriginalName();
+            $request->file('cover')->move(public_path('images'), $coverName);
+            $validated['cover'] = $coverName;
+        }
 
-        return redirect()->route('katalog')->with('success', 'Data berhasil diupdate');
+        // Update the book record
+        $buku->update($validated);
+
+        return redirect()->route('admin.katalog')->with('success', 'Data berhasil diupdate');
     }
 
     public function destroy($id)
     {
-        $buku = Buku::findOrFail($id);
+        $buku = Buku::where('buku_id', $id)->firstOrFail();
         $buku->delete();
 
         return redirect()->route('katalog')->with('success', 'Data berhasil dihapus');
@@ -65,12 +81,14 @@ class BukuController extends Controller
             'penulis' => 'required|string|max:255',
             'penerbit' => 'nullable|string|max:255',
             'genre' => 'required|string',
-            'book_id' => 'required|string|max:50',
             'status' => 'required|string',
             'tahun_terbit' => 'nullable|string|max:4',
             'cetakan' => 'nullable|string|max:50',
             'bahasa' => 'nullable|string|max:100',
-            'cover_input' => 'nullable|image|max:2048'
+            'isbn' => 'nullable|string|max:50',
+            'cover_input' => 'nullable|image|max:2048',
+            'deskripsi' => 'nullable|string',
+            'stok' => 'nullable|integer|min:1'
         ]);
 
         try {
@@ -85,19 +103,23 @@ class BukuController extends Controller
                 'penulis' => $request->penulis,
                 'penerbit' => $request->penerbit,
                 'genre' => $request->genre,
-                'book_id' => $request->book_id,
                 'status' => $request->status,
                 'tahun_terbit' => $request->tahun_terbit,
                 'cetakan' => $request->cetakan,
                 'bahasa' => $request->bahasa ?? 'Indonesia',
+                'isbn' => $request->isbn,
+                'kategori_id' => 1, // Default category ID
                 'cover' => $coverName,
+                'deskripsi' => $request->deskripsi,
+                'stok' => $request->stok ?? 1,
+                'tampil_katalog' => true,
             ]);
 
+            return redirect()->route('admin.katalog')->with('success', 'Buku berhasil ditambahkan!');
         } catch (\Exception $e) {
-            // If DB connection fails, simulate success anyway for the UI demo
+            \Log::error('Store buku error: ' . $e->getMessage());
+            return back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
         }
-
-        return redirect()->route('admin.katalog')->with('success', 'Buku berhasil ditambahkan!');
     }
     public function index()
 {
@@ -108,7 +130,7 @@ class BukuController extends Controller
     public function storePeminjaman(Request $request)
     {
         $request->validate([
-            'buku_id' => 'required',
+            'buku_id' => 'required|integer',
             'tanggal_pinjam' => 'required|date',
         ]);
 
@@ -116,30 +138,36 @@ class BukuController extends Controller
         if (!$user) return redirect('/login');
 
         try {
-            // Check if book is already borrowed
             $buku = Buku::findOrFail($request->buku_id);
-            if ($buku->status === 'Dipinjam') {
-                return back()->with('error', 'Buku sedang dipinjam.');
+            $userId = $user['id'] ?? null;
+            
+            if (!$userId) {
+                return back()->with('error', 'User tidak ditemukan. Silakan login kembali.');
             }
 
-            $userId = $user['id'] ?? 1;
+            $tanggalKembali = date('Y-m-d', strtotime($request->tanggal_pinjam . ' + 7 days'));
 
             $peminjaman = Peminjaman::create([
                 'user_id' => $userId,
                 'buku_id' => $request->buku_id,
                 'tanggal_pinjam' => $request->tanggal_pinjam,
-                'batas_kembali' => date('Y-m-d', strtotime($request->tanggal_pinjam . ' + 7 days')),
+                'batas_kembali' => $tanggalKembali,
                 'status' => 'dipinjam',
                 'denda' => 0,
                 'status_denda' => 'lunas',
             ]);
 
-            // Update book status
-            $buku->update(['status' => 'Dipinjam']);
-        } catch (\Exception $e) {
-            // Ignore DB error for UI mock mode
-        }
+            // Update book stock and status if needed
+            if ($buku->stok > 0) {
+                $buku->update([
+                    'stok' => $buku->stok - 1,
+                ]);
+            }
 
-        return redirect()->back()->with('success', 'Peminjaman berhasil diajukan! Silakan temui admin.');
+            return redirect()->back()->with('success', 'Peminjaman berhasil diajukan! Silakan temui admin.');
+        } catch (\Exception $e) {
+            \Log::error('Peminjaman error: ' . $e->getMessage());
+            return back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
+        }
     }
 }

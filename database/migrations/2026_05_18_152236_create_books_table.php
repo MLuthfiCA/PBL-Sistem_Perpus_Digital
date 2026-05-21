@@ -8,19 +8,19 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::create('books', function (Blueprint $table) {
+        Schema::create('buku', function (Blueprint $table) {
 
             // Primary key internal database
-            $table->id('book_id');
+            $table->id('buku_id');
 
             // Judul buku
-            $table->string('title');
+            $table->string('judul');
 
             // Slug URL
             $table->string('slug')->unique();
 
             // Penulis
-            $table->string('author');
+            $table->string('penulis');
 
             // Genre
             $table->string('genre')->nullable();
@@ -29,28 +29,34 @@ return new class extends Migration
             $table->string('isbn')->unique();
 
             // Penerbit
-            $table->string('publisher');
+            $table->string('penerbit');
 
             // Tahun terbit
-            $table->year('publication_year');
+            $table->year('tahun_terbit');
 
             // Relasi kategori
-            $table->foreignId('category_id')->constrained('categories', 'category_id')->onDelete('cascade');
+            $table->foreignId('kategori_id')->constrained('kategori', 'kategori_id')->onDelete('cascade');
 
             // Bahasa
-            $table->string('language');
+            $table->string('bahasa');
+
+            // Cetakan (tambahan)
+            $table->string('cetakan')->nullable();
 
             // Deskripsi
-            $table->text('description')->nullable();
+            $table->text('deskripsi')->nullable();
 
             // Cover buku
             $table->string('cover')->nullable();
 
             // Lokasi rak
-            $table->string('rack_location')->nullable();
+            $table->string('lokasi_rak')->nullable();
 
             // Stok buku
-            $table->integer('stock')->default(1);
+            $table->integer('stok')->default(1);
+
+            // Tampil Katalog (tambahan)
+            $table->boolean('tampil_katalog')->default(true);
 
             // Status buku
             $table->enum('status', [
@@ -69,6 +75,6 @@ return new class extends Migration
 
     public function down(): void
     {
-        Schema::dropIfExists('books');
+        Schema::dropIfExists('buku');
     }
 };

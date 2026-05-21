@@ -10,19 +10,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\LoginController;
 use App\Http\Controllers\BukuController;
 use App\Http\Controllers\AdminController;
-
-function getDummyBooks() {
-    return collect([
-        ['id' => 1, 'book_id' => 'B001', 'judul' => 'Laskar Pelangi', 'penulis' => 'Andrea Hirata', 'genre' => 'Drama', 'status' => 'Tersedia', 'cover' => 'Laskar_Pelangi_Sampul.jpg', 'tahun_terbit' => '2005', 'cetakan' => 'Cetakan Pertama', 'bahasa' => 'Indonesia'],
-        ['id' => 2, 'book_id' => 'B002', 'judul' => 'Filosofi Teras', 'penulis' => 'Henry Manampiring', 'genre' => 'Self-Dev', 'status' => 'Dipinjam', 'cover' => 'filosofi_teras.webp', 'tahun_terbit' => '2018', 'cetakan' => 'Cetakan Ketiga', 'bahasa' => 'Indonesia'],
-        ['id' => 3, 'book_id' => 'B003', 'judul' => 'Akuntansi Dasar', 'penulis' => 'Erlangga', 'genre' => 'Edukasi', 'status' => 'Tersedia', 'cover' => 'Cover_akutansi.jpg', 'tahun_terbit' => '2020', 'cetakan' => 'Cetakan Pertama', 'bahasa' => 'Indonesia'],
-        ['id' => 4, 'book_id' => 'B004', 'judul' => 'Hujan', 'penulis' => 'Tere Liye', 'genre' => 'Romance', 'status' => 'Tersedia', 'cover' => 'cover_hujan.jpg', 'tahun_terbit' => '2016', 'cetakan' => 'Cetakan Ke-12', 'bahasa' => 'Indonesia'],
-        ['id' => 5, 'book_id' => 'B005', 'judul' => 'Bandung After Rain', 'penulis' => 'Viva.co', 'genre' => 'Romance', 'status' => 'Tersedia', 'cover' => 'bandung.after.rain.jpg', 'tahun_terbit' => '2019', 'cetakan' => 'Cetakan Kedua', 'bahasa' => 'Indonesia'],
-        ['id' => 6, 'book_id' => 'B006', 'judul' => 'AI For Everyone', 'penulis' => 'Andrew Ng', 'genre' => 'Technology', 'status' => 'Tersedia', 'cover' => 'cover_AI.byerlangga.jpg', 'tahun_terbit' => '2021', 'cetakan' => 'Cetakan Pertama', 'bahasa' => 'Inggris (Terjemahan)'],
-        ['id' => 7, 'book_id' => 'B007', 'judul' => 'Malioboro at Midnight', 'penulis' => 'Skysphire', 'genre' => 'Romance', 'status' => 'Dipinjam', 'cover' => 'maliboro.cover.jpg', 'tahun_terbit' => '2023', 'cetakan' => 'Cetakan Pertama', 'bahasa' => 'Indonesia'],
-        ['id' => 8, 'book_id' => 'B008', 'judul' => 'Bumi', 'penulis' => 'Tere Liye', 'genre' => 'Fantasi', 'status' => 'Tersedia', 'cover' => 'cover_buku_bumi.jpg', 'tahun_terbit' => '2014', 'cetakan' => 'Cetakan Keenam', 'bahasa' => 'Indonesia'],
-    ]);
-}
+use App\Models\Buku;
 
 Route::get('/', function () {
     if (session()->has('user')) {
@@ -38,9 +26,10 @@ Route::get('/profile', [RiwayatController::class, 'tampilkanRiwayat'])->name('pr
 
 Route::get('/admin/profile', [AdminController::class, 'profile'])->name('admin.profile');
 
-Route::get('/admin/users', function () {
-    return view('admin.pages.datauser'); 
-})->name('admin.users');
+    // Admin User Management Routes
+Route::prefix('admin')->as('admin.')->group(function () {
+    Route::resource('users', \App\Http\Controllers\UserController::class);
+});
 
 // --- GUEST & AUTH ROUTES ---
 
@@ -70,57 +59,69 @@ Route::post('/logout', function (Request $request) {
 
 // --- USER / MAHASISWA ROUTES ---
 Route::get('/katalog', function (Request $request) {
-    $semuaBuku = getDummyBooks();
-
     $query = $request->input('query');
+    
+    $bukuQuery = Buku::where('tampil_katalog', true);
+    
     if ($query) {
-        $hasilBuku = $semuaBuku->filter(function ($item) use ($query) {
-            return str_contains(strtolower($item['judul']), strtolower($query)) || 
-                   str_contains(strtolower($item['penulis']), strtolower($query)) ||
-                   str_contains(strtolower($item['genre']), strtolower($query));
+        $bukuQuery->where(function ($q) use ($query) {
+            $q->where('judul', 'like', '%' . $query . '%')
+              ->orWhere('penulis', 'like', '%' . $query . '%')
+              ->orWhere('genre', 'like', '%' . $query . '%');
         });
-    } else {
-        $hasilBuku = $semuaBuku;
     }
-    return view('user.pages.katalog', ['daftarBuku' => $hasilBuku]);
+    
+    $hasilBuku = $bukuQuery->get();
+    $daftarBuku = $hasilBuku->map(function($buku) {
+        return [
+            'id' => $buku->buku_id,
+            'buku_id' => $buku->buku_id,
+            'judul' => $buku->judul,
+            'penulis' => $buku->penulis,
+            'genre' => $buku->genre,
+            'isbn' => $buku->isbn,
+            'penerbit' => $buku->penerbit,
+            'tahun_terbit' => $buku->tahun_terbit,
+            'cetakan' => $buku->cetakan,
+            'bahasa' => $buku->bahasa,
+            'status' => $buku->status,
+            'cover' => $buku->cover,
+            'stok' => $buku->stok,
+            'deskripsi' => $buku->deskripsi,
+        ];
+    });
+    
+    return view('user.pages.katalog', ['daftarBuku' => $daftarBuku]);
 })->name('katalog');
 
 // Route Search Mahasiswa 
 Route::get('/search', function (Request $request) {
-    $semuaBuku = getDummyBooks()->map(fn($item) => (object)$item);
-
     $query = $request->input('query');
     $category = $request->input('category');
-
-    if ($query || $category) {
-        $books = $semuaBuku->filter(function ($book) use ($query, $category) {
-            $matchQuery = true;
-            if ($query) {
-                $matchQuery = str_contains(strtolower($book->judul), strtolower($query)) || 
-                              str_contains(strtolower($book->penulis), strtolower($query)) ||
-                              str_contains(strtolower($book->genre), strtolower($query));
-            }
-            
-            $matchCategory = !$category || strtolower($book->genre) === strtolower($category);
-
-            return $matchQuery && $matchCategory;
+    
+    $bukuQuery = Buku::where('tampil_katalog', true);
+    
+    if ($query) {
+        $bukuQuery->where(function ($q) use ($query) {
+            $q->where('judul', 'like', '%' . $query . '%')
+              ->orWhere('penulis', 'like', '%' . $query . '%')
+              ->orWhere('genre', 'like', '%' . $query . '%');
         });
-    } else {
-        $books = collect(); 
     }
-
-    $categories = $semuaBuku->pluck('genre')->unique()->values();
+    
+    if ($category) {
+        $bukuQuery->where('genre', $category);
+    }
+    
+    $books = $bukuQuery->get();
+    $categories = Buku::where('tampil_katalog', true)->distinct('genre')->pluck('genre');
 
     return view('user.pages.search', compact('books', 'categories'));
 })->name('search');
 
 Route::get('/katalog/{id}', function ($id) {
-    $buku = getDummyBooks()->firstWhere('id', (int)$id);
+    $buku = Buku::where('buku_id', $id)->firstOrFail();
     
-    if (!$buku) {
-        abort(404);
-    }
-
     return view('user.pages.detail-buku', compact('buku'));
 })->name('katalog.detail');
 
@@ -141,32 +142,26 @@ Route::post('/pengajuan', [BukuController::class, 'storePeminjaman'])->name('pen
 
 // --- AREA ADMIN ---
 Route::get('/admin/search', function (Request $request) {
-    $semuaBuku = getDummyBooks()->map(fn($item) => (object)$item);
-
     $query = $request->input('query');
-
-        $category = $request->input('category');
-
-    if ($query || $category) {
-        $books = $semuaBuku->filter(function ($book) use ($query, $category) {
-            $matchQuery = true;
-            if ($query) {
-                $q = strtolower((string)$query);
-                $matchQuery = str_contains(strtolower((string)($book->judul ?? '')), $q) || 
-                              str_contains(strtolower((string)($book->book_id ?? '')), $q) ||
-                              str_contains(strtolower((string)($book->penulis ?? '')), $q) ||
-                              str_contains((string)($book->id ?? ''), $q);
-            }
-            
-            $matchCategory = !$category || strtolower((string)($book->genre ?? '')) === strtolower((string)$category);
-
-            return $matchQuery && $matchCategory;
+    $category = $request->input('category');
+    
+    $bukuQuery = Buku::query();
+    
+    if ($query) {
+        $bukuQuery->where(function ($q) use ($query) {
+            $q->where('judul', 'like', '%' . $query . '%')
+              ->orWhere('penulis', 'like', '%' . $query . '%')
+              ->orWhere('genre', 'like', '%' . $query . '%')
+              ->orWhere('isbn', 'like', '%' . $query . '%');
         });
-    } else {
-        $books = collect();
     }
-
-    $categories = $semuaBuku->pluck('genre')->unique()->values();
+    
+    if ($category) {
+        $bukuQuery->where('genre', $category);
+    }
+    
+    $books = $bukuQuery->get();
+    $categories = Buku::distinct('genre')->pluck('genre');
 
     return view('admin.pages.search', compact('books', 'categories'));
 })->name('admin.search');
@@ -175,9 +170,25 @@ Route::prefix('admin')->group(function () {
 
     // DATA BUKU HARUS DI DALAM SINI
     Route::get('/katalog', function () {
-        $Buku = getDummyBooks();
+        $Buku = Buku::all()->map(function($buku) {
+            return [
+                'id' => $buku->buku_id,
+                'buku_id' => $buku->buku_id,
+                'judul' => $buku->judul,
+                'penulis' => $buku->penulis,
+                'genre' => $buku->genre,
+                'isbn' => $buku->isbn,
+                'penerbit' => $buku->penerbit,
+                'tahun_terbit' => $buku->tahun_terbit,
+                'cetakan' => $buku->cetakan,
+                'bahasa' => $buku->bahasa,
+                'status' => $buku->status,
+                'cover' => $buku->cover,
+                'stok' => $buku->stok,
+                'deskripsi' => $buku->deskripsi,
+            ];
+        })->toArray();
 
-        // Mengirimkan variabel $Buku ke view
         return view('admin.pages.katalog-admin', compact('Buku'));
     })->name('admin.katalog');
 
@@ -199,11 +210,7 @@ Route::prefix('admin')->group(function () {
 
 // --- ROUTE UNTUK HALAMAN EDIT BUKU ---
 Route::get('/admin/buku/{id}/edit', function ($id) {
-    $buku = getDummyBooks()->firstWhere('id', (int)$id);
-
-    if (!$buku) {
-        abort(404);
-    }
+    $buku = Buku::where('buku_id', $id)->firstOrFail();
 
     return view('admin.pages.edit-buku', compact('buku'));
 })->name('admin.edit_buku'); 

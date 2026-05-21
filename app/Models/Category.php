@@ -2,7 +2,7 @@
 
 namespace App\Models;
 
-use App\Models\Book;
+use App\Models\Buku;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
@@ -10,19 +10,22 @@ class Category extends Model
 {
     use HasFactory;
 
-    protected $primaryKey = 'category_id';
+    protected $table = 'kategori';
+    protected $primaryKey = 'kategori_id';
+    public $timestamps = true;
 
     protected $fillable = [
-        'name',
-        'description',
+        'nama_kategori',
+        'slug',
+        'deskripsi',
     ];
 
     // =========================
     // RELATIONSHIPS
     // =========================
 
-    public function books()
+    public function buku()
     {
-        return $this->hasMany(Book::class, 'category_id', 'category_id');
+        return $this->hasMany(Buku::class, 'kategori_id', 'kategori_id');
     }
 }

@@ -60,10 +60,10 @@
     <!-- Results -->
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
         @forelse($books as $index => $book)
-            <div class="glass-panel p-4 flex flex-col group animate-fade-up border-white/60" style="animation-delay: {{ $index * 100 }}ms">
+            <div class="glass-panel p-4 flex flex-col group animate-fade-up border-white/60" style="--delay: {{ $index * 100 }}ms; animation-delay: var(--delay);">
                 <a href="{{ route('katalog.detail', $book->id) }}" class="relative h-64 rounded-2xl mb-4 overflow-hidden bg-gradient-to-br from-red-50 to-rose-100 flex items-center justify-center border border-white/20 group-hover:shadow-2xl transition-all duration-500">
                     @if(isset($book->cover))
-                        <img src="{{ asset('images/'.$book->cover) }}" class="h-4/5 object-contain shadow-2xl transform group-hover:scale-110 group-hover:rotate-2 transition-transform duration-700" onerror="this.src='{{ asset('images/readspace-library.png') }}'">
+                        <img src="{{ asset('images/'.$book->cover) }}" class="h-4/5 object-contain shadow-2xl transform group-hover:scale-110 group-hover:rotate-2 transition-transform duration-700" onerror=`this.src='{{ asset('images/readspace-library.png') }}'`>
                     @else
                         <div class="w-20 h-28 bg-white shadow-2xl rounded-sm flex items-center justify-center text-3xl font-bold text-red-100">
                             {{ substr($book->judul, 0, 1) }}

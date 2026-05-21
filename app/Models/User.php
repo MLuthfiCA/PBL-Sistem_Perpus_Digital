@@ -16,12 +16,18 @@ class User extends Authenticatable
 {
     use HasFactory, Notifiable;
 
+    protected $table = 'users';
+    protected $primaryKey = 'user_id';
+    public $timestamps = true;
+
     protected $fillable = [
-        'name',
+        'full_name',
         'email',
         'password',
         'username',
         'role',
+        'identity_number',
+        'status',
     ];
 
     protected $hidden = [
@@ -29,16 +35,18 @@ class User extends Authenticatable
         'remember_token',
     ];
 
-    protected function casts(): array
+    protected $casts = [
+        'email_verified_at' => 'datetime',
+        'password' => 'hashed',
+    ];
+
+    public function getNameAttribute(): string
     {
-        return [
-            'email_verified_at' => 'datetime',
-            'password' => 'hashed',
-        ];
+        return $this->full_name;
     }
 
     public function peminjamans()
     {
-        return $this->hasMany(Peminjaman::class);
+        return $this->hasMany(Peminjaman::class, 'user_id', 'user_id');
     }
 }

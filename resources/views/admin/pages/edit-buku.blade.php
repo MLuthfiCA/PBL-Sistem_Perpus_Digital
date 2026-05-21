@@ -17,7 +17,7 @@
         </div>
     </div>
 
-    <div class="glass-panel p-8 border-white/60 shadow-2xl shadow-red-50">
+    <x-ui.glass-card class="p-8 border-white/60 shadow-2xl shadow-red-50">
         <form action="{{ route('admin.update_buku', $buku['id']) }}" method="POST" enctype="multipart/form-data">
             @csrf
             @method('PUT')
@@ -32,13 +32,17 @@
                     
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
                         <div>
+                        <div>
                             <label class="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2 ml-1">Author</label>
                             <input type="text" name="penulis" value="{{ $buku['penulis'] }}" required
                                 class="w-full px-4 py-3.5 border border-white bg-white/50 rounded-2xl focus:outline-none focus:ring-4 focus:ring-red-100 font-medium text-sm transition-all">
                         </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
                         <div>
-                            <label class="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2 ml-1">Book ID</label>
-                            <input type="text" name="book_id" value="{{ $buku['book_id'] ?? '' }}" required
+                            <label class="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2 ml-1">Publisher</label>
+                            <input type="text" name="penerbit" value="{{ $buku['penerbit'] ?? '' }}" placeholder="Publisher Name"
                                 class="w-full px-4 py-3.5 border border-white bg-white/50 rounded-2xl focus:outline-none focus:ring-4 focus:ring-red-100 font-medium text-sm transition-all">
                         </div>
                     </div>
@@ -114,6 +118,6 @@
 
             </div>
         </form>
-    </div>
+    </x-ui.glass-card>
 </div>
 @endsection

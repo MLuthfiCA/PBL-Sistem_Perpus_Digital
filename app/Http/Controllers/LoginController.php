@@ -16,16 +16,33 @@ class LoginController extends Controller
             'role'     => 'required'
         ]);
 
+        // Map form role ke database role
+        $roleMap = [
+            'mahasiswa' => 'student',
+            'student' => 'student',
+            'admin' => 'admin'
+        ];
+        
+        $databaseRole = $roleMap[$request->role] ?? $request->role;
+
         // MELAKUKAN LOGIN ASLI KE DATABASE
-        if (Auth::attempt(['username' => $request->username, 'password' => $request->password, 'role' => $request->role])) {
+        // Try dengan username terlebih dahulu
+        if (Auth::attempt(['username' => $request->username, 'password' => $request->password])) {
             $user = Auth::user();
+            
+            // Verify role matches
+            if ($user->role !== $databaseRole) {
+                Auth::logout();
+                return back()->withErrors(['login_error' => 'Username dan role tidak sesuai.']);
+            }
             
             // Simpan data esensial ke session agar sesuai dengan arsitektur saat ini
             session(['user' => [
-                'id' => $user->id,
-                'name' => $user->name,
+                'id' => $user->user_id,
+                'name' => $user->full_name,
                 'role' => $user->role,
-                'username' => $user->username
+                'username' => $user->username,
+                'email' => $user->email,
             ]]);
 
             if ($user->role == 'admin') {
@@ -36,6 +53,6 @@ class LoginController extends Controller
         }
 
         // Jika username/password salah
-        return back()->withErrors(['login_error' => 'Invalid username, password, or role. Only registered accounts can log in.']);
+        return back()->withErrors(['login_error' => 'Username atau password salah. Silakan coba lagi.']);
     }
 }

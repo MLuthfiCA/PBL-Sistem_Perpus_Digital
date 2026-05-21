@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 use App\Models\Peminjaman;
+use App\Models\User;
 use Illuminate\Http\Request;
 
 class RiwayatController extends Controller
@@ -13,11 +14,24 @@ class RiwayatController extends Controller
 
         $userId = $user['id'] ?? 1;
 
-        // Fetch active loans
-        $peminjaman = collect([]);
+        try {
+            // Fetch active loans (dipinjam)
+            $peminjaman = Peminjaman::where('user_id', $userId)
+                ->where('status', 'dipinjam')
+                ->with('buku')
+                ->get();
 
-        // Fetch return history
-        $pengembalian = collect([]);
+            // Fetch return history (dikembalikan)
+            $pengembalian = Peminjaman::where('user_id', $userId)
+                ->where('status', 'dikembalikan')
+                ->with('buku')
+                ->orderBy('updated_at', 'desc')
+                ->get();
+        } catch (\Exception $e) {
+            // Jika database error, gunakan empty collection
+            $peminjaman = collect([]);
+            $pengembalian = collect([]);
+        }
 
         return view('user.pages.profile', compact('peminjaman', 'pengembalian'));
     }

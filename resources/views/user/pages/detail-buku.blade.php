@@ -23,7 +23,7 @@
                     <img src="{{ asset('images/' . ($buku['cover'] ?? 'readspace-library.png')) }}" 
                         alt="{{ $buku['judul'] }}"
                         class="h-full object-contain shadow-2xl rounded-lg transform group-hover:scale-105 transition-transform duration-700"
-                        onerror="this.src='{{ asset('images/readspace-library.png') }}'">
+                        onerror=`this.src='{{ asset('images/readspace-library.png') }}'`>
                 </div>
 
                 <!-- Status Badge Floating -->

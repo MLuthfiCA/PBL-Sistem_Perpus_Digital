@@ -67,7 +67,7 @@
                     
                     <div class="col-span-3 flex items-center gap-4">
                         <div class="w-12 h-16 bg-gray-100 rounded-md border border-gray-200 flex-shrink-0 flex items-center justify-center text-gray-300 overflow-hidden">
-                            @if($b->buku->cover)
+                            @if($b->buku?->cover)
                                 <img src="{{ asset('images/' . $b->buku->cover) }}" class="w-full h-full object-cover" onerror="this.src='{{ asset('images/readspace-library.png') }}'">
                             @else
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -76,8 +76,8 @@
                             @endif
                         </div>
                         <div>
-                            <h3 class="font-bold text-gray-800 text-sm line-clamp-1">{{ $b->buku->judul }}</h3>
-                            <p class="text-[10px] text-gray-400 font-medium mt-0.5">{{ $b->buku->penulis }}</p>
+                            <h3 class="font-bold text-gray-800 text-sm line-clamp-1">{{ $b->buku?->judul ?? 'Unknown Book' }}</h3>
+                            <p class="text-[10px] text-gray-400 font-medium mt-0.5">{{ $b->buku?->penulis ?? 'Unknown Author' }}</p>
                         </div>
                     </div>
 
@@ -85,10 +85,10 @@
                         <span class="md:hidden text-[10px] font-bold text-gray-400 uppercase">Peminjam:</span>
                         <div class="flex items-center gap-2 px-3 py-1.5 rounded-full border border-gray-100 w-fit bg-white shadow-sm">
                             <div class="w-5 h-5 rounded-full bg-burgundy-500 text-white flex items-center justify-center text-[10px] font-bold">
-                                {{ substr($b->user->name, 0, 1) }}
+                                {{ substr($b->user?->name ?? $b->user?->full_name ?? 'U', 0, 1) }}
                             </div>
                             <div>
-                                <p class="font-semibold text-gray-700 text-xs">{{ $b->user->name }}</p>
+                                <p class="font-semibold text-gray-700 text-xs">{{ $b->user?->name ?? $b->user?->full_name ?? 'Unknown User' }}</p>
                             </div>
                         </div>
                     </div>

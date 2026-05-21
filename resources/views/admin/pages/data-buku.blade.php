@@ -34,25 +34,20 @@
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
                             <label class="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2 ml-1">Genre</label>
-                            <select name="genre" class="w-full px-4 py-3 border border-white bg-white/50 rounded-2xl focus:outline-none focus:ring-4 focus:ring-red-100 font-medium text-sm">
+                            <select name="genre" required class="w-full px-4 py-3 border border-white bg-white/50 rounded-2xl focus:outline-none focus:ring-4 focus:ring-red-100 font-medium text-sm">
+                                <option value="">Select Genre</option>
                                 <option value="Drama">Drama</option>
                                 <option value="Fantasi">Fantasy</option>
                                 <option value="Self-Dev">Self-Dev</option>
                                 <option value="Romance">Romance</option>
                                 <option value="Edukasi">Education</option>
+                                <option value="Technology">Technology</option>
                             </select>
                         </div>
                         <div>
-                            <label class="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2 ml-1">Book ID</label>
-                            <input type="text" name="book_id" required value="{{ old('book_id') }}" placeholder="Book 001" class="w-full px-4 py-3 border border-white bg-white/50 rounded-2xl focus:outline-none focus:ring-4 focus:ring-red-100 font-medium text-sm @error('book_id') border-red-500 @enderror">
-                            
-                            @error('book_id')
-                                <span class="text-[10px] text-red-500 font-bold ml-1">{{ $message }}</span>
-                            @enderror
-                        </div>
-                        <div>
                             <label class="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2 ml-1">Status</label>
-                            <select name="status" class="w-full px-4 py-3 border border-white bg-white/50 rounded-2xl focus:outline-none focus:ring-4 focus:ring-red-100 font-medium text-sm">
+                            <select name="status" required class="w-full px-4 py-3 border border-white bg-white/50 rounded-2xl focus:outline-none focus:ring-4 focus:ring-red-100 font-medium text-sm">
+                                <option value="">Select Status</option>
                                 <option value="Tersedia">Available</option>
                                 <option value="Dipinjam">Borrowed</option>
                             </select>
@@ -68,6 +63,10 @@
                         <div>
                             <label class="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2 ml-1">Language / Translation (Bahasa)</label>
                             <input type="text" name="bahasa" placeholder="e.g., Indonesia atau Terjemahan Inggris" class="w-full px-4 py-3 border border-white bg-white/50 rounded-2xl focus:outline-none focus:ring-4 focus:ring-red-100 font-medium text-sm">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2 ml-1">Stock</label>
+                            <input type="number" name="stok" min="1" value="1" placeholder="Number of books" class="w-full px-4 py-3 border border-white bg-white/50 rounded-2xl focus:outline-none focus:ring-4 focus:ring-red-100 font-medium text-sm">
                         </div>
                     </div>
                     <div class="pt-6">
