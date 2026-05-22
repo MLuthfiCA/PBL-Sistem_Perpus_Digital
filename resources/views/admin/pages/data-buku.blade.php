@@ -170,6 +170,14 @@
 
                     </div>
 
+                        <!-- DESCRIPTION -->
+                        <div>
+                            <label class="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2 ml-1">
+                                Description
+                            </label>
+                            <textarea name="deskripsi" rows="5" placeholder="Write a short description about the book" class="w-full px-4 py-3 border border-white bg-white/50 rounded-2xl focus:outline-none focus:ring-4 focus:ring-red-100 font-medium text-sm"></textarea>
+                        </div>
+
                     <!-- BUTTON -->
                     <div class="pt-6">
                         <button type="submit"

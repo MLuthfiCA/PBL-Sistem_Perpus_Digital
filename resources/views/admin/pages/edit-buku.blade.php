@@ -90,30 +90,40 @@
                             Save Changes
                         </button>
                     </div>
+                    
+                    <!-- DESCRIPTION -->
+                    <div>
+                        <label class="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2 ml-1">Description</label>
+                        <textarea name="deskripsi" rows="5" class="w-full px-4 py-3.5 border border-white bg-white/50 rounded-2xl focus:outline-none focus:ring-4 focus:ring-red-100 font-medium text-sm transition-all" placeholder="Write a short description for this book">{{ $buku['deskripsi'] ?? '' }}</textarea>
+                    </div>
                 </div>
 
-                <div class="w-full flex flex-col space-y-4">
-                    <label class="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2 ml-1">Book Cover</label>
-                    <div class="flex-1 min-h-[320px] bg-red-50/30 border-2 border-dashed border-red-100 rounded-3xl flex flex-col items-center justify-center p-6 relative group overflow-hidden transition-all hover:bg-red-50/50">
+                <div class="w-full flex flex-col">
+
+                    <label class="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2 ml-1">
+                        Book Cover
+                    </label>
+
+                    <label for="cover_input" class="cursor-pointer flex-1 min-h-[300px] border-2 border-dashed border-gray-300 bg-white/50 rounded-3xl flex flex-col items-center justify-center hover:bg-gray-50 hover:border-red-200 transition-all group relative overflow-hidden">
+
+                        <input type="file" name="cover" id="cover_input" class="hidden" accept="image/*">
+
                         @if(isset($buku['cover']) && $buku['cover'])
-                            <img src="{{ asset('images/' . $buku['cover']) }}" alt="Cover" class="max-h-[320px] md:max-h-[420px] w-full object-contain rounded-xl shadow-xl transition-transform group-hover:scale-105">
+                            <img src="{{ asset('images/' . $buku['cover']) }}" alt="Cover" class="w-full h-full object-contain">
                         @else
-                            <div class="text-center text-red-200">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-20 w-20 mx-auto mb-4 opacity-50" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                                </svg>
-                                <p class="font-bold text-sm text-red-300">No cover yet</p>
+                            <div class="text-center group-hover:scale-105 transition-transform">
+                                <div class="w-16 h-16 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-4 text-burgundy-500 group-hover:bg-red-100 transition-colors">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+                                    </svg>
+                                </div>
+
+                                <p class="text-sm font-bold text-gray-500 group-hover:text-burgundy-500 transition-colors">Upload / Replace Cover</p>
                             </div>
                         @endif
-                        
-                        <div class="absolute inset-0 bg-burgundy-900/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                            <label for="cover_input" class="cursor-pointer px-6 py-3 bg-white rounded-xl text-burgundy-500 font-bold text-sm shadow-xl hover:scale-105 transition-transform">
-                                Replace Cover
-                                <input type="file" id="cover_input" name="cover" class="hidden" accept="image/*">
-                            </label>
-                        </div>
-                    </div>
-                    <p class="text-[10px] text-gray-400 text-center uppercase tracking-widest">Click on the image to change the cover</p>
+
+                    </label>
+
                 </div>
 
             </div>
