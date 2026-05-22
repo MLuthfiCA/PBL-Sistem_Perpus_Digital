@@ -9,10 +9,30 @@ use Illuminate\Support\Facades\Hash;
 class UserController extends Controller
 {
     // Display list of users in admin panel
-    public function index()
+    public function index(Request $request)
     {
-        $users = User::all();
-        return view('admin.pages.users.index', compact('users'));
+        $search = $request->get('search', '');
+        $roleFilter = $request->get('role', '');
+        
+        $query = User::query();
+        
+        // Search by name, username, email, or identity number
+        if ($search) {
+            $query->where(function($q) use ($search) {
+                $q->where('full_name', 'like', "%$search%")
+                  ->orWhere('username', 'like', "%$search%")
+                  ->orWhere('email', 'like', "%$search%")
+                  ->orWhere('identity_number', 'like', "%$search%");
+            });
+        }
+        
+        // Filter by role
+        if ($roleFilter && $roleFilter !== 'all') {
+            $query->where('role', $roleFilter);
+        }
+        
+        $users = $query->get();
+        return view('admin.pages.users.index', compact('users', 'search', 'roleFilter'));
     }
 
     // Show form for creating a new user
@@ -32,6 +52,8 @@ class UserController extends Controller
             'password' => 'required|string|min:6',
             'role' => 'required|in:admin,student',
             'status' => 'required|in:active,inactive,suspended',
+        ], [
+            'identity_number.unique' => 'ID Number sudah terdaftar. Tidak bisa menambahkan data dengan ID Number yang sama.',
         ]);
 
         $validated['password'] = Hash::make($validated['password']);

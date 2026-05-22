@@ -5,24 +5,35 @@
 @section('content')
 <div class="py-10 space-y-8" x-data="{}">
     <x-ui.page-header title="Add User" subtitle="Form to add a new user"></x-ui.page-header>
+
+    @if($errors->any())
+    <div class="p-6 bg-red-50 border border-red-200 rounded-2xl text-red-700 font-medium text-sm">
+        <ul class="list-disc list-inside">
+            @foreach($errors->all() as $error)
+                <li>{{ $error }}</li>
+            @endforeach
+        </ul>
+    </div>
+    @endif
+
     <div class="p-6 bg-white/80 rounded-2xl shadow-xl">
         <form action="{{ route('admin.users.store') }}" method="POST" class="grid grid-cols-1 md:grid-cols-2 gap-6">
             @csrf
             <div>
                 <label class="block text-sm font-bold text-gray-700 mb-1">Full Name</label>
-                <input type="text" name="full_name" class="w-full px-4 py-2.5 border rounded" required>
+                <input type="text" name="full_name" value="{{ old('full_name') }}" class="w-full px-4 py-2.5 border rounded" required>
             </div>
             <div>
                 <label class="block text-sm font-bold text-gray-700 mb-1">Identity Number</label>
-                <input type="text" name="identity_number" class="w-full px-4 py-2.5 border rounded" required>
+                <input type="text" name="identity_number" value="{{ old('identity_number') }}" class="w-full px-4 py-2.5 border rounded" required>
             </div>
             <div>
                 <label class="block text-sm font-bold text-gray-700 mb-1">Username</label>
-                <input type="text" name="username" class="w-full px-4 py-2.5 border rounded" required>
+                <input type="text" name="username" value="{{ old('username') }}" class="w-full px-4 py-2.5 border rounded" required>
             </div>
             <div>
                 <label class="block text-sm font-bold text-gray-700 mb-1">Email</label>
-                <input type="email" name="email" class="w-full px-4 py-2.5 border rounded" required>
+                <input type="email" name="email" value="{{ old('email') }}" class="w-full px-4 py-2.5 border rounded" required>
             </div>
             <div>
                 <label class="block text-sm font-bold text-gray-700 mb-1">Password</label>
@@ -31,16 +42,16 @@
             <div>
                 <label class="block text-sm font-bold text-gray-700 mb-1">Role</label>
                 <select name="role" class="w-full px-4 py-2.5 border rounded" required>
-                    <option value="admin">Admin</option>
-                    <option value="student">Student</option>
+                    <option value="admin" {{ old('role') === 'admin' ? 'selected' : '' }}>Admin</option>
+                    <option value="student" {{ old('role') === 'student' ? 'selected' : '' }}>Student</option>
                 </select>
             </div>
             <div>
                 <label class="block text-sm font-bold text-gray-700 mb-1">Status</label>
                 <select name="status" class="w-full px-4 py-2.5 border rounded" required>
-                    <option value="active">Active</option>
-                    <option value="inactive">Inactive</option>
-                    <option value="suspended">Suspended</option>
+                    <option value="active" {{ old('status') === 'active' ? 'selected' : '' }}>Active</option>
+                    <option value="inactive" {{ old('status') === 'inactive' ? 'selected' : '' }}>Inactive</option>
+                    <option value="suspended" {{ old('status') === 'suspended' ? 'selected' : '' }}>Suspended</option>
                 </select>
             </div>
             <div class="col-span-2 flex justify-end space-x-4">
