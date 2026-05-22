@@ -13,6 +13,14 @@ class BukuController extends Controller
     {
         $buku = Buku::where('buku_id', $id)->firstOrFail();
 
+        // Map enum status ke Indonesian
+        $statusMap = [
+            'available' => 'Tersedia',
+            'borrowed' => 'Dipinjam',
+            'lost' => 'Hilang',
+            'maintenance' => 'Perawatan',
+        ];
+
         return view('admin.pages.detail-buku', [
             'buku' => [
                 'id' => $buku->buku_id,
@@ -26,10 +34,11 @@ class BukuController extends Controller
                 'tahun_terbit' => $buku->tahun_terbit,
                 'cetakan' => $buku->cetakan,
                 'bahasa' => $buku->bahasa,
-                'status' => $buku->status,
+                'status' => $statusMap[$buku->status] ?? $buku->status,
                 'cover' => $buku->cover,
                 'stok' => $buku->stok,
                 'deskripsi' => $buku->deskripsi,
+                'kategori' => $buku->category?->nama_kategori ?? null,
             ]
         ]);
     }
@@ -37,6 +46,14 @@ class BukuController extends Controller
     public function edit($id)
     {
         $buku = Buku::where('buku_id', $id)->firstOrFail();
+
+        // Map enum status ke Indonesian
+        $statusMap = [
+            'available' => 'Tersedia',
+            'borrowed' => 'Dipinjam',
+            'lost' => 'Hilang',
+            'maintenance' => 'Perawatan',
+        ];
 
         return view('admin.pages.edit-buku', [
             'buku' => [
@@ -50,7 +67,7 @@ class BukuController extends Controller
                 'tahun_terbit' => $buku->tahun_terbit,
                 'cetakan' => $buku->cetakan,
                 'bahasa' => $buku->bahasa,
-                'status' => $buku->status,
+                'status' => $statusMap[$buku->status] ?? $buku->status,
                 'cover' => $buku->cover,
                 'stok' => $buku->stok,
                 'deskripsi' => $buku->deskripsi,
@@ -62,7 +79,13 @@ class BukuController extends Controller
     {
         $buku = Buku::where('buku_id', $id)->firstOrFail();
 
+        $messages = [
+            'buku_id.unique' => 'Kode ID buku sudah ada. Silakan gunakan ID lain atau kosongkan field untuk auto-generate.',
+            'buku_id.integer' => 'ID buku harus berupa angka.',
+        ];
+
         $validated = $request->validate([
+            'buku_id' => 'nullable|integer|unique:buku,buku_id,' . $buku->buku_id . ',buku_id',
             'judul' => 'required|string|max:255',
             'penulis' => 'required|string|max:255',
             'isbn' => 'required|string|max:50',
@@ -75,7 +98,15 @@ class BukuController extends Controller
             'status' => 'required|in:Tersedia,Dipinjam',
             'deskripsi' => 'nullable|string',
             'cover' => 'nullable|image|max:2048',
-        ]);
+        ], $messages);
+
+        // Map Indonesian status to enum values
+        $statusMap = [
+            'Tersedia' => 'available',
+            'Dipinjam' => 'borrowed',
+        ];
+        
+        $validated['status'] = $statusMap[$validated['status']] ?? 'available';
 
         // Upload cover baru
         if ($request->hasFile('cover')) {
@@ -110,7 +141,15 @@ class BukuController extends Controller
 
     public function store(Request $request)
     {
+        // validation with custom messages handled below
+
+        $messages = [
+            'buku_id.unique' => 'Kode ID buku sudah ada. Silakan gunakan ID lain atau kosongkan field untuk auto-generate.',
+            'buku_id.integer' => 'ID buku harus berupa angka.',
+        ];
+
         $request->validate([
+            'buku_id' => 'nullable|integer|unique:buku,buku_id',
             'judul' => 'required|string|max:255',
             'penulis' => 'required|string|max:255',
             'penerbit' => 'nullable|string|max:255',
@@ -123,10 +162,9 @@ class BukuController extends Controller
             'cover' => 'nullable|image|max:2048',
             'deskripsi' => 'nullable|string',
             'stok' => 'nullable|integer|min:1'
-        ]);
+        ], $messages);
 
         try {
-
             $coverName = null;
 
             // Upload cover
@@ -140,12 +178,22 @@ class BukuController extends Controller
                 );
             }
 
-            Buku::create([
+            // Map Indonesian status to enum values
+            $statusMap = [
+                'Tersedia' => 'available',
+                'Dipinjam' => 'borrowed',
+            ];
+
+            // Generate slug from judul
+            $slug = \Illuminate\Support\Str::slug($request->judul, '-');
+
+            $data = [
                 'judul' => $request->judul,
+                'slug' => $slug,
                 'penulis' => $request->penulis,
                 'penerbit' => $request->penerbit,
                 'genre' => $request->genre,
-                'status' => $request->status,
+                'status' => $statusMap[$request->status] ?? 'available',
                 'tahun_terbit' => $request->tahun_terbit,
                 'cetakan' => $request->cetakan,
                 'bahasa' => $request->bahasa ?? 'Indonesia',
@@ -155,7 +203,14 @@ class BukuController extends Controller
                 'deskripsi' => $request->deskripsi,
                 'stok' => $request->stok ?? 1,
                 'tampil_katalog' => true,
-            ]);
+            ];
+
+            // Allow optional manual buku_id if provided
+            if ($request->filled('buku_id')) {
+                $data['buku_id'] = (int) $request->buku_id;
+            }
+
+            Buku::create($data);
 
             return redirect()
                 ->route('admin.katalog')

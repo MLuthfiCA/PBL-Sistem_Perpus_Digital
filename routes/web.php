@@ -60,9 +60,16 @@ Route::post('/logout', function (Request $request) {
 // --- USER / MAHASISWA ROUTES ---
 Route::get('/katalog', function (Request $request) {
     $query = $request->input('query');
-    
+
+    $statusMap = [
+        'available' => 'Tersedia',
+        'borrowed' => 'Dipinjam',
+        'lost' => 'Hilang',
+        'maintenance' => 'Perawatan',
+    ];
+
     $bukuQuery = Buku::where('tampil_katalog', true);
-    
+
     if ($query) {
         $bukuQuery->where(function ($q) use ($query) {
             $q->where('judul', 'like', '%' . $query . '%')
@@ -70,9 +77,10 @@ Route::get('/katalog', function (Request $request) {
               ->orWhere('genre', 'like', '%' . $query . '%');
         });
     }
-    
-    $hasilBuku = $bukuQuery->get();
-    $daftarBuku = $hasilBuku->map(function($buku) {
+
+    $paginator = $bukuQuery->orderBy('buku_id', 'desc')->paginate(8);
+
+    $paginator->getCollection()->transform(function($buku) use ($statusMap) {
         return [
             'id' => $buku->buku_id,
             'buku_id' => $buku->buku_id,
@@ -84,20 +92,27 @@ Route::get('/katalog', function (Request $request) {
             'tahun_terbit' => $buku->tahun_terbit,
             'cetakan' => $buku->cetakan,
             'bahasa' => $buku->bahasa,
-            'status' => $buku->status,
+            'status' => $statusMap[$buku->status] ?? $buku->status,
             'cover' => $buku->cover,
             'stok' => $buku->stok,
             'deskripsi' => $buku->deskripsi,
         ];
     });
-    
-    return view('user.pages.katalog', ['daftarBuku' => $daftarBuku]);
+
+    return view('user.pages.katalog', ['daftarBuku' => $paginator]);
 })->name('katalog');
 
 // Route Search Mahasiswa 
 Route::get('/search', function (Request $request) {
     $query = $request->input('query');
     $category = $request->input('category');
+    
+    $statusMap = [
+        'available' => 'Tersedia',
+        'borrowed' => 'Dipinjam',
+        'lost' => 'Hilang',
+        'maintenance' => 'Perawatan',
+    ];
     
     $bukuQuery = Buku::where('tampil_katalog', true);
     
@@ -113,7 +128,10 @@ Route::get('/search', function (Request $request) {
         $bukuQuery->where('genre', $category);
     }
     
-    $books = $bukuQuery->get();
+    $books = $bukuQuery->get()->map(function($buku) use ($statusMap) {
+        $buku->status = $statusMap[$buku->status] ?? $buku->status;
+        return $buku;
+    });
     $categories = Buku::where('tampil_katalog', true)->distinct('genre')->pluck('genre');
 
     return view('user.pages.search', compact('books', 'categories'));
@@ -145,6 +163,13 @@ Route::get('/admin/search', function (Request $request) {
     $query = $request->input('query');
     $category = $request->input('category');
     
+    $statusMap = [
+        'available' => 'Tersedia',
+        'borrowed' => 'Dipinjam',
+        'lost' => 'Hilang',
+        'maintenance' => 'Perawatan',
+    ];
+    
     $bukuQuery = Buku::query();
     
     if ($query) {
@@ -160,7 +185,10 @@ Route::get('/admin/search', function (Request $request) {
         $bukuQuery->where('genre', $category);
     }
     
-    $books = $bukuQuery->get();
+    $books = $bukuQuery->get()->map(function($buku) use ($statusMap) {
+        $buku->status = $statusMap[$buku->status] ?? $buku->status;
+        return $buku;
+    });
     $categories = Buku::distinct('genre')->pluck('genre');
 
     return view('admin.pages.search', compact('books', 'categories'));
@@ -168,9 +196,18 @@ Route::get('/admin/search', function (Request $request) {
 
 Route::prefix('admin')->group(function () {
 
-    // DATA BUKU HARUS DI DALAM SINI
+    // DATA BUKU HARUS DI DALAM SINI (Paginated)
     Route::get('/katalog', function () {
-        $Buku = Buku::all()->map(function($buku) {
+        $statusMap = [
+            'available' => 'Tersedia',
+            'borrowed' => 'Dipinjam',
+            'lost' => 'Hilang',
+            'maintenance' => 'Perawatan',
+        ];
+
+        $paginator = Buku::orderBy('buku_id', 'desc')->paginate(8);
+
+        $paginator->getCollection()->transform(function($buku) use ($statusMap) {
             return [
                 'id' => $buku->buku_id,
                 'buku_id' => $buku->buku_id,
@@ -183,14 +220,14 @@ Route::prefix('admin')->group(function () {
                 'tahun_terbit' => $buku->tahun_terbit,
                 'cetakan' => $buku->cetakan,
                 'bahasa' => $buku->bahasa,
-                'status' => $buku->status,
+                'status' => $statusMap[$buku->status] ?? $buku->status,
                 'cover' => $buku->cover,
                 'stok' => $buku->stok,
                 'deskripsi' => $buku->deskripsi,
             ];
-        })->toArray();
+        });
 
-        return view('admin.pages.katalog-admin', compact('Buku'));
+        return view('admin.pages.katalog-admin', ['Buku' => $paginator]);
     })->name('admin.katalog');
 
     // Route detail, edit, update, dan delete

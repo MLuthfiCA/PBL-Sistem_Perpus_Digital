@@ -23,6 +23,12 @@
                 Table
             </button>
         </div>
+
+        <div class="col-span-full mt-6">
+            @if(isset($daftarBuku) && method_exists($daftarBuku, 'links'))
+                <div class="flex justify-center text-gray-700">{{ $daftarBuku->links() }}</div>
+            @endif
+        </div>
     </x-ui.page-header>
 
     <!-- Grid View -->

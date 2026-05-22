@@ -21,9 +21,78 @@
 
             @csrf
 
+            @if(session('success'))
+            <div class="mb-4 p-3 rounded-lg bg-green-50 border border-green-100 text-green-700">
+                {{ session('success') }}
+            </div>
+            @endif
+
+            @if(session('error'))
+            <div class="mb-4 p-3 rounded-lg bg-red-50 border border-red-100 text-red-700">
+                {{ session('error') }}
+            </div>
+            @endif
+
+            @if($errors->any())
+            <div class="mb-4 p-3 rounded-lg bg-yellow-50 border border-yellow-100 text-yellow-700">
+                <ul class="list-disc list-inside text-sm">
+                    @foreach($errors->all() as $err)
+                        <li>{{ $err }}</li>
+                    @endforeach
+                </ul>
+            </div>
+            @endif
+
             <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
 
-                <!-- LEFT SIDE -->
+                <!-- COVER LEFT -->
+                <div class="md:col-span-1 w-full flex flex-col">
+
+                    <label class="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2 ml-1">
+                        Book Cover
+                    </label>
+
+                    <label for="cover_input"
+                        class="cursor-pointer flex-1 min-h-[300px] border-2 border-dashed border-gray-300 bg-white/50 rounded-3xl flex flex-col items-center justify-center hover:bg-gray-50 hover:border-red-200 transition-all group relative overflow-hidden">
+
+                        <!-- FIXED -->
+                        <input type="file" name="cover" id="cover_input" class="hidden" accept="image/*">
+                        <img id="cover_preview" src="{{ asset('images/readspace-library.png') }}" alt="Cover Preview" class="w-full h-full object-contain">
+
+                        <div class="text-center group-hover:scale-105 transition-transform">
+
+                            <div class="w-16 h-16 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-4 text-burgundy-500 group-hover:bg-red-100 transition-colors">
+
+                                <svg xmlns="http://www.w3.org/2000/svg" 
+                                     class="h-8 w-8" 
+                                     fill="none" 
+                                     viewBox="0 0 24 24" 
+                                     stroke="currentColor">
+
+                                    <path stroke-linecap="round" 
+                                          stroke-linejoin="round" 
+                                          stroke-width="2" 
+                                          d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+
+                                </svg>
+
+                            </div>
+
+                            <p class="text-sm font-bold text-gray-500 group-hover:text-burgundy-500 transition-colors">
+                                Upload Cover
+                            </p>
+
+                            <p class="text-[10px] text-gray-400 mt-1 uppercase tracking-wider">
+                                JPG, PNG max 2MB
+                            </p>
+
+                        </div>
+
+                    </label>
+
+                </div>
+
+                <!-- RIGHT SIDE (FORM) -->
                 <div class="md:col-span-2 space-y-6">
 
                     <!-- JUDUL -->
@@ -80,6 +149,15 @@
                                class="w-full px-4 py-3 border border-white bg-white/50 rounded-2xl focus:outline-none focus:ring-4 focus:ring-red-100 font-medium text-sm">
                     </div>
 
+                    <!-- OPTIONAL BOOK ID -->
+                    <div>
+                        <label class="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2 ml-1">
+                            Book ID (Optional)
+                        </label>
+                        <input type="number" name="buku_id" min="1" placeholder="Optional — leave blank to auto-generate"
+                            class="w-48 px-4 py-3 border border-white bg-white/50 rounded-2xl focus:outline-none focus:ring-4 focus:ring-red-100 font-medium text-sm">
+                    </div>
+
                     <!-- GRID -->
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
 
@@ -124,15 +202,11 @@
                             <label class="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2 ml-1">
                                 Publication Year
                             </label>
+                            <input type="text" name="tahun_terbit" placeholder="e.g., 2024"
+                                class="w-full px-4 py-3 border border-white bg-white/50 rounded-2xl focus:outline-none focus:ring-4 focus:ring-red-100 font-medium text-sm">
 
-                            <input type="text" 
-                                   name="tahun_terbit"
-                                   placeholder="e.g. 2024"
-                                   class="w-full px-4 py-3 border border-white bg-white/50 rounded-2xl focus:outline-none focus:ring-4 focus:ring-red-100 font-medium text-sm">
-                        </div>
-
-                        <!-- CETAKAN -->
-                        <div>
+                            <!-- CETAKAN -->
+                            <div>
                             <label class="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2 ml-1">
                                 Edition
                             </label>
@@ -190,56 +264,24 @@
 
                 </div>
 
-                <!-- RIGHT SIDE -->
-                <div class="w-full flex flex-col">
-
-                    <label class="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2 ml-1">
-                        Book Cover
-                    </label>
-
-                    <label for="cover_input"
-                        class="cursor-pointer flex-1 min-h-[300px] border-2 border-dashed border-gray-300 bg-white/50 rounded-3xl flex flex-col items-center justify-center hover:bg-gray-50 hover:border-red-200 transition-all group relative overflow-hidden">
-
-                        <!-- FIXED -->
-                        <input type="file" name="cover" id="cover_input" class="hidden" accept="image/*">
-
-                        <div class="text-center group-hover:scale-105 transition-transform">
-
-                            <div class="w-16 h-16 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-4 text-burgundy-500 group-hover:bg-red-100 transition-colors">
-
-                                <svg xmlns="http://www.w3.org/2000/svg" 
-                                     class="h-8 w-8" 
-                                     fill="none" 
-                                     viewBox="0 0 24 24" 
-                                     stroke="currentColor">
-
-                                    <path stroke-linecap="round" 
-                                          stroke-linejoin="round" 
-                                          stroke-width="2" 
-                                          d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
-
-                                </svg>
-
-                            </div>
-
-                            <p class="text-sm font-bold text-gray-500 group-hover:text-burgundy-500 transition-colors">
-                                Upload Cover
-                            </p>
-
-                            <p class="text-[10px] text-gray-400 mt-1 uppercase tracking-wider">
-                                JPG, PNG max 2MB
-                            </p>
-
-                        </div>
-
-                    </label>
-
-                </div>
-
+                
             </div>
 
         </form>
 
     </x-ui.glass-card>
+    <script>
+        (function(){
+            const input = document.getElementById('cover_input');
+            const preview = document.getElementById('cover_preview');
+            if (!input) return;
+            input.addEventListener('change', function(e){
+                const file = this.files && this.files[0];
+                if (!file) return;
+                const url = URL.createObjectURL(file);
+                preview.src = url;
+            });
+        })();
+    </script>
 </div>
 @endsection

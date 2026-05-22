@@ -106,6 +106,14 @@
                             {{ $buku['status'] == 'Tersedia' ? 'Available' : ( $buku['status'] == 'Dipinjam' ? 'Borrowed' : $buku['status'] ) }}
                         </p>
                     </div>
+                    <div class="bg-white/60 rounded-2xl p-4 border border-white/80">
+                        <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Category</p>
+                        <p class="text-sm font-bold text-gray-700">{{ $buku['kategori'] ?? 'General' }}</p>
+                    </div>
+                    <div class="bg-white/60 rounded-2xl p-4 border border-white/80">
+                        <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Book Code</p>
+                        <p class="text-sm font-bold text-gray-700">{{ $buku['book_id'] ?? '#00'.$buku['id'] }}</p>
+                    </div>
                 </div>
             </x-ui.glass-card>
 

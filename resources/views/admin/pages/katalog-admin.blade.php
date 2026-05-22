@@ -34,6 +34,12 @@
                 Add New Book
             </a>
         </div>
+
+        <div class="col-span-full mt-6">
+            @if(isset($Buku) && method_exists($Buku, 'links'))
+                <div class="flex justify-center text-gray-700">{{ $Buku->links() }}</div>
+            @endif
+        </div>
     </x-ui.page-header>
 
     <!-- Grid View -->
