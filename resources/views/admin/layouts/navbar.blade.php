@@ -18,7 +18,7 @@
             <a href="{{ route('admin.buku.create') }}" class="px-5 py-2 rounded-xl transition-all duration-300 {{ request()->routeIs('admin.buku.create') ? 'bg-burgundy-500 text-white shadow-lg shadow-red-100' : 'text-gray-500 hover:text-burgundy-500 hover:bg-white/80' }} font-medium text-sm">
                 Add Book
             </a>
-            <a href="{{ route('admin.users') }}" class="px-5 py-2 rounded-xl transition-all duration-300 {{ request()->routeIs('admin.users') ? 'bg-burgundy-500 text-white shadow-lg shadow-red-100' : 'text-gray-500 hover:text-burgundy-500 hover:bg-white/80' }} font-medium text-sm">
+            <a href="{{ route('admin.users.index') }}" class="px-5 py-2 rounded-xl transition-all duration-300 {{ request()->routeIs('admin.users.index') ? 'bg-burgundy-500 text-white shadow-lg shadow-red-100' : 'text-gray-500 hover:text-burgundy-500 hover:bg-white/80' }} font-medium text-sm">
                 User Data
             </a>
         </div>

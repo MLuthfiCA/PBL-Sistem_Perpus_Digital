@@ -94,7 +94,7 @@ class BukuController extends Controller
 
         return redirect()
             ->route('admin.katalog')
-            ->with('success', 'Data buku berhasil diperbarui!');
+            ->with('success', 'Book updated successfully!');
     }
 
     public function destroy($id)
@@ -105,7 +105,7 @@ class BukuController extends Controller
 
         return redirect()
             ->route('admin.katalog')
-            ->with('success', 'Data buku berhasil dihapus!');
+            ->with('success', 'Book deleted successfully!');
     }
 
     public function store(Request $request)
@@ -159,7 +159,7 @@ class BukuController extends Controller
 
             return redirect()
                 ->route('admin.katalog')
-                ->with('success', 'Buku berhasil ditambahkan!');
+                ->with('success', 'Book added successfully!');
 
         } catch (\Exception $e) {
 
@@ -232,7 +232,7 @@ class BukuController extends Controller
                 ->back()
                 ->with(
                     'success',
-                    'Peminjaman berhasil diajukan! Silakan temui admin.'
+                    'Borrow request submitted. Please contact an administrator.'
                 );
 
         } catch (\Exception $e) {

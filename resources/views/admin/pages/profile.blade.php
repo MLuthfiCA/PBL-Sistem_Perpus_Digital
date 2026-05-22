@@ -12,8 +12,8 @@
 
     <div class="flex flex-col md:flex-row md:items-end justify-between gap-4 animate-fade-up">
         <div>
-            <h1 class="text-4xl font-bold text-gray-800">Profil Admin</h1>
-            <p class="text-gray-500 mt-2">Kelola informasi perpustakaan dan pantau buku yang sedang dipinjam.</p>
+            <h1 class="text-4xl font-bold text-gray-800">Admin Profile</h1>
+            <p class="text-gray-500 mt-2">Manage library information and monitor borrowed books.</p>
         </div>
     </div>
 
@@ -28,8 +28,8 @@
                 Main Administrator 
             </div>
         </div>
-        <div class="w-full md:w-auto flex flex-col sm:flex-row gap-3">
-            <a href="{{ route('admin.users') }}" class="w-full md:w-auto px-6 py-3 rounded-xl bg-burgundy-500 text-white font-bold hover:bg-maroon transition-colors text-sm text-center shadow-lg shadow-red-100">
+            <div class="w-full md:w-auto flex flex-col sm:flex-row gap-3">
+            <a href="{{ route('admin.users.index') }}" class="w-full md:w-auto px-6 py-3 rounded-xl bg-burgundy-500 text-white font-bold hover:bg-maroon transition-colors text-sm text-center shadow-lg shadow-red-100">
                 Manage Users
             </a>
             <a href="{{ route('admin.buku.create') }}" class="w-full md:w-auto px-6 py-3 rounded-xl border-2 border-burgundy-500 text-burgundy-600 font-bold hover:bg-red-50 transition-colors text-sm text-center">
@@ -52,9 +52,9 @@
         </div>
         
         <div class="glass-panel border-white/60 shadow-lg shadow-red-50 rounded-2xl overflow-hidden">
-            <div class="hidden md:grid grid-cols-12 gap-4 px-8 py-5 border-b border-gray-100 bg-gray-50/30 text-[11px] font-bold text-gray-400 uppercase tracking-wider">
+                <div class="hidden md:grid grid-cols-12 gap-4 px-8 py-5 border-b border-gray-100 bg-gray-50/30 text-[11px] font-bold text-gray-400 uppercase tracking-wider">
                 <div class="col-span-3">Book information</div>
-                <div class="col-span-3">Loaners</div>
+                <div class="col-span-3">Borrower</div>
                 <div class="col-span-2">Due Date</div>
                 <div class="col-span-2">Fine & Status</div>
                 <div class="col-span-2 text-right">Actions</div>
@@ -81,8 +81,8 @@
                         </div>
                     </div>
 
-                    <div class="col-span-3 flex flex-col md:flex-row md:items-center gap-2 mt-2 md:mt-0">
-                        <span class="md:hidden text-[10px] font-bold text-gray-400 uppercase">Peminjam:</span>
+                        <div class="col-span-3 flex flex-col md:flex-row md:items-center gap-2 mt-2 md:mt-0">
+                        <span class="md:hidden text-[10px] font-bold text-gray-400 uppercase">Borrower:</span>
                         <div class="flex items-center gap-2 px-3 py-1.5 rounded-full border border-gray-100 w-fit bg-white shadow-sm">
                             <div class="w-5 h-5 rounded-full bg-burgundy-500 text-white flex items-center justify-center text-[10px] font-bold">
                                 {{ substr($b->user?->name ?? $b->user?->full_name ?? 'U', 0, 1) }}
@@ -116,13 +116,13 @@
                                 <form action="{{ route('admin.peminjaman.bayar', $b->id) }}" method="POST">
                                     @csrf
                                     <button type="submit" class="text-[9px] font-bold text-white bg-red-500 px-2 py-0.5 rounded hover:bg-red-600 transition-colors">
-                                        SET LUNAS
+                                        MARK PAID
                                     </button>
                                 </form>
                             @elseif($b->status === 'dikembalikan' && $b->status_denda === 'lunas')
-                                <span class="text-[9px] font-bold text-green-600 bg-green-50 px-2 py-0.5 rounded border border-green-100 w-fit">LUNAS</span>
+                                <span class="text-[9px] font-bold text-green-600 bg-green-50 px-2 py-0.5 rounded border border-green-100 w-fit">PAID</span>
                             @elseif($b->status === 'dipinjam')
-                                <span class="text-[9px] font-bold text-red-600 bg-red-50 px-2 py-0.5 rounded border border-red-100 w-fit">BELUM BAYAR</span>
+                                <span class="text-[9px] font-bold text-red-600 bg-red-50 px-2 py-0.5 rounded border border-red-100 w-fit">UNPAID</span>
                             @endif
                         @else
                             <p class="text-xs text-gray-400 font-medium">No Fines</p>
@@ -131,10 +131,10 @@
 
                     <div class="col-span-2 flex items-center md:justify-end gap-2 mt-4 md:mt-0 border-t md:border-t-0 border-gray-100 pt-3 md:pt-0">
                         @if($b->status === 'dipinjam')
-                            <form action="{{ route('admin.peminjaman.acc', $b->id) }}" method="POST" onsubmit="return confirm('Apakah buku ini benar sudah dikembalikan?')">
+                            <form action="{{ route('admin.peminjaman.acc', $b->id) }}" method="POST" onsubmit="return confirm('Confirm this book has been returned?')">
                                 @csrf
                                 <button type="submit" class="text-[10px] font-bold text-white bg-burgundy-500 hover:bg-maroon px-3 py-2 rounded-lg transition-all shadow-md shadow-red-50 whitespace-nowrap">
-                                    ACC KEMBALI
+                                    Confirm Return
                                 </button>
                             </form>
                         @else

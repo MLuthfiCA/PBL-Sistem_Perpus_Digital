@@ -30,7 +30,7 @@
                             class="w-full px-4 py-3.5 border border-white bg-white/50 rounded-2xl focus:outline-none focus:ring-4 focus:ring-red-100 font-medium text-sm transition-all">
                     </div>
                     
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
                         <div>
                         <div>
                             <label class="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2 ml-1">Author</label>
@@ -71,8 +71,8 @@
                                 class="w-full px-4 py-3.5 border border-white bg-white/50 rounded-2xl focus:outline-none focus:ring-4 focus:ring-red-100 font-medium text-sm transition-all">
                         </div>
                         <div>
-                            <label class="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2 ml-1">Edition (Cetakan)</label>
-                            <input type="text" name="cetakan" value="{{ $buku['cetakan'] ?? '' }}" placeholder="e.g., Cetakan Pertama"
+                            <label class="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2 ml-1">Edition</label>
+                            <input type="text" name="cetakan" value="{{ $buku['cetakan'] ?? '' }}" placeholder="e.g., First edition"
                                 class="w-full px-4 py-3.5 border border-white bg-white/50 rounded-2xl focus:outline-none focus:ring-4 focus:ring-red-100 font-medium text-sm transition-all">
                         </div>
                         <div class="sm:col-span-2">
@@ -96,7 +96,7 @@
                     <label class="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2 ml-1">Book Cover</label>
                     <div class="flex-1 min-h-[320px] bg-red-50/30 border-2 border-dashed border-red-100 rounded-3xl flex flex-col items-center justify-center p-6 relative group overflow-hidden transition-all hover:bg-red-50/50">
                         @if(isset($buku['cover']) && $buku['cover'])
-                            <img src="{{ asset('images/' . $buku['cover']) }}" alt="Cover" class="max-h-full object-contain rounded-xl shadow-xl transition-transform group-hover:scale-105">
+                            <img src="{{ asset('images/' . $buku['cover']) }}" alt="Cover" class="max-h-[320px] md:max-h-[420px] w-full object-contain rounded-xl shadow-xl transition-transform group-hover:scale-105">
                         @else
                             <div class="text-center text-red-200">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-20 w-20 mx-auto mb-4 opacity-50" fill="none" viewBox="0 0 24 24" stroke="currentColor">

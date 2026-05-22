@@ -9,10 +9,10 @@
 
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
             @php
-                // Untuk menambahkan foto: 
-                // 1. Buat folder 'team' di dalam folder 'public/images/' (public/images/team/)
-                // 2. Masukkan file foto ke folder tersebut
-                // 3. Pastikan nama file sesuai dengan nama di kolom 'photo' di bawah ini
+                // To add photos:
+                // 1. Create a 'team' folder inside 'public/images/' (public/images/team/)
+                // 2. Put the photo files into that folder
+                // 3. Ensure the filename matches the 'photo' key below
                 $team = [
                     ['name' => 'M. Luthfi Causart Azavi', 'nim' => '3312501052', 'role' => 'Team Leader', 'color' => 'bg-red-50 text-burgundy-500', 'photo' => 'luthfi.jpg'],
                     ['name' => 'Muhammad Risky Kurnia', 'nim' => '3312501056', 'role' => 'Team Member', 'color' => 'bg-rose-50 text-maroon', 'photo' => 'risky.jpg'],
@@ -22,21 +22,21 @@
             @endphp
 
             @foreach($team as $index => $member)
-            <x-ui.glass-card class="p-8 text-center hover:shadow-2xl hover:-translate-y-2 transition-all duration-500 group animate-fade-up" :style="`animation-delay: ${index * 100}ms`">
+            <x-ui.glass-card class="p-8 text-center hover:shadow-2xl hover:-translate-y-2 transition-all duration-500 group animate-fade-up" style="animation-delay: {{ $index * 100 }}ms">
                 
-                <!-- FOTO ANGGOTA TIM -->
+                <!-- TEAM MEMBER PHOTO -->
                 <div class="w-24 h-24 mx-auto mb-6 rounded-full {{ $member['color'] }} flex items-center justify-center text-3xl font-bold shadow-inner overflow-hidden relative border-4 border-white">
-                    <!-- Default inisial huruf jika foto gagal dimuat (atau belum ada) -->
+                    <!-- Default initial if photo fails to load (or is missing) -->
                     <span class="relative z-0">{{ substr($member['name'], 0, 1) }}</span>
                     
-                    <!-- Foto akan muncul menutupi inisial di atas jika file fotonya tersedia di public/images/team/ -->
+                    <!-- Photo will overlay the initial above if the file exists in public/images/team/ -->
                     <img src="{{ asset('images/team/' . $member['photo']) }}" alt="{{ $member['name'] }}" class="w-full h-full object-cover absolute inset-0 z-10" onerror="this.style.display='none'">
                 </div>
 
                 <p class="font-bold text-xl text-gray-800 mb-2 group-hover:text-burgundy-500 transition-colors">{{ $member['name'] }}</p>
                 <div class="space-y-1">
-                    <p class="text-sm font-medium text-gray-400">NIM : {{ $member['nim'] }}</p>
-                    <p class="text-sm font-medium text-gray-400">Prodi : Teknik Informatika</p>
+                    <p class="text-sm font-medium text-gray-400">Student ID: {{ $member['nim'] }}</p>
+                    <p class="text-sm font-medium text-gray-400">Program: Informatics Engineering</p>
                     <div class="mt-6 pt-6 border-t border-red-50">
                         <span class="px-4 py-1.5 rounded-full bg-white text-[10px] font-bold text-gray-400 uppercase tracking-widest border border-red-50">{{ $member['role'] }}</span>
                     </div>

@@ -50,7 +50,7 @@
                     
                     <!-- Availability Badge -->
                     <div class="absolute top-4 right-4 px-3 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-widest backdrop-blur-xl {{ $buku['status'] == 'Tersedia' ? 'bg-green-500/10 text-green-600 border border-green-200' : 'bg-red-500/10 text-red-600 border border-red-200' }}">
-                        {{ $buku['status'] == 'Tersedia' ? 'TERSEDIA' : 'DIPINJAM' }}
+                        {{ $buku['status'] == 'Tersedia' ? 'AVAILABLE' : 'BORROWED' }}
                     </div>
 
                     <!-- Admin Action Overlay (Desktop only) -->
@@ -66,10 +66,10 @@
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
                             </svg>
                         </a>
-                        <form action="{{ route('admin.delete', $buku['id']) }}" method="POST" onsubmit="event.stopPropagation(); return confirm('Hapus buku ini dari katalog?')">
+                        <form action="{{ route('admin.delete', $buku['id']) }}" method="POST" onsubmit="event.stopPropagation(); return confirm('Remove this book from the catalog?')">
                             @csrf
                             @method('DELETE')
-                            <button type="submit" class="p-3 bg-white rounded-xl text-red-500 shadow-xl hover:scale-110 transition-transform" title="Hapus Buku">
+                            <button type="submit" class="p-3 bg-white rounded-xl text-red-500 shadow-xl hover:scale-110 transition-transform" title="Delete Book">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-1 12a2 2 0 01-2 2H8a2 2 0 01-2-2L5 7m5 4v6m4-6v6M9 7V4a1 1 0 011-1h4a1 1 0 011 1v3M4 7h16" />
                                 </svg>
@@ -88,7 +88,7 @@
                     <!-- Mobile Actions -->
                     <div class="flex md:hidden items-center gap-1.5">
                         <a href="{{ route('admin.edit_buku', $buku['id']) }}" class="text-burgundy-500 font-bold text-[10px] bg-red-50 px-2 py-1.5 rounded-lg border border-red-100 uppercase tracking-widest">Edit</a>
-                        <form action="{{ route('admin.delete', $buku['id']) }}" method="POST" onsubmit="return confirm('Hapus buku ini dari katalog?')">
+                        <form action="{{ route('admin.delete', $buku['id']) }}" method="POST" onsubmit="return confirm('Remove this book from the catalog?')">
                             @csrf
                             @method('DELETE')
                             <button type="submit" class="text-red-500 font-bold text-[10px] bg-red-50 px-2 py-1.5 rounded-lg border border-red-100 uppercase tracking-widest">Del</button>
@@ -158,7 +158,7 @@
                                         </svg>
                                         Edit
                                     </a>
-                                    <form action="{{ route('admin.delete', $buku['id']) }}" method="POST" onsubmit="return confirm('Hapus buku ini dari katalog?')" class="inline">
+                                    <form action="{{ route('admin.delete', $buku['id']) }}" method="POST" onsubmit="return confirm('Remove this book from the catalog?')" class="inline">
                                         @csrf
                                         @method('DELETE')
                                         <button type="submit" class="px-4 py-2 bg-white text-red-500 rounded-xl text-xs font-bold shadow-md hover:scale-105 transition-transform flex items-center gap-1">

@@ -3,7 +3,7 @@
 @section('content')
 
 <h2 class="text-lg font-semibold mb-2">
-    Halo, {{ session('user')['name'] ?? 'Nama Pengguna' }}
+    Hello, {{ session('user')['name'] ?? 'User' }}
 </h2>
 
 <p class="mb-6 text-gray-600">
@@ -38,7 +38,7 @@
                 {{ ($buku->status ?? '') == 'Tersedia'
                     ? 'bg-green-100 text-green-900'
                     : 'bg-red-100 text-red-900' }}">
-                {{ $buku->status ?? 'Tidak Tersedia' }}
+                {{ ($buku->status ?? '') == 'Tersedia' ? 'Available' : (($buku->status ?? '') == 'Dipinjam' ? 'Borrowed' : 'Not available') }}
             </span>
         </div>
 

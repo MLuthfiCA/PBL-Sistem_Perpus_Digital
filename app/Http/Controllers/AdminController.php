@@ -2,9 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Models\User;
-use App\Models\Buku;
 use App\Models\Peminjaman;
 
 
@@ -19,9 +17,9 @@ class AdminController extends Controller
     
     public function destroy($id)
     {
-        // Menemukan id dari tabel user untuk dihapus
+        // Find and delete user by id
         User::findOrFail($id)->delete();
-        return redirect('/admin/data_user')->with('success', 'Data berhasil dihapus');
+        return redirect('/admin/data_user')->with('success', 'User deleted successfully');
     }
 
     public function profile()
@@ -61,7 +59,7 @@ class AdminController extends Controller
             ]);
         }
 
-        return redirect()->back()->with('success', 'Pengembalian buku berhasil di-ACC!');
+        return redirect()->back()->with('success', 'Book return confirmed successfully!');
     }
 
     public function bayarDenda($id)
@@ -69,6 +67,6 @@ class AdminController extends Controller
         $peminjaman = Peminjaman::findOrFail($id);
         $peminjaman->update(['status_denda' => 'lunas']);
 
-        return redirect()->back()->with('success', 'Denda telah dinyatakan lunas!');
+        return redirect()->back()->with('success', 'Fine marked as paid!');
     }
 }

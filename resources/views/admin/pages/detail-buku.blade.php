@@ -25,7 +25,7 @@
                 </svg>
                 Edit Book
             </a>
-            <form action="{{ route('admin.delete', $buku['id']) }}" method="POST" onsubmit="return confirm('Yakin hapus buku ini?')">
+            <form action="{{ route('admin.delete', $buku['id']) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete this book?')">
                 @csrf
                 @method('DELETE')
                 <button type="submit"
@@ -56,13 +56,13 @@
                     {{-- Status Badge --}}
                     <div class="absolute -top-3 -right-3 px-4 py-2 rounded-2xl shadow-xl backdrop-blur-xl font-black text-xs uppercase tracking-widest
                         {{ $buku['status'] == 'Tersedia' ? 'bg-green-500 text-white shadow-green-200' : 'bg-red-500 text-white shadow-red-200' }}">
-                        {{ $buku['status'] == 'Tersedia' ? 'TERSEDIA' : 'DIPINJAM' }}
+                        {{ $buku['status'] == 'Tersedia' ? 'AVAILABLE' : 'BORROWED' }}
                     </div>
                 </div>
 
                 {{-- Stok Info --}}
                 <div class="mt-6 text-center">
-                    <p class="text-[10px] text-gray-400 uppercase tracking-widest font-bold mb-1">Stok Tersedia</p>
+                    <p class="text-[10px] text-gray-400 uppercase tracking-widest font-bold mb-1">Available Stock</p>
                     <p class="text-4xl font-black text-gray-800">{{ $buku['stok'] ?? 0 }}</p>
                 </div>
             </x-ui.glass-card>
@@ -85,25 +85,25 @@
                         <p class="text-sm font-bold text-gray-700">{{ $buku['isbn'] ?? 'N/A' }}</p>
                     </div>
                     <div class="bg-white/60 rounded-2xl p-4 border border-white/80">
-                        <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Penerbit</p>
+                        <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Publisher</p>
                         <p class="text-sm font-bold text-gray-700">{{ $buku['penerbit'] ?? 'N/A' }}</p>
                     </div>
                     <div class="bg-white/60 rounded-2xl p-4 border border-white/80">
-                        <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Tahun Terbit</p>
+                        <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Publication Year</p>
                         <p class="text-sm font-bold text-gray-700">{{ $buku['tahun_terbit'] ?? 'N/A' }}</p>
                     </div>
                     <div class="bg-white/60 rounded-2xl p-4 border border-white/80">
-                        <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Cetakan</p>
+                        <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Edition</p>
                         <p class="text-sm font-bold text-gray-700">{{ $buku['cetakan'] ?? 'N/A' }}</p>
                     </div>
                     <div class="bg-white/60 rounded-2xl p-4 border border-white/80">
-                        <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Bahasa</p>
+                        <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Language</p>
                         <p class="text-sm font-bold text-gray-700">{{ $buku['bahasa'] ?? 'Indonesia' }}</p>
                     </div>
                     <div class="bg-white/60 rounded-2xl p-4 border border-white/80">
                         <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Status</p>
                         <p class="text-sm font-bold {{ $buku['status'] == 'Tersedia' ? 'text-green-600' : 'text-red-500' }}">
-                            {{ $buku['status'] }}
+                            {{ $buku['status'] == 'Tersedia' ? 'Available' : ( $buku['status'] == 'Dipinjam' ? 'Borrowed' : $buku['status'] ) }}
                         </p>
                     </div>
                 </div>
