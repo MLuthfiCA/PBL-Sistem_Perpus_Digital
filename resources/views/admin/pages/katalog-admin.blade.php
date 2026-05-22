@@ -40,13 +40,15 @@
     <template x-if="view === 'grid'">
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 md:gap-8">
             @forelse($Buku as $index => $buku)
-            <x-ui.glass-card class="p-4 flex flex-col group animate-fade-up border-white/60" style="animation-delay: {{ $index * 100 }}ms">
-                <a href="{{ route('admin.katalog.detail', $buku['id']) }}" class="relative h-64 rounded-2xl mb-5 overflow-hidden bg-gradient-to-br from-red-50 to-rose-100 flex items-center justify-center border border-white/20 block">
-                    <!-- Real Image from images folder -->
-                    <img src="{{ asset('images/' . ($buku['cover'] ?? 'readspace-library.png')) }}" 
-                        class="h-4/5 object-contain shadow-2xl transform group-hover:scale-110 group-hover:rotate-2 transition-transform duration-700"
-                        data-fallback="{{ asset('images/readspace-library.png') }}"
-                        onerror="this.src=this.dataset.fallback" alt="Book Cover">
+            <x-ui.glass-card class="p-4 flex flex-col animate-fade-up border-white/60" style="animation-delay: {{ $index * 100 }}ms">
+                <div class="group relative h-64 rounded-2xl mb-5 overflow-hidden bg-gradient-to-br from-red-50 to-rose-100 flex items-center justify-center border border-white/20">
+                    <a href="{{ route('admin.katalog.detail', $buku['id']) }}" class="absolute inset-0 flex items-center justify-center">
+                        <!-- Real Image from images folder -->
+                        <img src="{{ asset('images/' . ($buku['cover'] ?? 'readspace-library.png')) }}" 
+                            class="h-4/5 object-contain shadow-2xl transform group-hover:scale-110 group-hover:rotate-2 transition-transform duration-700"
+                            data-fallback="{{ asset('images/readspace-library.png') }}"
+                            onerror="this.src=this.dataset.fallback" alt="Book Cover">
+                    </a>
                     
                     <!-- Availability Badge -->
                     <div class="absolute top-4 right-4 px-3 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-widest backdrop-blur-xl {{ $buku['status'] == 'Tersedia' ? 'bg-green-500/10 text-green-600 border border-green-200' : 'bg-red-500/10 text-red-600 border border-red-200' }}">
@@ -54,14 +56,14 @@
                     </div>
 
                     <!-- Admin Action Overlay (Desktop only) -->
-                    <div class="absolute inset-0 bg-burgundy-900/40 opacity-0 md:group-hover:opacity-100 transition-opacity hidden md:flex items-center justify-center gap-3 backdrop-blur-[2px]">
-                        <span class="p-3 bg-white rounded-xl text-burgundy-500 shadow-xl hover:scale-110 transition-transform" title="Lihat Detail">
+                    <div class="absolute inset-0 bg-burgundy-900/40 opacity-0 group-hover:opacity-100 transition-opacity hidden md:flex items-center justify-center gap-3 backdrop-blur-[2px]">
+                        <a href="{{ route('admin.katalog.detail', $buku['id']) }}" class="p-3 bg-white rounded-xl text-burgundy-500 shadow-xl hover:scale-110 active:scale-95 transition-transform" title="Lihat Detail">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                             </svg>
-                        </span>
-                        <a href="{{ route('admin.edit_buku', $buku['id']) }}" class="p-3 bg-white rounded-xl text-burgundy-500 shadow-xl hover:scale-110 transition-transform" title="Edit Buku" onclick="event.stopPropagation()">
+                        </a>
+                        <a href="{{ route('admin.edit_buku', $buku['id']) }}" class="p-3 bg-white rounded-xl text-burgundy-500 shadow-xl hover:scale-110 active:scale-95 transition-transform" title="Edit Buku" onclick="event.stopPropagation()">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
                             </svg>
@@ -69,16 +71,16 @@
                         <form action="{{ route('admin.delete', $buku['id']) }}" method="POST" onsubmit="event.stopPropagation(); return confirm('Remove this book from the catalog?')">
                             @csrf
                             @method('DELETE')
-                            <button type="submit" class="p-3 bg-white rounded-xl text-red-500 shadow-xl hover:scale-110 transition-transform" title="Delete Book">
+                            <button type="submit" class="p-3 bg-white rounded-xl text-red-500 shadow-xl hover:scale-110 active:scale-95 transition-transform" title="Delete Book">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-1 12a2 2 0 01-2 2H8a2 2 0 01-2-2L5 7m5 4v6m4-6v6M9 7V4a1 1 0 011-1h4a1 1 0 011 1v3M4 7h16" />
                                 </svg>
                             </button>
                         </form>
                     </div>
-                </a>
+                </div>
                 
-                <a href="{{ route('admin.katalog.detail', $buku['id']) }}" class="font-bold text-gray-800 line-clamp-1 mb-1 text-lg group-hover:text-burgundy-500 transition-colors block">{{ $buku['judul'] }}</a>
+                <a href="{{ route('admin.katalog.detail', $buku['id']) }}" class="font-bold text-gray-800 line-clamp-1 mb-1 text-lg hover:text-burgundy-500 transition-colors block">{{ $buku['judul'] }}</a>
                 <p class="text-xs text-gray-400 mb-6 font-medium">{{ $buku['penulis'] }}</p>
                 
                 <div class="mt-auto pt-5 border-t border-red-50 flex items-center justify-between">
@@ -124,10 +126,10 @@
                     </thead>
                     <tbody class="divide-y divide-red-50">
                         @forelse($Buku as $index => $buku)
-                        <tr class="group hover:bg-red-50/30 transition-colors duration-300">
+                        <tr>
                             <td class="px-8 py-6">
                                 <div class="flex items-center gap-5">
-                                    <a href="{{ route('admin.katalog.detail', $buku['id']) }}" class="w-12 h-16 bg-white rounded-xl shadow-md flex items-center justify-center overflow-hidden border border-white group-hover:scale-110 transition-transform duration-500">
+                                    <a href="{{ route('admin.katalog.detail', $buku['id']) }}" class="w-12 h-16 bg-white rounded-xl shadow-md flex items-center justify-center overflow-hidden border border-white hover:scale-110 transition-transform duration-500">
                                         <img src="{{ asset('images/' . ($buku['cover'] ?? 'readspace-library.png')) }}" class="w-full h-full object-cover" onerror="this.src='{{ asset('images/readspace-library.png') }}'">
                                     </a>
                                     <div>
@@ -151,8 +153,8 @@
                                 </div>
                             </td>
                             <td class="px-8 py-6 text-right">
-                                <div class="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                                    <a href="{{ route('admin.edit_buku', $buku['id']) }}" class="px-4 py-2 bg-white text-burgundy-500 rounded-xl text-xs font-bold shadow-md hover:scale-105 transition-transform flex items-center gap-1">
+                                <div class="flex items-center justify-end gap-2">
+                                    <a href="{{ route('admin.edit_buku', $buku['id']) }}" class="px-4 py-2 bg-white text-burgundy-500 rounded-xl text-xs font-bold shadow-md hover:scale-105 hover:bg-red-50 transition-all flex items-center gap-1">
                                         <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
                                         </svg>
@@ -161,7 +163,7 @@
                                     <form action="{{ route('admin.delete', $buku['id']) }}" method="POST" onsubmit="return confirm('Remove this book from the catalog?')" class="inline">
                                         @csrf
                                         @method('DELETE')
-                                        <button type="submit" class="px-4 py-2 bg-white text-red-500 rounded-xl text-xs font-bold shadow-md hover:scale-105 transition-transform flex items-center gap-1">
+                                        <button type="submit" class="px-4 py-2 bg-white text-red-500 rounded-xl text-xs font-bold shadow-md hover:scale-105 hover:bg-red-50 transition-all flex items-center gap-1">
                                             <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-1 12a2 2 0 01-2 2H8a2 2 0 01-2-2L5 7m5 4v6m4-6v6M9 7V4a1 1 0 011-1h4a1 1 0 011 1v3M4 7h16" />
                                             </svg>
