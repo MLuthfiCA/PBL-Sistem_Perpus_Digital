@@ -14,9 +14,6 @@ return new class extends Migration
         // Rename peminjaman table to peminjamans
         Schema::rename('peminjaman', 'peminjamans');
 
-        // Rename detail_peminjaman table to borrowing_details
-        Schema::rename('detail_peminjaman', 'borrowing_details');
-
         // Update buku table - change status enum values to Indonesian
         Schema::table('buku', function (Blueprint $table) {
             $table->string('status')->change(); // Ubah dari enum ke string terlebih dahulu
@@ -28,8 +25,8 @@ return new class extends Migration
             $table->string('status_denda')->change(); // Ubah dari enum ke string terlebih dahulu
         });
 
-        // Update borrowing_details table - change kondisi_kembali enum values to Indonesian
-        Schema::table('borrowing_details', function (Blueprint $table) {
+        // Update detail_peminjaman table - change kondisi_kembali enum values to Indonesian
+        Schema::table('detail_peminjaman', function (Blueprint $table) {
             $table->string('kondisi_kembali')->nullable()->change();
         });
 
@@ -66,7 +63,6 @@ return new class extends Migration
     {
         // Revert table renames
         Schema::rename('peminjamans', 'peminjaman');
-        Schema::rename('borrowing_details', 'detail_peminjaman');
 
         // Revert schema changes
         Schema::table('buku', function (Blueprint $table) {

@@ -34,11 +34,11 @@ return new class extends Migration
             DB::statement("UPDATE peminjamans SET status_denda = 'belum lunas' WHERE status_denda = 'unpaid'");
         });
 
-        // Update borrowing_details kondisi_kembali to use Indonesian values
-        Schema::table('borrowing_details', function (Blueprint $table) {
-            DB::statement("UPDATE borrowing_details SET kondisi_kembali = 'baik' WHERE kondisi_kembali = 'good'");
-            DB::statement("UPDATE borrowing_details SET kondisi_kembali = 'rusak' WHERE kondisi_kembali = 'damaged'");
-            DB::statement("UPDATE borrowing_details SET kondisi_kembali = 'hilang' WHERE kondisi_kembali = 'lost'");
+        // Update detail_peminjaman kondisi_kembali to use Indonesian values
+        Schema::table('detail_peminjaman', function (Blueprint $table) {
+            DB::statement("UPDATE detail_peminjaman SET kondisi_kembali = 'baik' WHERE kondisi_kembali = 'good'");
+            DB::statement("UPDATE detail_peminjaman SET kondisi_kembali = 'rusak' WHERE kondisi_kembali = 'damaged'");
+            DB::statement("UPDATE detail_peminjaman SET kondisi_kembali = 'hilang' WHERE kondisi_kembali = 'lost'");
         });
     }
 
@@ -66,10 +66,10 @@ return new class extends Migration
             DB::statement("UPDATE peminjamans SET status_denda = 'unpaid' WHERE status_denda = 'belum lunas'");
         });
 
-        Schema::table('borrowing_details', function (Blueprint $table) {
-            DB::statement("UPDATE borrowing_details SET kondisi_kembali = 'good' WHERE kondisi_kembali = 'baik'");
-            DB::statement("UPDATE borrowing_details SET kondisi_kembali = 'damaged' WHERE kondisi_kembali = 'rusak'");
-            DB::statement("UPDATE borrowing_details SET kondisi_kembali = 'lost' WHERE kondisi_kembali = 'hilang'");
+        Schema::table('detail_peminjaman', function (Blueprint $table) {
+            DB::statement("UPDATE detail_peminjaman SET kondisi_kembali = 'good' WHERE kondisi_kembali = 'baik'");
+            DB::statement("UPDATE detail_peminjaman SET kondisi_kembali = 'damaged' WHERE kondisi_kembali = 'rusak'");
+            DB::statement("UPDATE detail_peminjaman SET kondisi_kembali = 'lost' WHERE kondisi_kembali = 'hilang'");
         });
     }
 };

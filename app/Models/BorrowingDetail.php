@@ -2,8 +2,8 @@
 
 namespace App\Models;
 
-use App\Models\Book;
-use App\Models\Borrowing;
+use App\Models\Buku;
+use App\Models\Peminjaman;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
@@ -11,7 +11,7 @@ class BorrowingDetail extends Model
 {
     use HasFactory;
 
-    protected $table = 'borrowing_details';
+    protected $table = 'detail_peminjaman';
     protected $primaryKey = 'detail_peminjaman_id';
 
     protected $fillable = [
@@ -31,11 +31,11 @@ class BorrowingDetail extends Model
 
     public function borrowing()
     {
-        return $this->belongsTo(Borrowing::class, 'borrowing_id', 'borrowing_id');
+        return $this->belongsTo(Peminjaman::class, 'peminjaman_id', 'peminjaman_id');
     }
 
     public function book()
     {
-        return $this->belongsTo(Book::class, 'book_id', 'book_id');
+        return $this->belongsTo(Buku::class, 'buku_id', 'buku_id');
     }
 }

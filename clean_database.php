@@ -27,8 +27,8 @@ $pdo->exec('SET FOREIGN_KEY_CHECKS=0');
 try {
     // Clean up tables
     echo "1. Clearing existing data...\n";
-    $pdo->exec("TRUNCATE TABLE borrowing_details");
-    echo "   ✓ borrowing_details\n";
+    $pdo->exec("TRUNCATE TABLE detail_peminjaman");
+    echo "   ✓ detail_peminjaman\n";
     
     $pdo->exec("TRUNCATE TABLE peminjamans");
     echo "   ✓ peminjamans\n";
