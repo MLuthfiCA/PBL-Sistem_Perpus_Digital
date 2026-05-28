@@ -15,13 +15,13 @@ class ProfileController extends Controller
 
         try {
             // Fetch active loans (dipinjam)
-            $peminjaman = \App\Models\Peminjaman::where('user_id', $userId)
+            $peminjaman = \App\Models\Peminjaman::where('id_pengguna', $userId)
                 ->where('status', 'dipinjam')
                 ->with('buku')
                 ->get();
 
             // Fetch return history (dikembalikan)
-            $pengembalian = \App\Models\Peminjaman::where('user_id', $userId)
+            $pengembalian = \App\Models\Peminjaman::where('id_pengguna', $userId)
                 ->where('status', 'dikembalikan')
                 ->with('buku')
                 ->orderBy('updated_at', 'desc')

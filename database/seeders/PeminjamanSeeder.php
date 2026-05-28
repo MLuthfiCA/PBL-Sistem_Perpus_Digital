@@ -12,13 +12,39 @@ class PeminjamanSeeder extends Seeder
 {
     public function run(): void
     {
+        // 0. Pastikan ada Kategori
+        $kategoriNovel = \App\Models\Kategori::firstOrCreate([
+            'nama_kategori' => 'Novel',
+        ], [
+            'deskripsi' => 'Kategori Buku Novel',
+            'slug' => 'novel'
+        ]);
+
+        $kategoriSelfHelp = \App\Models\Kategori::firstOrCreate([
+            'nama_kategori' => 'Self Improvement',
+        ], [
+            'deskripsi' => 'Kategori Pengembangan Diri',
+            'slug' => 'self-improvement'
+        ]);
+
         // 1. Pastikan ada User
         $user = User::first() ?? User::create([
-            'name' => 'Rayyan',
+            'nama' => 'Rayyan',
             'email' => 'rayyan@student.polibatam.ac.id',
             'username' => 'rayyan123',
             'password' => Hash::make('password'),
             'role' => 'mahasiswa',
+            'identity_number' => '1234567890',
+        ]);
+
+        // Seed an admin user for testing
+        $admin = User::where('role', 'admin')->first() ?? User::create([
+            'nama' => 'Admin Library',
+            'email' => 'admin@readspace.com',
+            'username' => 'admin',
+            'password' => Hash::make('admin123'),
+            'role' => 'admin',
+            'identity_number' => '0000000001',
         ]);
 
         // 2. Pastikan ada Buku
@@ -29,7 +55,7 @@ class PeminjamanSeeder extends Seeder
             'isbn' => '978-979-3062-79-1',
             'penerbit' => 'Bentang Pustaka',
             'tahun_terbit' => 2005,
-            'kategori' => 'Novel',
+            'id_kategori' => $kategoriNovel->id_kategori,
             'stok' => 5,
             'status' => 'Dipinjam',
         ]);
@@ -41,7 +67,7 @@ class PeminjamanSeeder extends Seeder
             'isbn' => '978-602-03-3295-6',
             'penerbit' => 'Gramedia Pustaka Utama',
             'tahun_terbit' => 2014,
-            'kategori' => 'Novel',
+            'id_kategori' => $kategoriNovel->id_kategori,
             'stok' => 3,
             'status' => 'Dipinjam',
         ]);
@@ -53,7 +79,7 @@ class PeminjamanSeeder extends Seeder
             'isbn' => '978-602-412-518-9',
             'penerbit' => 'Kompas',
             'tahun_terbit' => 2018,
-            'kategori' => 'Self Improvement',
+            'id_kategori' => $kategoriSelfHelp->id_kategori,
             'stok' => 10,
             'status' => 'Tersedia',
         ]);
@@ -62,8 +88,8 @@ class PeminjamanSeeder extends Seeder
         
         // Peminjaman yang sudah dikembalikan
         Peminjaman::create([
-            'user_id' => $user->id,
-            'buku_id' => $buku3->id,
+            'id_pengguna' => $user->id_pengguna,
+            'id_buku' => $buku3->id_buku,
             'tanggal_pinjam' => date('Y-m-d', strtotime('-10 days')),
             'batas_kembali' => date('Y-m-d', strtotime('-3 days')),
             'tanggal_kembali' => date('Y-m-d', strtotime('-3 days')),
@@ -74,8 +100,8 @@ class PeminjamanSeeder extends Seeder
 
         // Peminjaman yang hampir jatuh tempo (kembali dalam 2 hari)
         Peminjaman::create([
-            'user_id' => $user->id,
-            'buku_id' => $buku1->id,
+            'id_pengguna' => $user->id_pengguna,
+            'id_buku' => $buku1->id_buku,
             'tanggal_pinjam' => date('Y-m-d', strtotime('-5 days')),
             'batas_kembali' => date('Y-m-d', strtotime('+2 days')),
             'status' => 'dipinjam',
@@ -85,8 +111,8 @@ class PeminjamanSeeder extends Seeder
 
         // Peminjaman baru hari ini
         Peminjaman::create([
-            'user_id' => $user->id,
-            'buku_id' => $buku2->id,
+            'id_pengguna' => $user->id_pengguna,
+            'id_buku' => $buku2->id_buku,
             'tanggal_pinjam' => date('Y-m-d'),
             'batas_kembali' => date('Y-m-d', strtotime('+7 days')),
             'status' => 'dipinjam',

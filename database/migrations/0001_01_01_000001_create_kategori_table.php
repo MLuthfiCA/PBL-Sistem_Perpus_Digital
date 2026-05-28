@@ -10,21 +10,15 @@ return new class extends Migration
     {
         Schema::create('kategori', function (Blueprint $table) {
 
-            // Primary key internal database
-            $table->id('kategori_id');
-
-            // Nama kategori
+            // === Kolom ERD (KATEGORI) ===
+            $table->id('id_kategori');
             $table->string('nama_kategori')->unique();
-
-            // Slug URL
-            $table->string('slug')->unique();
-
-            // Deskripsi kategori
             $table->text('deskripsi')->nullable();
 
-            $table->timestamps();
+            // === Kolom tambahan (dipertahankan dari database lama) ===
+            $table->string('slug')->unique()->nullable();
 
-            // Soft delete
+            $table->timestamps();
             $table->softDeletes();
         });
     }

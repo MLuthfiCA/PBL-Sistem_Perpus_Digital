@@ -18,8 +18,8 @@ class LoginController extends Controller
 
         // Map form role ke database role
         $roleMap = [
-            'mahasiswa' => 'student',
-            'student' => 'student',
+            'mahasiswa' => 'mahasiswa',
+            'student' => 'mahasiswa',
             'admin' => 'admin'
         ];
         
@@ -38,8 +38,8 @@ class LoginController extends Controller
             
             // Simpan data esensial ke session agar sesuai dengan arsitektur saat ini
             session(['user' => [
-                'id' => $user->user_id,
-                'name' => $user->full_name,
+                'id' => $user->id_pengguna,
+                'name' => $user->nama,
                 'role' => $user->role,
                 'username' => $user->username,
                 'email' => $user->email,

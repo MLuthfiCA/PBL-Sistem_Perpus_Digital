@@ -4,29 +4,35 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
-use App\Models\Peminjaman;
 use Illuminate\Notifications\Notifiable;
 
 /**
- * PHPDoc di bawah ini adalah "kunci" agar VS Code tahu $role itu ada
+ * Model PENGGUNA (ERD)
+ *
+ * @property int $id_pengguna
+ * @property string $nama
+ * @property string $email
+ * @property string $password
  * @property string $role
- * @property string $username
+ * @property string|null $identity_number
+ * @property string|null $username
+ * @property string $status
  */
 class User extends Authenticatable
 {
     use HasFactory, Notifiable;
 
     protected $table = 'users';
-    protected $primaryKey = 'user_id';
+    protected $primaryKey = 'id_pengguna';
     public $timestamps = true;
 
     protected $fillable = [
-        'full_name',
+        'nama',
         'email',
         'password',
-        'username',
         'role',
         'identity_number',
+        'username',
         'status',
     ];
 
@@ -36,17 +42,49 @@ class User extends Authenticatable
     ];
 
     protected $casts = [
-        'email_verified_at' => 'datetime',
         'password' => 'hashed',
     ];
 
+    /**
+     * Accessor: agar $user->name tetap bisa dipakai
+     */
     public function getNameAttribute(): string
     {
-        return $this->full_name;
+        return $this->nama;
     }
 
-    public function peminjamans()
+    public function getFullNameAttribute(): string
     {
-        return $this->hasMany(Peminjaman::class, 'user_id', 'user_id');
+        return $this->nama;
+    }
+
+    public function getUserIdAttribute()
+    {
+        return $this->id_pengguna;
+    }
+
+    public function getIdAttribute()
+    {
+        return $this->id_pengguna;
+    }
+
+    // ==============================
+    // RELATIONSHIPS (ERD)
+    // ==============================
+
+    /**
+     * PENGGUNA 1 -- N PEMINJAMAN
+     */
+    public function peminjaman()
+    {
+        return $this->hasMany(Peminjaman::class, 'id_pengguna', 'id_pengguna');
+    }
+
+    /**
+     * PENGGUNA 1 -- N RIWAYAT
+     */
+    public function riwayat()
+    {
+        return $this->hasMany(Riwayat::class, 'id_pengguna', 'id_pengguna');
     }
 }

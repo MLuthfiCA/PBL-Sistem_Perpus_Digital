@@ -78,12 +78,12 @@ Route::get('/katalog', function (Request $request) {
         });
     }
 
-    $paginator = $bukuQuery->orderBy('buku_id', 'desc')->paginate(8);
+    $paginator = $bukuQuery->orderBy('id_buku', 'desc')->paginate(8);
 
     $paginator->getCollection()->transform(function($buku) use ($statusMap) {
         return [
-            'id' => $buku->buku_id,
-            'buku_id' => $buku->buku_id,
+            'id' => $buku->id_buku,
+            'buku_id' => $buku->id_buku,
             'judul' => $buku->judul,
             'penulis' => $buku->penulis,
             'genre' => $buku->genre,
@@ -138,7 +138,7 @@ Route::get('/search', function (Request $request) {
 })->name('search');
 
 Route::get('/katalog/{id}', function ($id) {
-    $buku = Buku::where('buku_id', $id)->firstOrFail();
+    $buku = Buku::findOrFail($id);
     
     return view('user.pages.detail-buku', compact('buku'));
 })->name('katalog.detail');
@@ -205,13 +205,13 @@ Route::prefix('admin')->group(function () {
             'maintenance' => 'Perawatan',
         ];
 
-        $paginator = Buku::orderBy('buku_id', 'desc')->paginate(8);
+        $paginator = Buku::orderBy('id_buku', 'desc')->paginate(8);
 
         $paginator->getCollection()->transform(function($buku) use ($statusMap) {
             return [
-                'id' => $buku->buku_id,
-                'buku_id' => $buku->buku_id,
-                'book_id' => $buku->buku_id,
+                'id' => $buku->id_buku,
+                'buku_id' => $buku->id_buku,
+                'book_id' => $buku->id_buku,
                 'judul' => $buku->judul,
                 'penulis' => $buku->penulis,
                 'genre' => $buku->genre,

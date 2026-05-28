@@ -2,52 +2,97 @@
 
 namespace App\Models;
 
-use App\Models\Peminjaman;
-use App\Models\Category;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
+/**
+ * Model BUKU (ERD)
+ *
+ * @property int $id_buku
+ * @property string $judul
+ * @property string $penulis
+ * @property string $penerbit
+ * @property int $tahun_terbit
+ * @property string $isbn
+ * @property int $stok
+ * @property string|null $deskripsi
+ * @property int $id_kategori
+ * @property string|null $cetakan
+ * @property string|null $genre
+ * @property string $bahasa
+ */
 class Buku extends Model
 {
+    use HasFactory, SoftDeletes;
+
     protected $table = 'buku';
-    protected $primaryKey = 'buku_id';
+    protected $primaryKey = 'id_buku';
+    public $timestamps = true;
+
     protected $fillable = [
-        'buku_id',
         'judul',
-        'slug',
         'penulis',
-        'genre',
-        'isbn',
         'penerbit',
         'tahun_terbit',
-        'cetakan',
-        'bahasa',
-        'kategori_id',
+        'isbn',
         'stok',
-        'status',
         'deskripsi',
+        'id_kategori',
+        'cetakan',
+        'genre',
+        'bahasa',
+        'slug',
         'cover',
-        'tampil_katalog'
+        'lokasi_rak',
+        'tampil_katalog',
+        'status',
     ];
 
-    // Translate raw status to Indonesian for UI consistency
-    public function getStatusAttribute($value)
+    // ==============================
+    // ACCESSORS (Compatibility)
+    // ==============================
+
+    public function getBukuIdAttribute()
     {
-        $map = [
-            'available' => 'Tersedia',
-            'borrowed' => 'Dipinjam',
-            'lost' => 'Hilang',
-            'maintenance' => 'Perawatan',
-        ];
-        return $map[$value] ?? $value;
-    }
-    public function peminjamans()
-    {
-        return $this->hasMany(Peminjaman::class, 'buku_id');
+        return $this->id_buku;
     }
 
-    // Category relationship
-    public function category()
+    public function getIdAttribute()
     {
-        return $this->belongsTo(Category::class, 'kategori_id', 'kategori_id');
+        return $this->id_buku;
+    }
+
+    public function getKategoriIdAttribute()
+    {
+        return $this->id_kategori;
+    }
+
+    // ==============================
+    // RELATIONSHIPS (ERD)
+    // ==============================
+
+    /**
+     * BUKU N -- 1 KATEGORI (Terdiri)
+     */
+    public function kategori()
+    {
+        return $this->belongsTo(Kategori::class, 'id_kategori', 'id_kategori');
+    }
+
+    /**
+     * BUKU referenced by DETAIL_PEMINJAMAN
+     */
+    public function detailPeminjaman()
+    {
+        return $this->hasMany(DetailPeminjaman::class, 'id_buku', 'id_buku');
+    }
+
+    /**
+     * BUKU referenced by PEMINJAMAN (relasi langsung, dipertahankan)
+     */
+    public function peminjaman()
+    {
+        return $this->hasMany(Peminjaman::class, 'id_buku', 'id_buku');
     }
 }

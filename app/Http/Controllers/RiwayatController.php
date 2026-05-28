@@ -16,13 +16,13 @@ class RiwayatController extends Controller
 
         try {
             // Fetch active loans (dipinjam)
-            $peminjaman = Peminjaman::where('user_id', $userId)
+            $peminjaman = Peminjaman::where('id_pengguna', $userId)
                 ->where('status', 'dipinjam')
                 ->with('buku')
                 ->get();
 
             // Fetch return history (dikembalikan)
-            $pengembalian = Peminjaman::where('user_id', $userId)
+            $pengembalian = Peminjaman::where('id_pengguna', $userId)
                 ->where('status', 'dikembalikan')
                 ->with('buku')
                 ->orderBy('updated_at', 'desc')

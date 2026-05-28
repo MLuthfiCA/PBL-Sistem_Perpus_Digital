@@ -19,7 +19,7 @@ class UserController extends Controller
         // Search by name, username, email, or identity number
         if ($search) {
             $query->where(function($q) use ($search) {
-                $q->where('full_name', 'like', "%$search%")
+                $q->where('nama', 'like', "%$search%")
                   ->orWhere('username', 'like', "%$search%")
                   ->orWhere('email', 'like', "%$search%")
                   ->orWhere('identity_number', 'like', "%$search%");
@@ -44,13 +44,20 @@ class UserController extends Controller
     // Store new user
     public function store(Request $request)
     {
+        if ($request->has('full_name') && !$request->has('nama')) {
+            $request->merge(['nama' => $request->full_name]);
+        }
+        if ($request->role === 'student') {
+            $request->merge(['role' => 'mahasiswa']);
+        }
+
         $validated = $request->validate([
-            'full_name' => 'required|string|max:255',
+            'nama' => 'required|string|max:255',
             'identity_number' => 'required|string|max:255|unique:users,identity_number',
             'username' => 'required|string|max:255|unique:users,username',
             'email' => 'required|email|max:255|unique:users,email',
             'password' => 'required|string|min:6',
-            'role' => 'required|in:admin,student',
+            'role' => 'required|in:admin,mahasiswa',
             'status' => 'required|in:active,inactive,suspended',
         ], [
             'identity_number.unique' => 'ID Number sudah terdaftar. Tidak bisa menambahkan data dengan ID Number yang sama.',
@@ -64,14 +71,21 @@ class UserController extends Controller
     // Update existing user
     public function update(Request $request, $id)
     {
+        if ($request->has('full_name') && !$request->has('nama')) {
+            $request->merge(['nama' => $request->full_name]);
+        }
+        if ($request->role === 'student') {
+            $request->merge(['role' => 'mahasiswa']);
+        }
+
         $user = User::findOrFail($id);
         $validated = $request->validate([
-            'full_name' => 'required|string|max:255',
-            'identity_number' => 'required|string|max:255|unique:users,identity_number,' . $id . ',user_id',
-            'username' => 'required|string|max:255|unique:users,username,' . $id . ',user_id',
-            'email' => 'required|email|max:255|unique:users,email,' . $id . ',user_id',
+            'nama' => 'required|string|max:255',
+            'identity_number' => 'required|string|max:255|unique:users,identity_number,' . $id . ',id_pengguna',
+            'username' => 'required|string|max:255|unique:users,username,' . $id . ',id_pengguna',
+            'email' => 'required|email|max:255|unique:users,email,' . $id . ',id_pengguna',
             'password' => 'nullable|string|min:6',
-            'role' => 'required|in:admin,student',
+            'role' => 'required|in:admin,mahasiswa',
             'status' => 'required|in:active,inactive,suspended',
         ]);
 
