@@ -33,7 +33,7 @@ class LoginController extends Controller
             // Verify role matches
             if ($user->role !== $databaseRole) {
                 Auth::logout();
-                return back()->withErrors(['login_error' => 'Username dan role tidak sesuai.']);
+                return back()->withErrors(['login_error' => 'Username and role do not match.']);
             }
             
             // Simpan data esensial ke session agar sesuai dengan arsitektur saat ini
@@ -53,6 +53,6 @@ class LoginController extends Controller
         }
 
         // Jika username/password salah
-        return back()->withErrors(['login_error' => 'Username atau password salah. Silakan coba lagi.']);
+        return back()->withErrors(['login_error' => 'Incorrect username or password. Please try again.']);
     }
 }
