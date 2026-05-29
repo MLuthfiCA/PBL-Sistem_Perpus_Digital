@@ -75,9 +75,12 @@
                 </div>
             </form>
             
-            <div class="mt-8 text-center">
+            <div class="mt-8 text-center space-y-2">
                 <p class="text-xs text-gray-400 font-medium">
                     Access is restricted to registered library accounts.
+                </p>
+                <p class="text-sm text-gray-500">
+                    Don't have an account yet? <a href="{{ route('register') }}" class="font-bold text-burgundy-600 hover:text-maroon transition-colors">Register here</a>
                 </p>
             </div>
         </div>

@@ -12,7 +12,7 @@
         </div>
 
         <div class="glass-panel p-8 shadow-2xl shadow-red-50 border-white/60">
-            <form class="space-y-5" action="{{ route('register') }}" method="POST">
+            <form class="space-y-5" action="{{ route('register.post') }}" method="POST">
                 @csrf
 
                 @if($errors->any())
@@ -24,28 +24,24 @@
                     </ul>
                 </div>
                 @endif
-                <div class="grid grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2 ml-1">Username</label>
-                        <input name="username" type="text" required class="w-full px-4 py-3.5 border border-white bg-white/50 rounded-2xl placeholder-gray-400 text-gray-800 focus:outline-none focus:ring-4 focus:ring-red-100 focus:border-burgundy-500 transition-all text-sm font-medium" placeholder="Ex: crist">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2 ml-1">Role</label>
-                        <select name="role" class="w-full px-4 py-3.5 border border-white bg-white/50 rounded-2xl text-gray-800 focus:outline-none focus:ring-4 focus:ring-red-100 focus:border-burgundy-500 transition-all text-sm font-medium cursor-pointer appearance-none">
-                            <option value="mahasiswa">Student</option>
-                            <option value="admin">Admin</option>
-                        </select>
-                    </div>
+                <div>
+                    <label class="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2 ml-1">Full name</label>
+                    <input name="nama" type="text" value="{{ old('nama') }}" required class="w-full px-4 py-3.5 border border-white bg-white/50 rounded-2xl placeholder-gray-400 text-gray-800 focus:outline-none focus:ring-4 focus:ring-red-100 focus:border-burgundy-500 transition-all text-sm font-medium" placeholder="Your full name">
                 </div>
 
                 <div>
-                    <label class="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2 ml-1">Full name</label>
-                    <input name="name" type="text" required class="w-full px-4 py-3.5 border border-white bg-white/50 rounded-2xl placeholder-gray-400 text-gray-800 focus:outline-none focus:ring-4 focus:ring-red-100 focus:border-burgundy-500 transition-all text-sm font-medium" placeholder="Your full name">
+                    <label class="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2 ml-1">Username</label>
+                    <input name="username" type="text" value="{{ old('username') }}" required class="w-full px-4 py-3.5 border border-white bg-white/50 rounded-2xl placeholder-gray-400 text-gray-800 focus:outline-none focus:ring-4 focus:ring-red-100 focus:border-burgundy-500 transition-all text-sm font-medium" placeholder="Choose a username">
                 </div>
 
                 <div>
                     <label class="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2 ml-1">Email</label>
-                    <input name="email" type="email" required class="w-full px-4 py-3.5 border border-white bg-white/50 rounded-2xl placeholder-gray-400 text-gray-800 focus:outline-none focus:ring-4 focus:ring-red-100 focus:border-burgundy-500 transition-all text-sm font-medium" placeholder="email@example.com">
+                    <input name="email" type="email" value="{{ old('email') }}" required class="w-full px-4 py-3.5 border border-white bg-white/50 rounded-2xl placeholder-gray-400 text-gray-800 focus:outline-none focus:ring-4 focus:ring-red-100 focus:border-burgundy-500 transition-all text-sm font-medium" placeholder="email@example.com">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2 ml-1">Student ID (NIM)</label>
+                    <input name="nim" type="text" value="{{ old('nim') }}" required class="w-full px-4 py-3.5 border border-white bg-white/50 rounded-2xl placeholder-gray-400 text-gray-800 focus:outline-none focus:ring-4 focus:ring-red-100 focus:border-burgundy-500 transition-all text-sm font-medium" placeholder="Enter your student ID number">
                 </div>
 
                 <div>
