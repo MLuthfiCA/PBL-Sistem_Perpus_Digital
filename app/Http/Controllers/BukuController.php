@@ -88,7 +88,7 @@ class BukuController extends Controller
         // Update the book record
         $buku->update($validated);
 
-        return redirect()->route('admin.katalog')->with('success', 'Data berhasil diupdate');
+        return redirect()->route('admin.katalog')->with('success', 'Data updated successfully');
     }
 
     public function destroy($id)
@@ -96,7 +96,7 @@ class BukuController extends Controller
         $buku = Buku::findOrFail($id);
         $buku->delete();
 
-        return redirect()->route('katalog')->with('success', 'Data berhasil dihapus');
+        return redirect()->route('katalog')->with('success', 'Data deleted successfully');
     }
 
   public function store(Request $request)
@@ -163,7 +163,7 @@ class BukuController extends Controller
             $userId = $user['id'] ?? null;
             
             if (!$userId) {
-                return back()->with('error', 'User tidak ditemukan. Silakan login kembali.');
+                return back()->with('error', 'User not found. Please log in again.');
             }
 
             $tanggalKembali = date('Y-m-d', strtotime($request->tanggal_pinjam . ' + 7 days'));
@@ -185,10 +185,10 @@ class BukuController extends Controller
                 ]);
             }
 
-            return redirect()->back()->with('success', 'Peminjaman berhasil diajukan! Silakan temui admin.');
+            return redirect()->back()->with('success', 'Borrowing successfully submitted! Please contact the admin.');
         } catch (\Exception $e) {
-            \Log::error('Peminjaman error: ' . $e->getMessage());
-            return back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
+            \Log::error('Borrowing error: ' . $e->getMessage());
+            return back()->with('error', 'There is an error: ' . $e->getMessage());
         }
     }
 }
