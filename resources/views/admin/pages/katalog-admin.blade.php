@@ -99,7 +99,7 @@
                         <form action="{{ route('admin.delete', $buku['id']) }}" method="POST" onsubmit="return confirm('Remove this book from the catalog?')">
                             @csrf
                             @method('DELETE')
-                            <button type="submit" class="text-red-500 font-bold text-[10px] bg-red-50 px-2 py-1.5 rounded-lg border border-red-100 uppercase tracking-widest">Del</button>
+                            <button type="submit" class="text-red-500 font-bold text-[10px] bg-red-50 px-2 py-1.5 rounded-lg border border-red-100 uppercase tracking-widest">Delete</button>
                         </form>
                     </div>
                 </div>
@@ -173,7 +173,7 @@
                                             <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-1 12a2 2 0 01-2 2H8a2 2 0 01-2-2L5 7m5 4v6m4-6v6M9 7V4a1 1 0 011-1h4a1 1 0 011 1v3M4 7h16" />
                                             </svg>
-                                            Del
+                                            Delete
                                         </button>
                                     </form>
                                 </div>
