@@ -37,6 +37,12 @@ class Peminjaman extends Model
         'id_buku',
     ];
 
+    protected $casts = [
+        'tanggal_pinjam' => 'date',
+        'tanggal_kembali' => 'date',
+        'batas_kembali' => 'date',
+    ];
+
     // ==============================
     // ACCESSORS (Compatibility)
     // ==============================
@@ -87,6 +93,14 @@ class Peminjaman extends Model
     public function riwayat()
     {
         return $this->hasMany(Riwayat::class, 'id_peminjaman', 'id_peminjaman');
+    }
+
+    /**
+     * PEMINJAMAN N -- 1 BUKU
+     */
+    public function buku()
+    {
+        return $this->belongsTo(Buku::class, 'id_buku', 'id_buku');
     }
 
     // ==============================

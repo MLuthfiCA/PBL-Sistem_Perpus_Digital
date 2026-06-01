@@ -18,6 +18,10 @@ class RiwayatController extends Controller
             // Fetch active loans (dipinjam)
             $peminjaman = Peminjaman::where('id_pengguna', $userId)
                 ->where('status', 'dipinjam')
+                ->orWhere(function ($query) use ($userId) {
+                    $query->where('id_pengguna', $userId)
+                        ->where('status', 'terlambat');
+                })
                 ->with('buku')
                 ->get();
 
