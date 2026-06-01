@@ -2,7 +2,10 @@
 
 @section('content')
 <div class="py-10 space-y-10" x-data="{ view: 'grid' }">
-    
+
+    <!-- Overdue Books Warning -->
+    <x-overdue-warning />
+
     <!-- Page Header -->
     <x-ui.page-header 
         title="Library Catalog"

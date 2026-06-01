@@ -89,11 +89,32 @@ class Peminjaman extends Model
         return $this->hasMany(Riwayat::class, 'id_peminjaman', 'id_peminjaman');
     }
 
-    /**
-     * Relasi langsung ke buku (dipertahankan dari database lama)
-     */
-    public function buku()
+    // ==============================
+    // METHODS & HELPERS
+    // ==============================
+
+    public function calculateOverdueDays()
     {
-        return $this->belongsTo(Buku::class, 'id_buku', 'id_buku');
+        if (!$this->batas_kembali) {
+            return 0;
+        }
+        return max(0, now()->diffInDays($this->batas_kembali, false));
+    }
+
+    public function calculateDenda()
+    {
+        $overdaysDays = $this->calculateOverdueDays();
+        return max($this->denda, $overdaysDays * 5000);
+    }
+
+    public function isOverdue()
+    {
+        if ($this->status === 'terlambat') {
+            return true;
+        }
+        if ($this->status === 'dipinjam' && $this->batas_kembali && now()->isAfter($this->batas_kembali)) {
+            return true;
+        }
+        return false;
     }
 }

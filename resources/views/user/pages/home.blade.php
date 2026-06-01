@@ -2,7 +2,10 @@
 
 @section('content')
 <div class="space-y-8">
-    
+
+    <!-- Overdue Books Warning -->
+    <x-overdue-warning />
+
     <!-- Welcome Header -->
     <div class="glass-panel p-8 md:p-12 relative overflow-hidden animate-fade-up border-white/60">
         <div class="relative z-10 max-w-2xl">
