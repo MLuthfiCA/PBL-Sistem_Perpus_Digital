@@ -232,6 +232,10 @@ Route::prefix('admin')->group(function () {
         return view('admin.pages.katalog-admin', ['Buku' => $paginator]);
     })->name('admin.katalog');
 
+    // Soft-deleted books (trash) routes
+    Route::get('/katalog/trash', [BukuController::class, 'trash'])->name('admin.katalog.trash');
+    Route::post('/katalog/{id}/restore', [BukuController::class, 'restore'])->name('admin.katalog.restore');
+
     // Route detail, edit, update, dan delete
     Route::get('/katalog/{id}', [BukuController::class, 'showAdmin'])->name('admin.katalog.detail');
     Route::get('/katalog/{id}/edit', [BukuController::class, 'edit'])->name('admin.edit_buku');

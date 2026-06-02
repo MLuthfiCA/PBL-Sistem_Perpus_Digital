@@ -27,12 +27,15 @@
                 </button>
             </div>
 
-            <a href="{{ route('admin.buku.create') }}" class="w-full sm:w-auto justify-center px-6 py-3.5 bg-burgundy-500 text-white rounded-2xl text-sm font-bold shadow-lg shadow-red-100 hover:bg-maroon transition-all transform active:scale-95 flex items-center gap-2">
+            <div class="flex items-center gap-3">
+                <a href="{{ route('admin.buku.create') }}" class="w-full sm:w-auto justify-center px-6 py-3.5 bg-burgundy-500 text-white rounded-2xl text-sm font-bold shadow-lg shadow-red-100 hover:bg-maroon transition-all transform active:scale-95 flex items-center gap-2">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
                 </svg>
                 Add New Book
             </a>
+                <a href="{{ route('admin.katalog.trash') }}" class="px-4 py-2 bg-white rounded-2xl border border-gray-100 shadow-sm text-sm font-bold hover:bg-red-50">View Trash</a>
+            </div>
         </div>
 
         <div class="col-span-full mt-6">
@@ -57,8 +60,8 @@
                     </a>
                     
                     <!-- Availability Badge -->
-                    <div class="absolute top-4 right-4 px-3 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-widest backdrop-blur-xl {{ $buku['status'] == 'Tersedia' ? 'bg-green-500/10 text-green-600 border border-green-200' : 'bg-red-500/10 text-red-600 border border-red-200' }}">
-                        {{ $buku['status'] == 'Tersedia' ? 'AVAILABLE' : 'BORROWED' }}
+                    <div class="absolute top-4 right-4 px-3 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-widest backdrop-blur-xl {{ ($buku['status'] == 'Tersedia' && ($buku['stok'] ?? 0) > 0) ? 'bg-green-500/10 text-green-600 border border-green-200' : 'bg-red-500/10 text-red-600 border border-red-200' }}">
+                        {{ ($buku['status'] == 'Tersedia' && ($buku['stok'] ?? 0) > 0) ? 'AVAILABLE' : 'BORROWED' }}
                     </div>
 
                     <!-- Admin Action Overlay (Desktop only) -->
@@ -152,10 +155,10 @@
                             </td>
                             <td class="px-8 py-6">
                                 <div class="flex items-center gap-2.5">
-                                    <div class="w-2.5 h-2.5 rounded-full {{ $buku['status'] == 'Tersedia' ? 'bg-green-500 shadow-lg shadow-green-200' : 'bg-red-400 shadow-lg shadow-red-100' }}"></div>
-                                    <span class="text-sm font-bold {{ $buku['status'] == 'Tersedia' ? 'text-green-600' : 'text-red-400' }}">
-                                        {{ $buku['status'] == 'Tersedia' ? 'Available' : 'Borrowed' }}
-                                    </span>
+                                                    <div class="w-2.5 h-2.5 rounded-full {{ ($buku['status'] == 'Tersedia' && ($buku['stok'] ?? 0) > 0) ? 'bg-green-500 shadow-lg shadow-green-200' : 'bg-red-400 shadow-lg shadow-red-100' }}"></div>
+                                                    <span class="text-sm font-bold {{ ($buku['status'] == 'Tersedia' && ($buku['stok'] ?? 0) > 0) ? 'text-green-600' : 'text-red-400' }}">
+                                                        {{ ($buku['status'] == 'Tersedia' && ($buku['stok'] ?? 0) > 0) ? 'Available' : 'Borrowed' }}
+                                                    </span>
                                 </div>
                             </td>
                             <td class="px-8 py-6 text-right">

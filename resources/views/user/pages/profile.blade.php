@@ -43,11 +43,11 @@
                 <div class="flex justify-between items-center text-sm border-t border-red-50 pt-4">
                     <div>
                         <p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Borrow Date</p>
-                        <p class="font-bold text-gray-700">{{ $p->tanggal_pinjam }}</p>
+                        <p class="font-bold text-gray-700">{{ optional($p->tanggal_pinjam)->format('Y-m-d') }}</p>
                     </div>
                     <div class="text-right">
                         <p class="text-[10px] text-red-400 font-bold uppercase tracking-wider">Return Limit</p>
-                        <p class="font-bold text-red-600">{{ $p->batas_kembali }}</p>
+                        <p class="font-bold text-red-600">{{ optional($p->batas_kembali)->format('Y-m-d') }}</p>
                     </div>
                 </div>
 
@@ -119,7 +119,7 @@
                             </td>
                             <td class="px-8 py-6 text-right">
                                 <span class="px-3 py-1.5 rounded-lg bg-green-50 text-green-600 text-[10px] font-bold uppercase tracking-widest border border-green-100">
-                                    {{ $k->tanggal_kembali }}
+                                    {{ optional($k->tanggal_kembali)->format('Y-m-d') }}
                                 </span>
                             </td>
                         </tr>

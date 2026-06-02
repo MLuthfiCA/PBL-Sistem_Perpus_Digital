@@ -130,6 +130,8 @@
                                 <option value="">Select Status</option>
                                 <option value="Tersedia" {{ ($buku['status'] ?? '') == 'Tersedia' || ($buku['status'] ?? '') == 'available' ? 'selected' : '' }}>Available</option>
                                 <option value="Dipinjam" {{ ($buku['status'] ?? '') == 'Dipinjam' || ($buku['status'] ?? '') == 'borrowed' ? 'selected' : '' }}>Borrowed</option>
+                                <option value="Hilang" {{ ($buku['status'] ?? '') == 'Hilang' ? 'selected' : '' }}>Lost</option>
+                                <option value="Perawatan" {{ ($buku['status'] ?? '') == 'Perawatan' ? 'selected' : '' }}>Maintenance</option>
                             </select>
                         </div>
                         <div>

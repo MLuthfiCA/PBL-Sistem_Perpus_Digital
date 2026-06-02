@@ -36,6 +36,9 @@ class LoginController extends Controller
                 return back()->withErrors(['login_error' => 'Username and role do not match.']);
             }
 
+            /** @var \App\Models\User $user */
+$user = Auth::user();
+
             // Ambil data buku yang terlambat
             $booksOverdue = $user->peminjaman()
                 ->where(function ($query) {

@@ -55,8 +55,8 @@
                     </div>
                     {{-- Status Badge --}}
                     <div class="absolute -top-3 -right-3 px-4 py-2 rounded-2xl shadow-xl backdrop-blur-xl font-black text-xs uppercase tracking-widest
-                        {{ $buku['status'] == 'Tersedia' ? 'bg-green-500 text-white shadow-green-200' : 'bg-red-500 text-white shadow-red-200' }}">
-                        {{ $buku['status'] == 'Tersedia' ? 'AVAILABLE' : 'BORROWED' }}
+                        {{ ($buku['status'] == 'Tersedia' && ($buku['stok'] ?? 0) > 0) ? 'bg-green-500 text-white shadow-green-200' : 'bg-red-500 text-white shadow-red-200' }}">
+                        {{ ($buku['status'] == 'Tersedia' && ($buku['stok'] ?? 0) > 0) ? 'AVAILABLE' : 'BORROWED' }}
                     </div>
                 </div>
 
@@ -102,8 +102,8 @@
                     </div>
                     <div class="bg-white/60 rounded-2xl p-4 border border-white/80">
                         <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Status</p>
-                        <p class="text-sm font-bold {{ $buku['status'] == 'Tersedia' ? 'text-green-600' : 'text-red-500' }}">
-                            {{ $buku['status'] == 'Tersedia' ? 'Available' : ( $buku['status'] == 'Dipinjam' ? 'Borrowed' : $buku['status'] ) }}
+                        <p class="text-sm font-bold {{ ($buku['status'] == 'Tersedia' && ($buku['stok'] ?? 0) > 0) ? 'text-green-600' : 'text-red-500' }}">
+                            {{ ($buku['status'] == 'Tersedia' && ($buku['stok'] ?? 0) > 0) ? 'Available' : ( $buku['status'] == 'Dipinjam' ? 'Borrowed' : $buku['status'] ) }}
                         </p>
                     </div>
                     <div class="bg-white/60 rounded-2xl p-4 border border-white/80">

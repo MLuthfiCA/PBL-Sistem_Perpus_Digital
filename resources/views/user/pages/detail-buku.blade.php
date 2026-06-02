@@ -27,8 +27,8 @@
                 </div>
 
                 <!-- Status Badge Floating -->
-                <div class="absolute -top-4 -right-4 px-6 py-3 rounded-2xl shadow-xl backdrop-blur-xl border-2 {{ $buku['status'] == 'Tersedia' ? 'bg-green-500/90 text-white border-green-400' : 'bg-red-500/90 text-white border-red-400' }} font-black text-xs uppercase tracking-widest animate-bounce-slow">
-                    {{ $buku['status'] == 'Tersedia' ? 'AVAILABLE' : 'BORROWED' }}
+                <div class="absolute -top-4 -right-4 px-6 py-3 rounded-2xl shadow-xl backdrop-blur-xl border-2 {{ $buku['status'] == 'Tersedia' && ($buku['stok'] ?? 0) > 0 ? 'bg-green-500/90 text-white border-green-400' : 'bg-red-500/90 text-white border-red-400' }} font-black text-xs uppercase tracking-widest animate-bounce-slow">
+                    {{ $buku['status'] == 'Tersedia' && ($buku['stok'] ?? 0) > 0 ? 'AVAILABLE' : 'BORROWED' }}
                 </div>
             </div>
         </div>
@@ -53,7 +53,7 @@
                 </div>
                 <div class="glass-panel p-6 border-white/40 bg-white/20">
                     <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2">Availability</p>
-                    <p class="text-lg font-bold {{ $buku['status'] == 'Tersedia' ? 'text-green-600' : 'text-red-500' }}">{{ $buku['status'] == 'Tersedia' ? 'Available' : 'Borrowed' }}</p>
+                    <p class="text-lg font-bold {{ $buku['status'] == 'Tersedia' && ($buku['stok'] ?? 0) > 0 ? 'text-green-600' : 'text-red-500' }}">{{ $buku['status'] == 'Tersedia' && ($buku['stok'] ?? 0) > 0 ? 'Available' : 'Borrowed' }}</p>
                 </div>
                 <div class="glass-panel p-6 border-white/40 bg-white/20">
                     <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2">Publication Year</p>
@@ -80,7 +80,7 @@
             </div>
 
             <div class="pt-8 flex flex-col sm:flex-row gap-4">
-                @if($buku['status'] == 'Tersedia')
+                @if($buku['status'] == 'Tersedia' && ($buku['stok'] ?? 0) > 0)
                 <a href="{{ route('pengajuan', ['judul' => $buku['judul'], 'id' => $buku['id'], 'book_id' => $buku['book_id'] ?? ('B-' . str_pad($buku['id'], 3, '0', STR_PAD_LEFT)), 'cover' => $buku['cover']]) }}" 
                     class="px-10 py-5 bg-burgundy-500 text-white rounded-2xl font-bold text-lg shadow-2xl shadow-red-200 hover:bg-maroon hover:-translate-y-1 transition-all flex items-center justify-center gap-3">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">

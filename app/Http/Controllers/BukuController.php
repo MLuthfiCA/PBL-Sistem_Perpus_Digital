@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use App\Models\Buku;
 use App\Models\Peminjaman;
 
@@ -66,14 +67,14 @@ class BukuController extends Controller
         $validated = $request->validate([
             'judul' => 'required|string|max:255',
             'penulis' => 'required|string|max:255',
-            'isbn' => 'nullable|string|max:50',
+            'isbn' => 'nullable|string|max:50|unique:buku,isbn,' . $id . ',id_buku',
             'genre' => 'required|string|max:255',
             'penerbit' => 'nullable|string|max:255',
             'tahun_terbit' => 'nullable|string|max:4',
             'cetakan' => 'nullable|string|max:255',
             'bahasa' => 'nullable|string|max:255',
             'stok' => 'nullable|integer|min:0',
-            'status' => 'required|in:Tersedia,Dipinjam',
+            'status' => 'required|in:Tersedia,Dipinjam,Hilang,Perawatan',
             'deskripsi' => 'nullable|string',
             'cover' => 'nullable|image|max:2048',
         ]);
@@ -96,11 +97,26 @@ class BukuController extends Controller
         $buku = Buku::findOrFail($id);
         $buku->delete();
 
-        return redirect()->route('katalog')->with('success', 'Data deleted successfully');
+        return redirect()->route('admin.katalog')->with('success', 'Book moved to trash successfully.');
     }
 
   public function store(Request $request)
 {
+    $validated = $request->validate([
+        'judul' => 'required|string|max:255',
+        'penulis' => 'required|string|max:255',
+        'isbn' => 'nullable|string|max:50|unique:buku,isbn',
+        'genre' => 'required|string|max:255',
+        'penerbit' => 'nullable|string|max:255',
+        'tahun_terbit' => 'nullable|string|max:4',
+        'cetakan' => 'nullable|string|max:255',
+        'bahasa' => 'nullable|string|max:255',
+        'status' => 'required|in:Tersedia,Dipinjam,Hilang,Perawatan',
+        'stok' => 'nullable|integer|min:0',
+        'deskripsi' => 'nullable|string',
+        'cover' => 'nullable|image|max:2048',
+    ]);
+
     try {
 
         // Upload cover
@@ -117,17 +133,17 @@ class BukuController extends Controller
 
         // Simpan buku
         Buku::create([
-            'judul' => $request->judul,
-            'penulis' => $request->penulis,
-            'genre' => $request->genre,
-            'isbn' => $request->isbn,
-            'penerbit' => $request->penerbit,
-            'tahun_terbit' => $request->tahun_terbit,
-            'cetakan' => $request->cetakan,
-            'bahasa' => $request->bahasa,
-            'status' => $request->status,
-            'stok' => $request->stok ?? 1,
-            'deskripsi' => $request->deskripsi,
+            'judul' => $validated['judul'],
+            'penulis' => $validated['penulis'],
+            'genre' => $validated['genre'],
+            'isbn' => $validated['isbn'] ?? null,
+            'penerbit' => $validated['penerbit'] ?? null,
+            'tahun_terbit' => $validated['tahun_terbit'] ?? null,
+            'cetakan' => $validated['cetakan'] ?? null,
+            'bahasa' => $validated['bahasa'] ?? null,
+            'status' => $validated['status'],
+            'stok' => $validated['stok'] ?? 1,
+            'deskripsi' => $validated['deskripsi'] ?? null,
             'cover' => $coverName,
             'id_kategori' => 1,
             'tampil_katalog' => 1,
@@ -147,6 +163,48 @@ class BukuController extends Controller
     $Buku = Buku::all(); // ambil dari database
     return view('admin.pages.katalog-admin', compact('Buku'));
 }
+
+    /**
+     * Show soft-deleted books (trash)
+     */
+    public function trash()
+    {
+        $trashed = Buku::onlyTrashed()->get()->map(function($buku) {
+            return [
+                'id' => $buku->id_buku,
+                'judul' => $buku->judul,
+                'penulis' => $buku->penulis,
+                'isbn' => $buku->isbn,
+                'stok' => $buku->stok,
+                'cover' => $buku->cover,
+                'deleted_at' => $buku->deleted_at ? $buku->deleted_at->format('d M Y, H:i') : 'N/A',
+            ];
+        });
+
+        return view('admin.pages.trash-buku', ['trashed' => $trashed]);
+    }
+
+    /**
+     * Restore a soft-deleted book
+     */
+    public function restore($id)
+    {
+        $buku = Buku::withTrashed()->where('id_buku', $id)->first();
+        if (!$buku) {
+            return redirect()->route('admin.katalog')->with('error', 'Book not found.');
+        }
+
+        if ($buku->trashed()) {
+            $buku->restore();
+            // ensure it's visible in catalog and set status if stock > 0
+            $buku->tampil_katalog = 1;
+            if ($buku->stok > 0) $buku->status = 'Tersedia';
+            $buku->save();
+            return redirect()->route('admin.katalog.trash')->with('success', 'Book restored successfully');
+        }
+
+        return redirect()->route('admin.katalog.trash')->with('error', 'Book is not deleted');
+    }
 
     public function storePeminjaman(Request $request)
     {
@@ -178,16 +236,20 @@ class BukuController extends Controller
                 'status_denda' => 'lunas',
             ]);
 
-            // Update book stock and status if needed
-            if ($buku->stok > 0) {
-                $buku->update([
-                    'stok' => $buku->stok - 1,
-                ]);
+            // Prevent borrowing when stock is empty
+            if ($buku->stok <= 0) {
+                return back()->with('error', 'Stok buku telah habis. Tidak bisa meminjam saat ini.');
             }
+
+            $newStock = max(0, $buku->stok - 1);
+            $buku->update([
+                'stok' => $newStock,
+                'status' => $newStock === 0 ? 'Dipinjam' : 'Tersedia',
+            ]);
 
             return redirect()->back()->with('success', 'Borrowing successfully submitted! Please contact the admin.');
         } catch (\Exception $e) {
-            \Log::error('Borrowing error: ' . $e->getMessage());
+            Log::error('Borrowing error: ' . $e->getMessage());
             return back()->with('error', 'There is an error: ' . $e->getMessage());
         }
     }

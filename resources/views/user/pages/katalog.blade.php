@@ -46,8 +46,8 @@
                         onerror="this.src='{{ asset('images/readspace-library.png') }}'">
                     
                     <!-- Availability Badge -->
-                    <div class="absolute top-4 right-4 px-3 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-widest backdrop-blur-xl {{ $buku['status'] == 'Tersedia' ? 'bg-green-500/10 text-green-600 border border-green-200' : 'bg-red-500/10 text-red-600 border border-red-200' }}">
-                        {{ $buku['status'] == 'Tersedia' ? 'AVAILABLE' : 'BORROWED' }}
+                    <div class="absolute top-4 right-4 px-3 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-widest backdrop-blur-xl {{ $buku['status'] == 'Tersedia' && ($buku['stok'] ?? 0) > 0 ? 'bg-green-500/10 text-green-600 border border-green-200' : 'bg-red-500/10 text-red-600 border border-red-200' }}">
+                        {{ $buku['status'] == 'Tersedia' && ($buku['stok'] ?? 0) > 0 ? 'AVAILABLE' : 'BORROWED' }}
                     </div>
                 </a>
                 
@@ -58,7 +58,7 @@
                 
                 <div class="mt-auto pt-5 border-t border-red-50 flex items-center justify-between">
                     <span class="px-2 py-1 rounded bg-white/80 text-[10px] font-bold text-burgundy-500 uppercase tracking-tighter border border-red-100">{{ $buku['genre'] }}</span>
-                    @if($buku['status'] == 'Tersedia')
+                    @if($buku['status'] == 'Tersedia' && ($buku['stok'] ?? 0) > 0)
                     <a href="{{ route('pengajuan', ['judul' => $buku['judul'], 'id' => $buku['id'], 'book_id' => $buku['book_id'] ?? ('B-' . str_pad($buku['id'], 3, '0', STR_PAD_LEFT)), 'cover' => $buku['cover']]) }}" class="text-burgundy-500 hover:text-maroon font-bold text-xs flex items-center gap-1 transition-all group-hover:translate-x-1">
                         Borrow Now
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -108,9 +108,9 @@
                             </td>
                             <td class="px-8 py-6">
                                 <div class="flex items-center gap-2.5">
-                                    <div class="w-2.5 h-2.5 rounded-full {{ $buku['status'] == 'Tersedia' ? 'bg-green-500 shadow-lg shadow-green-200' : 'bg-red-400 shadow-lg shadow-red-100' }}"></div>
-                                    <span class="text-sm font-bold {{ $buku['status'] == 'Tersedia' ? 'text-green-600' : 'text-red-400' }}">
-                                        {{ $buku['status'] == 'Tersedia' ? 'Available' : 'Borrowed' }}
+                                    <div class="w-2.5 h-2.5 rounded-full {{ $buku['status'] == 'Tersedia' && ($buku['stok'] ?? 0) > 0 ? 'bg-green-500 shadow-lg shadow-green-200' : 'bg-red-400 shadow-lg shadow-red-100' }}"></div>
+                                    <span class="text-sm font-bold {{ $buku['status'] == 'Tersedia' && ($buku['stok'] ?? 0) > 0 ? 'text-green-600' : 'text-red-400' }}">
+                                        {{ $buku['status'] == 'Tersedia' && ($buku['stok'] ?? 0) > 0 ? 'Available' : 'Borrowed' }}
                                     </span>
                                 </div>
                             </td>

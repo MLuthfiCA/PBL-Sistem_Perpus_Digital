@@ -39,17 +39,60 @@
     </div>
 
     <div class="space-y-6 animate-fade-up delay-200">
-        <div class="flex items-center justify-between">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <h2 class="text-2xl font-bold text-gray-800 flex items-center gap-3">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-burgundy-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
                 </svg>
                 Active Loans
             </h2>
-            <span class="px-4 py-1.5 rounded-full bg-red-50 text-burgundy-600 font-bold text-sm">
-                Total: {{ count($books ?? []) }} Books
+            <span class="px-4 py-1.5 rounded-full bg-red-50 text-burgundy-600 font-bold text-sm self-start sm:self-auto">
+                Total: {{ $books->total() }} Books
             </span>
         </div>
+
+        <!-- Search & Filter Bar -->
+        <x-ui.glass-card class="p-4 border-white/60 shadow-md">
+            <form action="{{ route('admin.profile') }}" method="GET" class="flex flex-col md:flex-row items-center gap-4">
+                <!-- Search Input -->
+                <div class="relative w-full md:flex-1">
+                    <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 pointer-events-none text-gray-400">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                        </svg>
+                    </span>
+                    <input type="text" name="search" value="{{ request('search') }}" placeholder="Search by borrower name or book title..." 
+                        class="w-full pl-11 pr-4 py-3 bg-white/80 border border-gray-100 rounded-2xl text-sm font-medium text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-burgundy-500/20 focus:border-burgundy-500 transition-all">
+                </div>
+
+                <!-- Status Filter -->
+                <div class="relative w-full md:w-56">
+                    <select name="status" onchange="this.form.submit()" 
+                        class="w-full px-4 py-3 bg-white/80 border border-gray-100 rounded-2xl text-sm font-bold text-gray-600 focus:outline-none focus:ring-2 focus:ring-burgundy-500/20 focus:border-burgundy-500 transition-all appearance-none cursor-pointer">
+                        <option value="all" {{ request('status') === 'all' ? 'selected' : '' }}>All Status</option>
+                        <option value="dipinjam" {{ request('status') === 'dipinjam' ? 'selected' : '' }}>Borrowed (Dipinjam)</option>
+                        <option value="dikembalikan" {{ request('status') === 'dikembalikan' ? 'selected' : '' }}>Returned (Dikembalikan)</option>
+                    </select>
+                    <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-gray-400">
+                        <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+                            <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/>
+                        </svg>
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="flex items-center gap-2 w-full md:w-auto">
+                    <button type="submit" class="flex-1 md:flex-initial px-6 py-3 bg-burgundy-500 text-white rounded-2xl text-sm font-bold shadow-md hover:bg-maroon transition-all transform active:scale-95 whitespace-nowrap">
+                        Search
+                    </button>
+                    @if(request()->filled('search') || request('status') !== 'all')
+                        <a href="{{ route('admin.profile') }}" class="px-5 py-3 bg-white border border-gray-100 text-gray-500 rounded-2xl text-sm font-bold hover:bg-gray-50 transition-all transform active:scale-95 flex items-center justify-center">
+                            Reset
+                        </a>
+                    @endif
+                </div>
+            </form>
+        </x-ui.glass-card>
         
         <div class="glass-panel border-white/60 shadow-lg shadow-red-50 rounded-2xl overflow-hidden">
                 <div class="hidden md:grid grid-cols-12 gap-4 px-8 py-5 border-b border-gray-100 bg-gray-50/30 text-[11px] font-bold text-gray-400 uppercase tracking-wider">
@@ -147,14 +190,20 @@
                 <div class="p-10 text-center">
                     <div class="w-16 h-16 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-4 text-burgundy-300">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                         </svg>
                     </div>
-                    <p class="text-gray-400 font-medium">Incredible! Currently there are no books in borrowed status.</p>
+                    <p class="text-gray-400 font-medium">No borrowing records found.</p>
                 </div>
                 @endforelse
             </div>
         </div>
+
+        @if(isset($books) && method_exists($books, 'links'))
+            <div class="mt-6 flex justify-center text-gray-700">
+                {{ $books->links() }}
+            </div>
+        @endif
     </div>
 </div>
 @endsection

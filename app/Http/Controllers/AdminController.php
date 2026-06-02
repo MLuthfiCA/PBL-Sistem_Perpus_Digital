@@ -22,13 +22,36 @@ class AdminController extends Controller
         return redirect('/admin/data_user')->with('success', 'User deleted successfully');
     }
 
-    public function profile()
+    public function profile(\Illuminate\Http\Request $request)
     {
-        // Mengambil semua data peminjaman agar tabel tidak kosong
-        $books = Peminjaman::with(['user', 'buku'])
-            ->orderBy('status', 'desc') // 'dipinjam' akan muncul di atas 'dikembalikan'
-            ->orderBy('created_at', 'desc')
-            ->get();
+        $query = Peminjaman::with(['user', 'buku']);
+
+        // Search by borrower name or book title
+        if ($request->filled('search')) {
+            $search = $request->input('search');
+            $query->where(function ($q) use ($search) {
+                $q->whereHas('user', function ($uq) use ($search) {
+                    $uq->where('nama', 'like', "%{$search}%")
+                       ->orWhere('username', 'like', "%{$search}%")
+                       ->orWhere('email', 'like', "%{$search}%");
+                })->orWhereHas('buku', function ($bq) use ($search) {
+                    $bq->where('judul', 'like', "%{$search}%");
+                });
+            });
+        }
+
+        // Filter by status
+        if ($request->filled('status')) {
+            $status = $request->input('status');
+            if ($status !== 'all') {
+                $query->where('status', $status);
+            }
+        }
+
+        $books = $query->orderBy('created_at', 'desc')
+            ->paginate(5)
+            ->withQueryString();
+
         return view('admin.pages.profile', compact('books'));
     }
 

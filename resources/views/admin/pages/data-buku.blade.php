@@ -193,6 +193,8 @@
                                 <option value="">Select Status</option>
                                 <option value="Tersedia">Available</option>
                                 <option value="Dipinjam">Borrowed</option>
+                                <option value="Hilang">Lost</option>
+                                <option value="Perawatan">Maintenance</option>
 
                             </select>
                         </div>
@@ -236,9 +238,9 @@
                             </label>
 
                             <input type="number" 
-                                   name="stok"
-                                   min="1"
-                                   value="1"
+                                name="stok"
+                                min="0"
+                                value="1"
                                    class="w-full px-4 py-3 border border-white bg-white/50 rounded-2xl focus:outline-none focus:ring-4 focus:ring-red-100 font-medium text-sm">
                         </div>
 
