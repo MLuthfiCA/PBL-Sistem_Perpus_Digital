@@ -67,6 +67,10 @@
                     <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2">Language / Translation (Bahasa)</p>
                     <p class="text-lg font-bold text-gray-700">{{ $buku['bahasa'] ?? 'Indonesia' }}</p>
                 </div>
+                <div class="glass-panel p-6 border-white/40 bg-white/20 sm:col-span-2">
+                    <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2">Rak Buku</p>
+                    <p class="text-lg font-bold text-gray-700">{{ $buku['lokasi_rak'] ?? 'Belum ditentukan' }}</p>
+                </div>
             </div>
 
             <div class="prose prose-red max-w-none">

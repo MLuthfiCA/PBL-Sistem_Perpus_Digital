@@ -24,6 +24,44 @@
         </div>
     </div>
 
+    @php
+        $hasLateBook = false;
+        $hasUnpaidFine = false;
+        $totalPeminjamanAktif = $peminjaman ?? collect([]);
+        foreach($totalPeminjamanAktif as $px) {
+            if ($px->status === 'dipinjam' && strtotime($px->batas_kembali) < time()) {
+                $hasLateBook = true;
+            }
+        }
+        $totalPengembalian = $pengembalian ?? collect([]);
+        foreach($totalPengembalian as $py) {
+            if ($py->status_denda === 'belum_lunas') {
+                $hasUnpaidFine = true;
+            }
+        }
+    @endphp
+
+    @if($hasLateBook || $hasUnpaidFine)
+    <div class="bg-red-50 border border-red-200 rounded-xl p-5 shadow-sm animate-fade-down flex items-start gap-4 border-l-4 border-l-red-500">
+        <div class="w-10 h-10 rounded-full bg-red-100 text-red-600 flex items-center justify-center flex-shrink-0 mt-1">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
+        </div>
+        <div>
+            <h3 class="font-bold text-red-800 text-lg">Peringatan Akun!</h3>
+            <p class="text-red-600 text-sm mt-1">
+                @if($hasLateBook && $hasUnpaidFine)
+                    Anda memiliki buku yang terlambat dikembalikan dan denda yang belum dilunasi.
+                @elseif($hasLateBook)
+                    Anda memiliki buku yang telah melewati batas waktu pengembalian. Segera kembalikan buku tersebut!
+                @elseif($hasUnpaidFine)
+                    Anda memiliki denda keterlambatan yang belum dibayar. Harap segera hubungi admin perpustakaan untuk melunasi denda Anda.
+                @endif
+                <br><strong class="mt-2 block">Anda tidak dapat meminjam buku baru sampai masalah ini diselesaikan.</strong>
+            </p>
+        </div>
+    </div>
+    @endif
+
     <!-- Currently Borrowed -->
     <div class="space-y-6 animate-fade-up delay-200">
         <h2 class="text-2xl font-bold text-gray-800 flex items-center gap-3">
@@ -52,20 +90,27 @@
                 </div>
 
                 <!-- Late Fine Section -->
-                @if($p->denda > 0)
+                @php
+                    $calculated_denda = $p->denda;
+                    if ($p->status === 'dipinjam' && strtotime($p->batas_kembali) < time()) {
+                        $hari_terlambat = ceil((time() - strtotime($p->batas_kembali)) / (60 * 60 * 24));
+                        $calculated_denda = max(0, $hari_terlambat * 5000);
+                    }
+                @endphp
+                @if($calculated_denda > 0)
                 <div class="mt-4 p-3 bg-red-50 rounded-xl border border-red-100 flex items-center justify-between">
                     <div class="flex items-center gap-2">
-                        <div class="w-8 h-8 rounded-lg bg-red-500 text-white flex items-center justify-center shadow-lg shadow-red-100">
+                        <div class="w-8 h-8 rounded-lg bg-red-500 text-white flex items-center justify-center shadow-lg shadow-red-100 animate-pulse">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                             </svg>
                         </div>
                         <div class="flex flex-col">
                             <span class="text-[9px] font-bold text-red-600 uppercase tracking-widest leading-tight">Denda Keterlambatan</span>
-                            <span class="text-[8px] font-bold {{ $p->status_denda === 'lunas' ? 'text-green-600' : 'text-red-400' }} uppercase">{{ $p->status_denda === 'lunas' ? 'LUNAS' : 'BELUM LUNAS' }}</span>
+                            <span class="text-[8px] font-bold {{ $p->status_denda === 'lunas' ? 'text-green-600' : 'text-red-400' }} uppercase">{{ $p->status === 'dipinjam' ? 'BERJALAN' : ($p->status_denda === 'lunas' ? 'LUNAS' : 'BELUM LUNAS') }}</span>
                         </div>
                     </div>
-                    <span class="font-bold text-red-700 text-sm">Rp {{ number_format($p->denda, 0, ',', '.') }}</span>
+                    <span class="font-bold text-red-700 text-sm">Rp {{ number_format($calculated_denda, 0, ',', '.') }}</span>
                 </div>
                 @endif
             </div>

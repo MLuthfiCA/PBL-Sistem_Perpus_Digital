@@ -20,8 +20,7 @@ return new class extends Migration
             $table->integer('stok')->default(1);
             $table->text('deskripsi')->nullable();
 
-            // FK ke kategori (ERD: BUKU N -- 1 KATEGORI)
-            $table->foreignId('id_kategori')->constrained('kategori', 'id_kategori')->onDelete('cascade');
+            // FK ke kategori dihapus
 
             // === Kolom tambahan dari user (cetakan, genre, bahasa) ===
             $table->string('cetakan')->nullable();

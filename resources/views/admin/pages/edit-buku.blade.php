@@ -81,12 +81,19 @@
                             class="w-full px-4 py-3.5 border border-white bg-white/50 rounded-2xl focus:outline-none focus:ring-4 focus:ring-red-100 font-medium text-sm transition-all">
                     </div>
 
-                    <!-- OPTIONAL BOOK ID -->
-                    <div>
-                        <label class="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2 ml-1">Book ID (Optional)</label>
-                        <input type="number" name="buku_id" value="{{ $buku['buku_id'] ?? '' }}" min="1"
-                            class="w-48 px-4 py-3.5 border border-white bg-white/50 rounded-2xl focus:outline-none focus:ring-4 focus:ring-red-100 font-medium text-sm transition-all"
-                            placeholder="Optional — leave blank to keep current">
+                    <!-- OPTIONAL BOOK ID AND BOOK SHELF -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2 ml-1">Book ID (Optional)</label>
+                            <input type="number" name="buku_id" value="{{ $buku['buku_id'] ?? '' }}" min="1"
+                                class="w-full px-4 py-3.5 border border-white bg-white/50 rounded-2xl focus:outline-none focus:ring-4 focus:ring-red-100 font-medium text-sm transition-all"
+                                placeholder="Optional — leave blank to keep current">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2 ml-1">Book Shelf</label>
+                            <input type="text" name="lokasi_rak" value="{{ $buku['lokasi_rak'] ?? '' }}" placeholder="e.g., Shelf A1"
+                                class="w-full px-4 py-3.5 border border-white bg-white/50 rounded-2xl focus:outline-none focus:ring-4 focus:ring-red-100 font-medium text-sm transition-all">
+                        </div>
                     </div>
 
                     <!-- AUTHOR & PUBLISHER -->
@@ -114,15 +121,13 @@
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
                         <div>
                             <label class="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2 ml-1">Genre</label>
-                            <select name="genre" required class="w-full px-4 py-3.5 border border-white bg-white/50 rounded-2xl focus:outline-none focus:ring-4 focus:ring-red-100 font-medium text-sm transition-all appearance-none cursor-pointer">
-                                <option value="">Select Genre</option>
-                                <option value="Drama" {{ ($buku['genre'] ?? '') == 'Drama' ? 'selected' : '' }}>Drama</option>
-                                <option value="Fantasi" {{ ($buku['genre'] ?? '') == 'Fantasi' ? 'selected' : '' }}>Fantasy</option>
-                                <option value="Self-Dev" {{ ($buku['genre'] ?? '') == 'Self-Dev' ? 'selected' : '' }}>Self-Dev</option>
-                                <option value="Romance" {{ ($buku['genre'] ?? '') == 'Romance' ? 'selected' : '' }}>Romance</option>
-                                <option value="Edukasi" {{ ($buku['genre'] ?? '') == 'Edukasi' ? 'selected' : '' }}>Education</option>
-                                <option value="Technology" {{ ($buku['genre'] ?? '') == 'Technology' ? 'selected' : '' }}>Technology</option>
-                            </select>
+                            <input type="text" name="genre" value="{{ $buku['genre'] ?? '' }}" list="genre-list" required placeholder="Type or select genre"
+                                class="w-full px-4 py-3.5 border border-white bg-white/50 rounded-2xl focus:outline-none focus:ring-4 focus:ring-red-100 font-medium text-sm transition-all">
+                            <datalist id="genre-list">
+                                @foreach($genres as $genreOption)
+                                    <option value="{{ $genreOption }}"></option>
+                                @endforeach
+                            </datalist>
                         </div>
                         <div>
                             <label class="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2 ml-1">Status</label>

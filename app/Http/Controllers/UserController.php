@@ -32,13 +32,13 @@ class UserController extends Controller
         }
         
         $users = $query->get();
-        return view('admin.pages.users.index', compact('users', 'search', 'roleFilter'));
+        return view('admin.pages.users-index', compact('users', 'search', 'roleFilter'));
     }
 
     // Show form for creating a new user
     public function create()
     {
-        return view('admin.pages.users.create');
+        return view('admin.pages.users-create');
     }
 
     // Store new user
@@ -102,13 +102,13 @@ class UserController extends Controller
     public function show($id)
     {
         $user = User::findOrFail($id);
-        return view('admin.pages.users.edit', compact('user'));
+        return view('admin.pages.users-edit', compact('user'));
     }
 
     public function edit($id)
     {
         $user = User::findOrFail($id);
-        return view('admin.pages.users.edit', compact('user'));
+        return view('admin.pages.users-edit', compact('user'));
     }
 
     public function destroy($id)

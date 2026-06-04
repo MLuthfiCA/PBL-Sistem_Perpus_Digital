@@ -27,6 +27,7 @@ class BukuController extends Controller
                 'tahun_terbit'=> $buku->tahun_terbit,
                 'cetakan'     => $buku->cetakan,
                 'bahasa'      => $buku->bahasa,
+                'lokasi_rak'  => $buku->lokasi_rak,
                 'status'      => $buku->status,
                 'cover'       => $buku->cover,
                 'stok'        => $buku->stok,
@@ -38,6 +39,7 @@ class BukuController extends Controller
     public function edit($id)
     {
         $buku = Buku::findOrFail($id);
+        $genres = Buku::whereNotNull('genre')->distinct('genre')->pluck('genre');
         
         // Transform ke array untuk view
         return view('admin.pages.edit-buku', [
@@ -52,10 +54,13 @@ class BukuController extends Controller
                 'tahun_terbit' => $buku->tahun_terbit,
                 'cetakan' => $buku->cetakan,
                 'bahasa' => $buku->bahasa,
+                'lokasi_rak' => $buku->lokasi_rak,
                 'status' => $buku->status,
                 'cover' => $buku->cover,
                 'stok' => $buku->stok,
-            ]
+                'deskripsi' => $buku->deskripsi,
+            ],
+            'genres' => $genres
         ]);
     }
 
@@ -73,6 +78,7 @@ class BukuController extends Controller
             'tahun_terbit' => 'nullable|string|max:4',
             'cetakan' => 'nullable|string|max:255',
             'bahasa' => 'nullable|string|max:255',
+            'lokasi_rak' => 'nullable|string|max:255',
             'stok' => 'nullable|integer|min:0',
             'status' => 'required|in:Tersedia,Dipinjam,Hilang,Perawatan',
             'deskripsi' => 'nullable|string',
@@ -111,6 +117,7 @@ class BukuController extends Controller
         'tahun_terbit' => 'nullable|string|max:4',
         'cetakan' => 'nullable|string|max:255',
         'bahasa' => 'nullable|string|max:255',
+        'lokasi_rak' => 'nullable|string|max:255',
         'status' => 'required|in:Tersedia,Dipinjam,Hilang,Perawatan',
         'stok' => 'nullable|integer|min:0',
         'deskripsi' => 'nullable|string',
@@ -141,11 +148,11 @@ class BukuController extends Controller
             'tahun_terbit' => $validated['tahun_terbit'] ?? null,
             'cetakan' => $validated['cetakan'] ?? null,
             'bahasa' => $validated['bahasa'] ?? null,
+            'lokasi_rak' => $validated['lokasi_rak'] ?? null,
             'status' => $validated['status'],
             'stok' => $validated['stok'] ?? 1,
             'deskripsi' => $validated['deskripsi'] ?? null,
             'cover' => $coverName,
-            'id_kategori' => 1,
             'tampil_katalog' => 1,
         ]);
 
@@ -222,6 +229,24 @@ class BukuController extends Controller
             
             if (!$userId) {
                 return back()->with('error', 'User not found. Please log in again.');
+            }
+
+            // CEK 1: Apakah user masih memiliki buku yang belum dikembalikan (status: dipinjam)
+            $unreturnedBooks = Peminjaman::where('id_pengguna', $userId)
+                ->where('status', 'dipinjam')
+                ->exists();
+
+            if ($unreturnedBooks) {
+                return back()->with('error', 'Anda masih meminjam buku yang belum dikembalikan. Harap kembalikan buku tersebut terlebih dahulu sebelum meminjam buku baru.');
+            }
+
+            // CEK 2: Apakah user memiliki denda yang belum lunas
+            $unpaidFines = Peminjaman::where('id_pengguna', $userId)
+                ->where('status_denda', 'belum_lunas')
+                ->exists();
+
+            if ($unpaidFines) {
+                return back()->with('error', 'Anda memiliki denda keterlambatan yang belum dilunasi. Harap hubungi admin perpustakaan untuk melunasi denda Anda.');
             }
 
             $tanggalKembali = date('Y-m-d', strtotime($request->tanggal_pinjam . ' + 7 days'));

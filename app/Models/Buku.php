@@ -16,8 +16,6 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property int $tahun_terbit
  * @property string $isbn
  * @property int $stok
- * @property string|null $deskripsi
- * @property int $id_kategori
  * @property string|null $cetakan
  * @property string|null $genre
  * @property string $bahasa
@@ -38,7 +36,6 @@ class Buku extends Model
         'isbn',
         'stok',
         'deskripsi',
-        'id_kategori',
         'cetakan',
         'genre',
         'bahasa',
@@ -63,22 +60,7 @@ class Buku extends Model
         return $this->id_buku;
     }
 
-    public function getKategoriIdAttribute()
-    {
-        return $this->id_kategori;
-    }
-
     // ==============================
-    // RELATIONSHIPS (ERD)
-    // ==============================
-
-    /**
-     * BUKU N -- 1 KATEGORI (Terdiri)
-     */
-    public function kategori()
-    {
-        return $this->belongsTo(Kategori::class, 'id_kategori', 'id_kategori');
-    }
 
     /**
      * BUKU referenced by DETAIL_PEMINJAMAN

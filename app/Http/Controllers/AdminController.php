@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use App\Models\Peminjaman;
+use Illuminate\Support\Facades\DB;
 
 
 class AdminController extends Controller
@@ -52,7 +53,52 @@ class AdminController extends Controller
             ->paginate(5)
             ->withQueryString();
 
-        return view('admin.pages.profile', compact('books'));
+        // ===== LAPORAN DATA =====
+        $bulan = (int) $request->input('bulan', now()->month);
+        $tahun = (int) $request->input('tahun', now()->year);
+
+        $laporanQuery = Peminjaman::whereMonth('tanggal_pinjam', $bulan)
+            ->whereYear('tanggal_pinjam', $tahun);
+
+        $totalDipinjam   = (clone $laporanQuery)->count();
+        $sudahKembali    = (clone $laporanQuery)->where('status', 'dikembalikan')->count();
+        $sedangDipinjam  = (clone $laporanQuery)->where('status', 'dipinjam')->count();
+        $totalDenda      = (clone $laporanQuery)->sum('denda');
+
+        // Buku paling sering dipinjam bulan ini
+        $bukuTerpopuler = Peminjaman::with('buku')
+            ->whereMonth('tanggal_pinjam', $bulan)
+            ->whereYear('tanggal_pinjam', $tahun)
+            ->whereNotNull('id_buku')
+            ->select('id_buku', DB::raw('count(*) as total'))
+            ->groupBy('id_buku')
+            ->orderByDesc('total')
+            ->limit(5)
+            ->get();
+
+        // Anggota paling aktif bulan ini
+        $anggotaAktif = Peminjaman::with('user')
+            ->whereMonth('tanggal_pinjam', $bulan)
+            ->whereYear('tanggal_pinjam', $tahun)
+            ->whereNotNull('id_pengguna')
+            ->select('id_pengguna', DB::raw('count(*) as total'))
+            ->groupBy('id_pengguna')
+            ->orderByDesc('total')
+            ->limit(5)
+            ->get();
+
+        // Daftar bulan-tahun yang tersedia (untuk dropdown)
+        $availableMonths = Peminjaman::selectRaw('YEAR(tanggal_pinjam) as tahun, MONTH(tanggal_pinjam) as bulan')
+            ->groupByRaw('YEAR(tanggal_pinjam), MONTH(tanggal_pinjam)')
+            ->orderByRaw('YEAR(tanggal_pinjam) DESC, MONTH(tanggal_pinjam) DESC')
+            ->get();
+
+        return view('admin.pages.profile', compact(
+            'books',
+            'totalDipinjam', 'sudahKembali', 'sedangDipinjam', 'totalDenda',
+            'bukuTerpopuler', 'anggotaAktif', 'availableMonths',
+            'bulan', 'tahun'
+        ));
     }
 
     public function accPengembalian($id)
@@ -91,5 +137,21 @@ class AdminController extends Controller
         $peminjaman->update(['status_denda' => 'lunas']);
 
         return redirect()->back()->with('success', 'Fine marked as paid!');
+    }
+
+    public function exportLaporan(\Illuminate\Http\Request $request)
+    {
+        $bulan = (int) $request->input('bulan', now()->month);
+        $tahun = (int) $request->input('tahun', now()->year);
+
+        $peminjaman = Peminjaman::with(['user', 'buku' => function($q){
+            $q->withTrashed();
+        }])
+            ->whereMonth('tanggal_pinjam', $bulan)
+            ->whereYear('tanggal_pinjam', $tahun)
+            ->orderBy('tanggal_pinjam', 'asc')
+            ->get();
+
+        return view('admin.pages.laporan-cetak', compact('peminjaman', 'bulan', 'tahun'));
     }
 }

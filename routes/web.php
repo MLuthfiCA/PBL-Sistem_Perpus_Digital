@@ -73,11 +73,17 @@ Route::get('/katalog', function (Request $request) {
     $bukuQuery = Buku::where('tampil_katalog', true);
 
     if ($query) {
-        $bukuQuery->where(function ($q) use ($query) {
-            $q->where('judul', 'like', '%' . $query . '%')
-              ->orWhere('penulis', 'like', '%' . $query . '%')
-              ->orWhere('genre', 'like', '%' . $query . '%');
-        });
+        $keywords = explode(' ', $query);
+        foreach ($keywords as $word) {
+            if (!empty(trim($word))) {
+                $bukuQuery->where(function ($q) use ($word) {
+                    $q->where('judul', 'like', '%' . $word . '%')
+                      ->orWhere('penulis', 'like', '%' . $word . '%')
+                      ->orWhere('genre', 'like', '%' . $word . '%')
+                      ->orWhere('lokasi_rak', 'like', '%' . $word . '%');
+                });
+            }
+        }
     }
 
     $paginator = $bukuQuery->orderBy('id_buku', 'desc')->paginate(8);
@@ -119,11 +125,17 @@ Route::get('/search', function (Request $request) {
     $bukuQuery = Buku::where('tampil_katalog', true);
     
     if ($query) {
-        $bukuQuery->where(function ($q) use ($query) {
-            $q->where('judul', 'like', '%' . $query . '%')
-              ->orWhere('penulis', 'like', '%' . $query . '%')
-              ->orWhere('genre', 'like', '%' . $query . '%');
-        });
+        $keywords = explode(' ', $query);
+        foreach ($keywords as $word) {
+            if (!empty(trim($word))) {
+                $bukuQuery->where(function ($q) use ($word) {
+                    $q->where('judul', 'like', '%' . $word . '%')
+                      ->orWhere('penulis', 'like', '%' . $word . '%')
+                      ->orWhere('genre', 'like', '%' . $word . '%')
+                      ->orWhere('lokasi_rak', 'like', '%' . $word . '%');
+                });
+            }
+        }
     }
     
     if ($category) {
@@ -175,11 +187,19 @@ Route::get('/admin/search', function (Request $request) {
     $bukuQuery = Buku::query();
     
     if ($query) {
-        $bukuQuery->where(function ($q) use ($query) {
-            $q->where('judul', 'like', '%' . $query . '%')
-              ->orWhere('penulis', 'like', '%' . $query . '%')
-              ->orWhere('genre', 'like', '%' . $query . '%')
-              ->orWhere('isbn', 'like', '%' . $query . '%');
+        $keywords = explode(' ', $query);
+        $bukuQuery->where(function ($q) use ($keywords) {
+            foreach ($keywords as $word) {
+                if (!empty(trim($word))) {
+                    $q->orWhere(function ($q2) use ($word) {
+                        $q2->where('judul', 'like', '%' . $word . '%')
+                           ->orWhere('penulis', 'like', '%' . $word . '%')
+                           ->orWhere('genre', 'like', '%' . $word . '%')
+                           ->orWhere('isbn', 'like', '%' . $word . '%')
+                           ->orWhere('lokasi_rak', 'like', '%' . $word . '%');
+                    });
+                }
+            }
         });
     }
     
@@ -244,13 +264,17 @@ Route::prefix('admin')->group(function () {
     
     // Route Tambah Buku
     Route::get('/buku/tambah', function () {
-        return view('admin.pages.data-buku');
+        $genres = Buku::whereNotNull('genre')->distinct('genre')->pluck('genre');
+        return view('admin.pages.data-buku', compact('genres'));
     })->name('admin.buku.create');
     Route::post('/buku/tambah', [BukuController::class, 'store'])->name('admin.buku.store');
 
     // Route Peminjaman Admin Actions
     Route::post('/peminjaman/{id}/acc', [AdminController::class, 'accPengembalian'])->name('admin.peminjaman.acc');
     Route::post('/peminjaman/{id}/bayar', [AdminController::class, 'bayarDenda'])->name('admin.peminjaman.bayar');
+
+    // Route Export Laporan
+    Route::get('/laporan/export', [AdminController::class, 'exportLaporan'])->name('admin.laporan.export');
 });
 
 

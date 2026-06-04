@@ -149,36 +149,39 @@
                                class="w-full px-4 py-3 border border-white bg-white/50 rounded-2xl focus:outline-none focus:ring-4 focus:ring-red-100 font-medium text-sm">
                     </div>
 
-                    <!-- OPTIONAL BOOK ID -->
-                    <div>
-                        <label class="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2 ml-1">
-                            Book ID (Optional)
-                        </label>
-                        <input type="number" name="buku_id" min="1" placeholder="Optional — leave blank to auto-generate"
-                            class="w-48 px-4 py-3 border border-white bg-white/50 rounded-2xl focus:outline-none focus:ring-4 focus:ring-red-100 font-medium text-sm">
-                    </div>
-
                     <!-- GRID -->
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+                        <!-- OPTIONAL BOOK ID -->
+                        <div>
+                            <label class="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2 ml-1">
+                                Book ID (Optional)
+                            </label>
+                            <input type="number" name="buku_id" min="1" placeholder="Optional — leave blank to auto-generate"
+                                class="w-full px-4 py-3 border border-white bg-white/50 rounded-2xl focus:outline-none focus:ring-4 focus:ring-red-100 font-medium text-sm">
+                        </div>
+
+                        <!-- RAK BUKU -->
+                        <div>
+                            <label class="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2 ml-1">
+                                Book Shelf
+                            </label>
+                            <input type="text" name="lokasi_rak" placeholder="e.g., Shelf A1"
+                                class="w-full px-4 py-3 border border-white bg-white/50 rounded-2xl focus:outline-none focus:ring-4 focus:ring-red-100 font-medium text-sm">
+                        </div>
 
                         <!-- GENRE -->
                         <div>
                             <label class="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2 ml-1">
                                 Genre
                             </label>
-
-                            <select name="genre" required
+                            <input type="text" name="genre" list="genre-list" required placeholder="Type or select genre"
                                 class="w-full px-4 py-3 border border-white bg-white/50 rounded-2xl focus:outline-none focus:ring-4 focus:ring-red-100 font-medium text-sm">
-
-                                <option value="">Select Genre</option>
-                                <option value="Drama">Drama</option>
-                                <option value="Fantasi">Fantasy</option>
-                                <option value="Self-Dev">Self-Development</option>
-                                <option value="Romance">Romance</option>
-                                <option value="Edukasi">Education</option>
-                                <option value="Technology">Technology</option>
-
-                            </select>
+                            <datalist id="genre-list">
+                                @foreach($genres as $genreOption)
+                                    <option value="{{ $genreOption }}"></option>
+                                @endforeach
+                            </datalist>
                         </div>
 
                         <!-- STATUS -->
@@ -206,9 +209,10 @@
                             </label>
                             <input type="text" name="tahun_terbit" placeholder="e.g., 2024"
                                 class="w-full px-4 py-3 border border-white bg-white/50 rounded-2xl focus:outline-none focus:ring-4 focus:ring-red-100 font-medium text-sm">
+                        </div>
 
-                            <!-- CETAKAN -->
-                            <div>
+                        <!-- CETAKAN -->
+                        <div>
                             <label class="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2 ml-1">
                                 Edition
                             </label>
@@ -241,7 +245,7 @@
                                 name="stok"
                                 min="0"
                                 value="1"
-                                   class="w-full px-4 py-3 border border-white bg-white/50 rounded-2xl focus:outline-none focus:ring-4 focus:ring-red-100 font-medium text-sm">
+                                class="w-full px-4 py-3 border border-white bg-white/50 rounded-2xl focus:outline-none focus:ring-4 focus:ring-red-100 font-medium text-sm">
                         </div>
 
                     </div>

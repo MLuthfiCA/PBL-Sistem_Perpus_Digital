@@ -107,8 +107,8 @@
                         </p>
                     </div>
                     <div class="bg-white/60 rounded-2xl p-4 border border-white/80">
-                        <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Category</p>
-                        <p class="text-sm font-bold text-gray-700">{{ $buku['kategori'] ?? 'General' }}</p>
+                        <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Rak Buku</p>
+                        <p class="text-sm font-bold text-gray-700">{{ $buku['lokasi_rak'] ?? '-' }}</p>
                     </div>
                     <div class="bg-white/60 rounded-2xl p-4 border border-white/80">
                         <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Book Code</p>
