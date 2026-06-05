@@ -106,11 +106,7 @@ class AdminController extends Controller
         $peminjaman = Peminjaman::findOrFail($id);
         
         // Hitung denda jika terlambat
-        $denda = 0;
-        if (strtotime($peminjaman->batas_kembali) < time()) {
-            $hari_terlambat = ceil((time() - strtotime($peminjaman->batas_kembali)) / (60 * 60 * 24));
-            $denda = max(0, $hari_terlambat * 5000);
-        }
+        $denda = $peminjaman->calculateDenda();
 
         // Update status peminjaman
         $peminjaman->update([
@@ -123,8 +119,10 @@ class AdminController extends Controller
         // Update status buku (increase stock)
         $buku = $peminjaman->buku;
         if ($buku) {
+            $newStock = $buku->stok + 1;
             $buku->update([
-                'stok' => $buku->stok + 1,
+                'stok' => $newStock,
+                'status' => $newStock > 0 ? 'Tersedia' : $buku->status,
             ]);
         }
 

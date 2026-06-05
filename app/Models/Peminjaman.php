@@ -112,7 +112,12 @@ class Peminjaman extends Model
         if (!$this->batas_kembali) {
             return 0;
         }
-        return max(0, now()->diffInDays($this->batas_kembali, false));
+        $due = \Carbon\Carbon::parse($this->batas_kembali)->startOfDay();
+        $now = now()->startOfDay();
+        if ($now->greaterThan($due)) {
+            return $due->diffInDays($now);
+        }
+        return 0;
     }
 
     public function calculateDenda()
@@ -123,12 +128,6 @@ class Peminjaman extends Model
 
     public function isOverdue()
     {
-        if ($this->status === 'terlambat') {
-            return true;
-        }
-        if ($this->status === 'dipinjam' && $this->batas_kembali && now()->isAfter($this->batas_kembali)) {
-            return true;
-        }
-        return false;
+        return $this->calculateOverdueDays() > 0;
     }
 }

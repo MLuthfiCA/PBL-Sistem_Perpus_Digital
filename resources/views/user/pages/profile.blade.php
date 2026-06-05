@@ -29,7 +29,7 @@
         $hasUnpaidFine = false;
         $totalPeminjamanAktif = $peminjaman ?? collect([]);
         foreach($totalPeminjamanAktif as $px) {
-            if ($px->status === 'dipinjam' && strtotime($px->batas_kembali) < time()) {
+            if ($px->isOverdue()) {
                 $hasLateBook = true;
             }
         }
@@ -47,16 +47,16 @@
             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
         </div>
         <div>
-            <h3 class="font-bold text-red-800 text-lg">Peringatan Akun!</h3>
+            <h3 class="font-bold text-red-800 text-lg">Account Warning!</h3>
             <p class="text-red-600 text-sm mt-1">
                 @if($hasLateBook && $hasUnpaidFine)
-                    Anda memiliki buku yang terlambat dikembalikan dan denda yang belum dilunasi.
+                    You have overdue books and unpaid fines.
                 @elseif($hasLateBook)
-                    Anda memiliki buku yang telah melewati batas waktu pengembalian. Segera kembalikan buku tersebut!
+                    You have books that have exceeded the return deadline. Please return them immediately!
                 @elseif($hasUnpaidFine)
-                    Anda memiliki denda keterlambatan yang belum dibayar. Harap segera hubungi admin perpustakaan untuk melunasi denda Anda.
+                    You have unpaid late fines. Please contact the library administrator to settle your fines.
                 @endif
-                <br><strong class="mt-2 block">Anda tidak dapat meminjam buku baru sampai masalah ini diselesaikan.</strong>
+                <br><strong class="mt-2 block">You cannot borrow new books until this issue is resolved.</strong>
             </p>
         </div>
     </div>
@@ -91,11 +91,7 @@
 
                 <!-- Late Fine Section -->
                 @php
-                    $calculated_denda = $p->denda;
-                    if ($p->status === 'dipinjam' && strtotime($p->batas_kembali) < time()) {
-                        $hari_terlambat = ceil((time() - strtotime($p->batas_kembali)) / (60 * 60 * 24));
-                        $calculated_denda = max(0, $hari_terlambat * 5000);
-                    }
+                    $calculated_denda = $p->calculateDenda();
                 @endphp
                 @if($calculated_denda > 0)
                 <div class="mt-4 p-3 bg-red-50 rounded-xl border border-red-100 flex items-center justify-between">
@@ -106,8 +102,8 @@
                             </svg>
                         </div>
                         <div class="flex flex-col">
-                            <span class="text-[9px] font-bold text-red-600 uppercase tracking-widest leading-tight">Denda Keterlambatan</span>
-                            <span class="text-[8px] font-bold {{ $p->status_denda === 'lunas' ? 'text-green-600' : 'text-red-400' }} uppercase">{{ $p->status === 'dipinjam' ? 'BERJALAN' : ($p->status_denda === 'lunas' ? 'LUNAS' : 'BELUM LUNAS') }}</span>
+                            <span class="text-[9px] font-bold text-red-600 uppercase tracking-widest leading-tight">Overdue Fine</span>
+                            <span class="text-[8px] font-bold {{ $p->status_denda === 'lunas' ? 'text-green-600' : 'text-red-400' }} uppercase">{{ $p->status === 'dipinjam' ? 'ONGOING' : ($p->status_denda === 'lunas' ? 'PAID' : 'UNPAID') }}</span>
                         </div>
                     </div>
                     <span class="font-bold text-red-700 text-sm">Rp {{ number_format($calculated_denda, 0, ',', '.') }}</span>

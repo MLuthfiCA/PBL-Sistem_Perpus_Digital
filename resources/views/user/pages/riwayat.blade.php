@@ -47,7 +47,7 @@
         </p>
 
         <p class="text-sm mb-4">
-            {{ $buku->genre ?? 'Science Fiction' }}
+            {{ $buku->kategori ? $buku->kategori->nama_kategori : 'N/A' }}
         </p>
 
         @if(($buku->status ?? '') == 'Tersedia')

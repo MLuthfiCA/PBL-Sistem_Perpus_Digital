@@ -272,11 +272,7 @@
                     <div class="col-span-2 flex flex-col justify-center gap-1 mt-2 md:mt-0">
                         <span class="md:hidden text-[10px] font-bold text-gray-400 uppercase">Fine & Status:</span>
                         @php
-                            $calculated_denda = $b->denda;
-                            if ($b->status === 'dipinjam' && strtotime($b->batas_kembali) < time()) {
-                                $hari_terlambat = ceil((time() - strtotime($b->batas_kembali)) / (60 * 60 * 24));
-                                $calculated_denda = max(0, $hari_terlambat * 5000);
-                            }
+                            $calculated_denda = $b->calculateDenda();
                         @endphp
                         @if($calculated_denda > 0)
                             <p class="font-bold text-red-600 text-xs">Rp {{ number_format($calculated_denda, 0, ',', '.') }}</p>

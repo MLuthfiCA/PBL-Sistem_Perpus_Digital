@@ -170,18 +170,18 @@
                                 class="w-full px-4 py-3 border border-white bg-white/50 rounded-2xl focus:outline-none focus:ring-4 focus:ring-red-100 font-medium text-sm">
                         </div>
 
-                        <!-- GENRE -->
+                        <!-- CATEGORY -->
                         <div>
                             <label class="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2 ml-1">
-                                Genre
+                                Category (Genre)
                             </label>
-                            <input type="text" name="genre" list="genre-list" required placeholder="Type or select genre"
-                                class="w-full px-4 py-3 border border-white bg-white/50 rounded-2xl focus:outline-none focus:ring-4 focus:ring-red-100 font-medium text-sm">
-                            <datalist id="genre-list">
-                                @foreach($genres as $genreOption)
-                                    <option value="{{ $genreOption }}"></option>
+                            <select name="id_kategori" required
+                                class="w-full px-4 py-3 border border-white bg-white/50 rounded-2xl focus:outline-none focus:ring-4 focus:ring-red-100 font-medium text-sm appearance-none cursor-pointer">
+                                <option value="">Select Category</option>
+                                @foreach($kategoris as $kat)
+                                    <option value="{{ $kat->id_kategori }}">{{ $kat->nama_kategori }}</option>
                                 @endforeach
-                            </datalist>
+                            </select>
                         </div>
 
                         <!-- STATUS -->

@@ -10,9 +10,9 @@
 
         <!-- Content -->
         <div class="flex-1">
-            <h3 class="text-lg font-bold text-red-800 mb-2">⚠️ Perhatian: Buku Terlambat!</h3>
+            <h3 class="text-lg font-bold text-red-800 mb-2">⚠️ Attention: Overdue Books!</h3>
             <p class="text-sm text-red-700 mb-4">
-                Anda memiliki {{ count(session('user')['overdue_books']) }} buku yang belum dikembalikan tepat waktu.
+                You have {{ count(session('user')['overdue_books']) }} book(s) that have not been returned on time.
             </p>
 
             <!-- Books List -->
@@ -30,7 +30,7 @@
                     <div class="flex justify-between items-start mb-2">
                         <div>
                             <p class="font-semibold text-gray-800">
-                                {{ $overdue->buku?->judul ?? 'Buku' }}
+                                {{ $overdue->buku?->judul ?? 'Book' }}
                             </p>
                             @if($overdue->buku)
                             <p class="text-sm text-gray-600">
@@ -39,12 +39,12 @@
                             @endif
                         </div>
                         <span class="text-xs font-bold px-3 py-1 bg-red-600 text-white rounded">
-                            {{ $overdueDays }} HARI
+                            {{ $overdueDays }} {{ $overdueDays > 1 ? 'DAYS' : 'DAY' }}
                         </span>
                     </div>
                     <div class="text-sm text-gray-700">
-                        <p>Batas Kembali: <strong>{{ $overdue->batas_kembali instanceof \Carbon\Carbon ? $overdue->batas_kembali->format('d/m/Y') : $overdue->batas_kembali }}</strong></p>
-                        <p class="text-red-700 font-semibold mt-1">Denda: Rp. {{ number_format($denda, 0, ',', '.') }}</p>
+                        <p>Due Date: <strong>{{ $overdue->batas_kembali instanceof \Carbon\Carbon ? $overdue->batas_kembali->format('d/m/Y') : $overdue->batas_kembali }}</strong></p>
+                        <p class="text-red-700 font-semibold mt-1">Fine: Rp. {{ number_format($denda, 0, ',', '.') }}</p>
                     </div>
                 </div>
                 @endforeach
@@ -53,18 +53,18 @@
             <!-- Total Fine & CTA -->
             <div class="bg-white rounded p-4 border border-red-300 flex justify-between items-center">
                 <div>
-                    <p class="text-sm text-gray-600">Total Denda</p>
+                    <p class="text-sm text-gray-600">Total Fine</p>
                     <p class="text-2xl font-bold text-red-600">
                         Rp. {{ number_format($totalCalculatedDenda, 0, ',', '.') }}
                     </p>
                 </div>
                 <a href="{{ route('profile') }}" class="px-6 py-3 bg-red-600 text-white font-bold rounded-lg hover:bg-red-700 transition-all">
-                    Lihat Detail
+                    View Details
                 </a>
             </div>
 
             <p class="text-xs text-red-600 mt-3 font-semibold">
-                📌 Harap segera kembalikan buku dan lunasi denda Anda untuk menghindari pemblokiran akun.
+                📌 Please return the book(s) immediately and pay your fine(s) to avoid account suspension.
             </p>
         </div>
 

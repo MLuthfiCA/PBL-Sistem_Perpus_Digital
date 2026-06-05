@@ -21,7 +21,8 @@ class BukuController extends Controller
                 'book_id'     => 'B-' . str_pad($buku->id_buku, 3, '0', STR_PAD_LEFT),
                 'judul'       => $buku->judul,
                 'penulis'     => $buku->penulis,
-                'genre'       => $buku->genre,
+                'id_kategori' => $buku->id_kategori,
+                'genre'       => $buku->kategori ? $buku->kategori->nama_kategori : 'N/A',
                 'isbn'        => $buku->isbn,
                 'penerbit'    => $buku->penerbit,
                 'tahun_terbit'=> $buku->tahun_terbit,
@@ -38,8 +39,8 @@ class BukuController extends Controller
 
     public function edit($id)
     {
-        $buku = Buku::findOrFail($id);
-        $genres = Buku::whereNotNull('genre')->distinct('genre')->pluck('genre');
+        $buku = Buku::with('kategori')->findOrFail($id);
+        $kategoris = \App\Models\Kategori::all();
         
         // Transform ke array untuk view
         return view('admin.pages.edit-buku', [
@@ -48,7 +49,8 @@ class BukuController extends Controller
                 'buku_id' => $buku->id_buku,
                 'judul' => $buku->judul,
                 'penulis' => $buku->penulis,
-                'genre' => $buku->genre,
+                'id_kategori' => $buku->id_kategori,
+                'genre' => $buku->kategori ? $buku->kategori->nama_kategori : 'N/A',
                 'isbn' => $buku->isbn,
                 'penerbit' => $buku->penerbit,
                 'tahun_terbit' => $buku->tahun_terbit,
@@ -60,7 +62,7 @@ class BukuController extends Controller
                 'stok' => $buku->stok,
                 'deskripsi' => $buku->deskripsi,
             ],
-            'genres' => $genres
+            'kategoris' => $kategoris
         ]);
     }
 
@@ -73,7 +75,7 @@ class BukuController extends Controller
             'judul' => 'required|string|max:255',
             'penulis' => 'required|string|max:255',
             'isbn' => 'nullable|string|max:50|unique:buku,isbn,' . $id . ',id_buku',
-            'genre' => 'required|string|max:255',
+            'id_kategori' => 'required|exists:kategori,id_kategori',
             'penerbit' => 'nullable|string|max:255',
             'tahun_terbit' => 'nullable|string|max:4',
             'cetakan' => 'nullable|string|max:255',
@@ -112,7 +114,7 @@ class BukuController extends Controller
         'judul' => 'required|string|max:255',
         'penulis' => 'required|string|max:255',
         'isbn' => 'nullable|string|max:50|unique:buku,isbn',
-        'genre' => 'required|string|max:255',
+        'id_kategori' => 'required|exists:kategori,id_kategori',
         'penerbit' => 'nullable|string|max:255',
         'tahun_terbit' => 'nullable|string|max:4',
         'cetakan' => 'nullable|string|max:255',
@@ -142,7 +144,7 @@ class BukuController extends Controller
         Buku::create([
             'judul' => $validated['judul'],
             'penulis' => $validated['penulis'],
-            'genre' => $validated['genre'],
+            'id_kategori' => $validated['id_kategori'],
             'isbn' => $validated['isbn'] ?? null,
             'penerbit' => $validated['penerbit'] ?? null,
             'tahun_terbit' => $validated['tahun_terbit'] ?? null,
@@ -237,7 +239,7 @@ class BukuController extends Controller
                 ->exists();
 
             if ($unreturnedBooks) {
-                return back()->with('error', 'Anda masih meminjam buku yang belum dikembalikan. Harap kembalikan buku tersebut terlebih dahulu sebelum meminjam buku baru.');
+                return back()->with('error', 'You still have an unreturned book. Please return it before borrowing a new one.');
             }
 
             // CEK 2: Apakah user memiliki denda yang belum lunas
@@ -246,7 +248,12 @@ class BukuController extends Controller
                 ->exists();
 
             if ($unpaidFines) {
-                return back()->with('error', 'Anda memiliki denda keterlambatan yang belum dilunasi. Harap hubungi admin perpustakaan untuk melunasi denda Anda.');
+                return back()->with('error', 'You have unpaid late fines. Please contact the library administrator to settle your fines.');
+            }
+
+            // Prevent borrowing when stock is empty
+            if ($buku->stok <= 0) {
+                return back()->with('error', 'The book is out of stock. Cannot borrow at this time.');
             }
 
             $tanggalKembali = date('Y-m-d', strtotime($request->tanggal_pinjam . ' + 7 days'));
@@ -260,11 +267,6 @@ class BukuController extends Controller
                 'denda' => 0,
                 'status_denda' => 'lunas',
             ]);
-
-            // Prevent borrowing when stock is empty
-            if ($buku->stok <= 0) {
-                return back()->with('error', 'Stok buku telah habis. Tidak bisa meminjam saat ini.');
-            }
 
             $newStock = max(0, $buku->stok - 1);
             $buku->update([

@@ -120,14 +120,15 @@
                     <!-- GENRE, STATUS, TAHUN TERBIT, CETAKAN, BAHASA, STOK -->
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
                         <div>
-                            <label class="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2 ml-1">Genre</label>
-                            <input type="text" name="genre" value="{{ $buku['genre'] ?? '' }}" list="genre-list" required placeholder="Type or select genre"
-                                class="w-full px-4 py-3.5 border border-white bg-white/50 rounded-2xl focus:outline-none focus:ring-4 focus:ring-red-100 font-medium text-sm transition-all">
-                            <datalist id="genre-list">
-                                @foreach($genres as $genreOption)
-                                    <option value="{{ $genreOption }}"></option>
+                            <label class="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2 ml-1">Category (Genre)</label>
+                            <select name="id_kategori" required class="w-full px-4 py-3.5 border border-white bg-white/50 rounded-2xl focus:outline-none focus:ring-4 focus:ring-red-100 font-medium text-sm transition-all appearance-none cursor-pointer">
+                                <option value="">Select Category</option>
+                                @foreach($kategoris as $kat)
+                                    <option value="{{ $kat->id_kategori }}" {{ ($buku['id_kategori'] ?? '') == $kat->id_kategori ? 'selected' : '' }}>
+                                        {{ $kat->nama_kategori }}
+                                    </option>
                                 @endforeach
-                            </datalist>
+                            </select>
                         </div>
                         <div>
                             <label class="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2 ml-1">Status</label>

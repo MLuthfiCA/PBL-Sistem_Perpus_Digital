@@ -95,7 +95,7 @@
             <p class="text-xs text-gray-400 mb-6 font-medium">{{ $buku->penulis }}</p>
             
             <div class="mt-auto pt-5 border-t border-red-50 flex items-center justify-between">
-                <span class="px-2 py-1 rounded bg-white/80 text-[10px] font-bold text-burgundy-500 uppercase tracking-tighter border border-red-100">{{ $buku->genre }}</span>
+                <span class="px-2 py-1 rounded bg-white/80 text-[10px] font-bold text-burgundy-500 uppercase tracking-tighter border border-red-100">{{ $buku->kategori ? $buku->kategori->nama_kategori : 'N/A' }}</span>
                 <span class="hidden md:inline text-[10px] font-bold text-gray-300 uppercase tracking-widest">ID: {{ $buku->buku_id ?? '#00'.$buku->bid }}</span>
 
                 <!-- Mobile Actions -->

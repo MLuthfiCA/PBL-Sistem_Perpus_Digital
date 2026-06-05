@@ -17,7 +17,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property string $isbn
  * @property int $stok
  * @property string|null $cetakan
- * @property string|null $genre
+ * @property int|null $id_kategori
  * @property string $bahasa
  */
 class Buku extends Model
@@ -37,7 +37,7 @@ class Buku extends Model
         'stok',
         'deskripsi',
         'cetakan',
-        'genre',
+        'id_kategori',
         'bahasa',
         'slug',
         'cover',
@@ -76,5 +76,13 @@ class Buku extends Model
     public function peminjaman()
     {
         return $this->hasMany(Peminjaman::class, 'id_buku', 'id_buku');
+    }
+
+    /**
+     * BUKU belongs to KATEGORI
+     */
+    public function kategori()
+    {
+        return $this->belongsTo(Kategori::class, 'id_kategori', 'id_kategori');
     }
 }
