@@ -9,52 +9,112 @@
     </div>
 
     <!-- Search Bar -->
-    <div x-data="{ showFilters: false, selectedCategory: '{{ request('category') }}' }" class="max-w-3xl mx-auto mb-16 animate-fade-up delay-100 relative z-40">
-        <form action="{{ route('search') }}" method="GET" class="flex flex-col md:flex-row gap-4 relative items-stretch">
-            <input type="hidden" name="category" :value="selectedCategory">
-            
+    <div x-data="{
+            showFilters: false,
+            selectedCategories: {{ json_encode($categories) }}
+         }"
+         class="max-w-3xl mx-auto mb-16 animate-fade-up delay-100 relative z-40">
+
+        <form id="search-form" action="{{ route('search') }}" method="GET"
+              class="flex flex-col md:flex-row gap-4 relative items-stretch">
+
+            {{-- Hidden inputs untuk multi-kategori (dikiri di template, diisi oleh Alpine) --}}
+            <template x-for="cat in selectedCategories" :key="cat">
+                <input type="hidden" name="categories[]" :value="cat">
+            </template>
+
             <div class="relative w-full group">
-                <input type="text" name="query" value="{{ request('query') }}" 
-                    placeholder="Search for book title or author..." 
+                <input type="text" name="query" value="{{ request('query') }}"
+                    placeholder="Search for book title, author or category..."
                     class="w-full pl-8 pr-20 py-5 sm:py-6 bg-white/70 backdrop-blur-xl border border-white shadow-2xl shadow-red-50 rounded-3xl focus:ring-4 focus:ring-red-100 focus:outline-none transition-all text-lg text-gray-700 placeholder-gray-400">
-                <button type="submit" class="absolute right-3 top-2 sm:top-3 bg-burgundy-500 text-white p-3 sm:p-4 rounded-2xl hover:bg-maroon transition-all shadow-lg shadow-red-200 group-hover:scale-105 active:scale-95">
+                <button type="submit"
+                    class="absolute right-3 top-2 sm:top-3 bg-burgundy-500 text-white p-3 sm:p-4 rounded-2xl hover:bg-maroon transition-all shadow-lg shadow-red-200 group-hover:scale-105 active:scale-95">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                     </svg>
                 </button>
             </div>
-            
+
             <div class="relative flex-shrink-0 flex">
-                <button type="button" @click="showFilters = !showFilters" class="h-full aspect-square bg-white/70 backdrop-blur-xl border border-white shadow-2xl shadow-red-50 rounded-3xl text-gray-700 hover:text-burgundy-500 hover:bg-white transition-all focus:outline-none focus:ring-4 focus:ring-red-100 flex items-center justify-center">
+                {{-- Tombol filter --}}
+                <button type="button" @click="showFilters = !showFilters"
+                    class="h-full aspect-square bg-white/70 backdrop-blur-xl border border-white shadow-2xl shadow-red-50 rounded-3xl text-gray-700 hover:text-burgundy-500 hover:bg-white transition-all focus:outline-none focus:ring-4 focus:ring-red-100 flex items-center justify-center relative">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
                     </svg>
+                    {{-- Badge jumlah kategori terpilih --}}
+                    <span x-show="selectedCategories.length > 0"
+                          x-text="selectedCategories.length"
+                          class="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-burgundy-500 text-white text-[10px] font-bold flex items-center justify-center">
+                    </span>
                 </button>
 
-                <!-- Dropdown Filter Menu like the image -->
-                <div x-show="showFilters" x-transition @click.away="showFilters = false" style="display: none;" class="absolute top-full right-0 mt-3 w-56 bg-white rounded-xl shadow-2xl overflow-hidden z-50 border border-gray-100">
-                    <div class="bg-burgundy-500 text-white px-5 py-3 font-bold text-sm">
-                        Semua Kategori
+                <!-- Dropdown Multi-Kategori dengan Checkbox -->
+                <div x-show="showFilters" x-transition @click.away="showFilters = false"
+                     style="display: none;"
+                     class="absolute top-full right-0 mt-3 w-64 bg-white rounded-xl shadow-2xl overflow-hidden z-50 border border-gray-100">
+
+                    <div class="bg-burgundy-500 text-white px-5 py-3 font-bold text-sm flex items-center justify-between">
+                        <span>Filter Kategori</span>
+                        <button type="button"
+                            @click="selectedCategories = []; $nextTick(() => document.getElementById('search-form').submit())"
+                            x-show="selectedCategories.length > 0"
+                            class="text-[10px] bg-white/20 hover:bg-white/30 px-2 py-1 rounded-lg transition-colors font-medium">
+                            Reset
+                        </button>
                     </div>
-                    <ul class="py-2 text-gray-700 text-sm">
-                        <li>
-                            <button type="button" @click="selectedCategory = ''; $nextTick(() => { $el.closest('form').submit() })" class="w-full text-left px-5 py-3 hover:bg-red-50 hover:text-burgundy-500 transition-colors {{ !request('category') ? 'font-bold text-burgundy-500 bg-red-50/50' : '' }}">
-                                Semua Kategori
-                            </button>
-                        </li>
-                        @if(isset($categories))
-                            @foreach($categories as $cat)
-                                <li>
-                                    <button type="button" @click="selectedCategory = '{{ $cat }}'; $nextTick(() => { $el.closest('form').submit() })" class="w-full text-left px-5 py-3 hover:bg-red-50 hover:text-burgundy-500 transition-colors {{ request('category') == $cat ? 'font-bold text-burgundy-500 bg-red-50/50' : '' }}">
-                                        {{ $cat }}
-                                    </button>
-                                </li>
+
+                    <ul class="py-2 text-gray-700 text-sm max-h-64 overflow-y-auto">
+                        @if(isset($allCategories))
+                            @foreach($allCategories as $cat)
+                            <li>
+                                <label class="flex items-center gap-3 w-full px-5 py-3 hover:bg-red-50 hover:text-burgundy-500 transition-colors cursor-pointer"
+                                       :class="selectedCategories.includes('{{ $cat }}') ? 'font-semibold text-burgundy-500 bg-red-50/50' : ''">
+                                    <input type="checkbox"
+                                           class="w-4 h-4 rounded accent-burgundy-500 cursor-pointer"
+                                           value="{{ $cat }}"
+                                           :checked="selectedCategories.includes('{{ $cat }}')"
+                                           @change="
+                                               if ($event.target.checked) {
+                                                   selectedCategories.push('{{ $cat }}');
+                                               } else {
+                                                   selectedCategories = selectedCategories.filter(c => c !== '{{ $cat }}');
+                                               }
+                                           ">
+                                    {{ $cat }}
+                                </label>
+                            </li>
                             @endforeach
                         @endif
                     </ul>
+
+                    {{-- Tombol Apply --}}
+                    <div class="px-5 py-3 border-t border-gray-100">
+                        <button type="button"
+                            @click="showFilters = false; $nextTick(() => document.getElementById('search-form').submit())"
+                            class="w-full bg-burgundy-500 text-white py-2.5 rounded-xl font-bold text-sm hover:bg-maroon transition-all">
+                            Terapkan Filter
+                        </button>
+                    </div>
                 </div>
             </div>
         </form>
+
+        {{-- Chips kategori terpilih --}}
+        <div x-show="selectedCategories.length > 0" class="mt-4 flex flex-wrap gap-2" style="display:none;">
+            <template x-for="cat in selectedCategories" :key="cat">
+                <span class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-burgundy-500/10 text-burgundy-500 border border-burgundy-200 rounded-full text-xs font-semibold">
+                    <span x-text="cat"></span>
+                    <button type="button"
+                        @click="selectedCategories = selectedCategories.filter(c => c !== cat); $nextTick(() => document.getElementById('search-form').submit())"
+                        class="hover:text-maroon transition-colors">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M6 18L18 6M6 6l12 12"/>
+                        </svg>
+                    </button>
+                </span>
+            </template>
+        </div>
     </div>
 
     <!-- Results -->
@@ -63,19 +123,19 @@
             <div class="glass-panel p-4 flex flex-col group animate-fade-up border-white/60" style="--delay: {{ $index * 100 }}ms; animation-delay: var(--delay);">
                 <a href="{{ route('katalog.detail', $book->buku_id) }}" class="relative h-64 rounded-2xl mb-4 overflow-hidden bg-gradient-to-br from-red-50 to-rose-100 flex items-center justify-center border border-white/20 group-hover:shadow-2xl transition-all duration-500">
                     @if(isset($book->cover))
-                        <img src="{{ asset('images/'.$book->cover) }}" class="h-4/5 object-contain shadow-2xl transform group-hover:scale-110 group-hover:rotate-2 transition-transform duration-700" onerror=`this.src='{{ asset('images/readspace-library.png') }}'`>
+                        <img src="{{ asset('images/'.$book->cover) }}" class="h-4/5 object-contain shadow-2xl transform group-hover:scale-110 group-hover:rotate-2 transition-transform duration-700" onerror="this.src='{{ asset('images/readspace-library.png') }}'">
                     @else
                         <div class="w-20 h-28 bg-white shadow-2xl rounded-sm flex items-center justify-center text-3xl font-bold text-red-100">
                             {{ substr($book->judul, 0, 1) }}
                         </div>
                     @endif
                 </a>
-                
+
                 <a href="{{ route('katalog.detail', $book->buku_id) }}" class="group/title">
                     <h3 class="font-bold text-gray-800 line-clamp-1 mb-1 group-hover/title:text-burgundy-500 transition-colors">{{ $book->judul }}</h3>
                 </a>
                 <p class="text-xs text-gray-400 mb-6 font-medium">{{ $book->penulis }}</p>
-                
+
                 <div class="mt-auto">
                     <a href="{{ route('katalog.detail', $book->buku_id) }}" class="block text-center bg-burgundy-500 text-white py-3 rounded-2xl font-bold shadow-lg shadow-red-100 hover:bg-maroon transition-all">View Details</a>
                 </div>

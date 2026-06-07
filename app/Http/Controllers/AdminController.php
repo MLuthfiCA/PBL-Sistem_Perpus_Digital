@@ -116,14 +116,15 @@ class AdminController extends Controller
             'status_denda' => $denda > 0 ? 'belum_lunas' : 'lunas',
         ]);
 
-        // Update status buku (increase stock)
-        $buku = $peminjaman->buku;
-        if ($buku) {
-            $newStock = $buku->stok + 1;
-            $buku->update([
-                'stok' => $newStock,
-                'status' => $newStock > 0 ? 'Tersedia' : $buku->status,
-            ]);
+        // Update status buku — pakai DB langsung (lebih robust, tanpa Eloquent relationship)
+        if ($peminjaman->id_buku) {
+            DB::table('buku')
+                ->where('id_buku', $peminjaman->id_buku)
+                ->update([
+                    'stok'       => DB::raw('stok + 1'),
+                    'status'     => 'Tersedia',
+                    'updated_at' => now(),
+                ]);
         }
 
         return redirect()->back()->with('success', 'Book return confirmed successfully!');

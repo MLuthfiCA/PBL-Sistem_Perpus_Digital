@@ -79,13 +79,6 @@ class Peminjaman extends Model
         return $this->belongsTo(User::class, 'id_pengguna', 'id_pengguna');
     }
 
-    /**
-     * PEMINJAMAN 1 -- N DETAIL_PEMINJAMAN
-     */
-    public function detailPeminjaman()
-    {
-        return $this->hasMany(DetailPeminjaman::class, 'id_peminjaman', 'id_peminjaman');
-    }
 
     /**
      * PEMINJAMAN 1 -- N RIWAYAT

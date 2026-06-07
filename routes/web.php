@@ -3,8 +3,6 @@
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
-use App\Http\Controllers\HomeController;
-use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\RiwayatController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\LoginController;
@@ -21,8 +19,13 @@ Route::get('/', function () {
     return redirect('/home');
 });
 
-Route::get('/contact', [HomeController::class, 'contact']);
-Route::get('/dashboard', [DashboardController::class, 'index']);
+Route::get('/dashboard', function() {
+    if (session()->has('user')) {
+        if (session('user')['role'] === 'admin') return redirect()->route('admin.katalog');
+        return redirect()->route('katalog');
+    }
+    return redirect('/home');
+})->name('dashboard');
 Route::get('/profile', [RiwayatController::class, 'tampilkanRiwayat'])->name('profile');
 
 Route::get('/admin/profile', [AdminController::class, 'profile'])->name('admin.profile');
@@ -90,7 +93,7 @@ Route::get('/katalog', function (Request $request) {
         }
     }
 
-    $paginator = $bukuQuery->orderBy('id_buku', 'desc')->paginate(8);
+    $paginator = $bukuQuery->with('kategori')->orderBy('id_buku', 'desc')->paginate(8);
 
     $paginator->getCollection()->transform(function($buku) use ($statusMap) {
         return [
@@ -114,55 +117,79 @@ Route::get('/katalog', function (Request $request) {
     return view('user.pages.katalog', ['daftarBuku' => $paginator]);
 })->name('katalog');
 
-// Route Search Mahasiswa 
+// Route Search Mahasiswa
 Route::get('/search', function (Request $request) {
-    $query = $request->input('query');
-    $category = $request->input('category');
-    
+    $query      = $request->input('query');
+    $categories = $request->input('categories', []);   // multi-kategori (array)
+
     $statusMap = [
-        'available' => 'Tersedia',
-        'borrowed' => 'Dipinjam',
-        'lost' => 'Hilang',
+        'available'   => 'Tersedia',
+        'borrowed'    => 'Dipinjam',
+        'lost'        => 'Hilang',
         'maintenance' => 'Perawatan',
     ];
-    
+
     $bukuQuery = Buku::where('tampil_katalog', true);
-    
+
+    // Keyword search — OR antar kata (sama seperti admin)
     if ($query) {
         $keywords = explode(' ', $query);
-        foreach ($keywords as $word) {
-            if (!empty(trim($word))) {
-                $bukuQuery->where(function ($q) use ($word) {
-                    $q->where('judul', 'like', '%' . $word . '%')
-                      ->orWhere('penulis', 'like', '%' . $word . '%')
-                      ->orWhereHas('kategori', function($k) use ($word) {
-                          $k->where('nama_kategori', 'like', '%' . $word . '%');
-                      })
-                      ->orWhere('lokasi_rak', 'like', '%' . $word . '%');
-                });
+        $bukuQuery->where(function ($q) use ($keywords) {
+            foreach ($keywords as $word) {
+                if (!empty(trim($word))) {
+                    $q->orWhere(function ($q2) use ($word) {
+                        $q2->where('judul', 'like', '%' . $word . '%')
+                           ->orWhere('penulis', 'like', '%' . $word . '%')
+                           ->orWhereHas('kategori', function($k) use ($word) {
+                               $k->where('nama_kategori', 'like', '%' . $word . '%');
+                           })
+                           ->orWhere('lokasi_rak', 'like', '%' . $word . '%');
+                    });
+                }
             }
-        }
-    }
-    
-    if ($category) {
-        $bukuQuery->whereHas('kategori', function($q) use ($category) {
-            $q->where('nama_kategori', $category);
         });
     }
-    
+
+    // Filter multi-kategori — bisa pilih lebih dari 1
+    if (!empty($categories)) {
+        $bukuQuery->whereHas('kategori', function($q) use ($categories) {
+            $q->whereIn('nama_kategori', $categories);
+        });
+    }
+
     $books = $bukuQuery->get()->map(function($buku) use ($statusMap) {
         $buku->status = $statusMap[$buku->status] ?? $buku->status;
         return $buku;
     });
-    $categories = \App\Models\Kategori::has('buku')->pluck('nama_kategori');
 
-    return view('user.pages.search', compact('books', 'categories'));
+    $allCategories = \App\Models\Kategori::has('buku')->pluck('nama_kategori');
+
+    return view('user.pages.search', compact('books', 'allCategories', 'categories'));
 })->name('search');
 
 Route::get('/katalog/{id}', function ($id) {
-    $buku = Buku::findOrFail($id);
-    
-    return view('user.pages.detail-buku', compact('buku'));
+    $buku = Buku::with('kategori')->findOrFail($id);
+
+    return view('user.pages.detail-buku', [
+        'buku' => [
+            'id'           => $buku->id_buku,
+            'buku_id'      => $buku->id_buku,
+            'book_id'      => 'B-' . str_pad($buku->id_buku, 3, '0', STR_PAD_LEFT),
+            'judul'        => $buku->judul,
+            'penulis'      => $buku->penulis,
+            'genre'        => $buku->kategori ? $buku->kategori->nama_kategori : 'N/A',
+            'isbn'         => $buku->isbn,
+            'penerbit'     => $buku->penerbit,
+            'tahun_terbit' => $buku->tahun_terbit,
+            'cetakan'      => $buku->cetakan,
+            'bahasa'       => $buku->bahasa,
+            'lokasi_rak'   => $buku->lokasi_rak,
+            'status'       => $buku->status,
+            'cover'        => $buku->cover,
+            'stok'         => $buku->stok,
+            'deskripsi'    => $buku->deskripsi,
+        ]
+    ]);
 })->name('katalog.detail');
 
 Route::get('/about', function () {

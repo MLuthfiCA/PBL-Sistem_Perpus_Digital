@@ -115,13 +115,14 @@
                                 </div>
                             </td>
                             <td class="px-8 py-6 text-right">
-                                @if($buku['status'] == 'Tersedia')
+                                @if($buku['status'] == 'Tersedia' && ($buku['stok'] ?? 0) > 0)
                                 <a href="{{ route('pengajuan', ['judul' => $buku['judul'], 'id' => $buku['id'], 'book_id' => $buku['book_id'] ?? ('B-' . str_pad($buku['id'], 3, '0', STR_PAD_LEFT)), 'cover' => $buku['cover']]) }}" class="px-5 py-2.5 bg-burgundy-500 text-white rounded-xl text-xs font-bold shadow-lg shadow-red-100 hover:bg-maroon transition-all opacity-0 group-hover:opacity-100 inline-block">
                                     Apply for a loan
                                 </a>
                                 @else
                                 <span class="text-gray-300 text-xs font-bold italic">N/A</span>
                                 @endif
+
                             </td>
                         </tr>
                         @endforeach

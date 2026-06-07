@@ -62,13 +62,6 @@ class Buku extends Model
 
     // ==============================
 
-    /**
-     * BUKU referenced by DETAIL_PEMINJAMAN
-     */
-    public function detailPeminjaman()
-    {
-        return $this->hasMany(DetailPeminjaman::class, 'id_buku', 'id_buku');
-    }
 
     /**
      * BUKU referenced by PEMINJAMAN (relasi langsung, dipertahankan)
