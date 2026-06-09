@@ -106,9 +106,17 @@ class Peminjaman extends Model
             return 0;
         }
         $due = \Carbon\Carbon::parse($this->batas_kembali)->startOfDay();
-        $now = now()->startOfDay();
-        if ($now->greaterThan($due)) {
-            return $due->diffInDays($now);
+
+        // Jika buku sudah dikembalikan, gunakan tanggal kembali sebagai acuan
+        // agar denda tidak terus bertambah setelah buku dikembalikan
+        if ($this->tanggal_kembali) {
+            $reference = \Carbon\Carbon::parse($this->tanggal_kembali)->startOfDay();
+        } else {
+            $reference = now()->startOfDay();
+        }
+
+        if ($reference->greaterThan($due)) {
+            return $due->diffInDays($reference);
         }
         return 0;
     }
