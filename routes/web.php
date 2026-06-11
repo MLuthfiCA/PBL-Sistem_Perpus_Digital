@@ -58,10 +58,20 @@ Route::post('/register', [AuthController::class, 'register'])->name('register.po
 Route::post('/logout', function (Request $request) {
     Auth::logout();
     $request->session()->forget('user');
+    $request->session()->flush();
     $request->session()->invalidate();
     $request->session()->regenerateToken();
     return redirect('/login');
 })->name('logout');
+
+Route::get('/logout', function (Request $request) {
+    Auth::logout();
+    $request->session()->forget('user');
+    $request->session()->flush();
+    $request->session()->invalidate();
+    $request->session()->regenerateToken();
+    return redirect('/login');
+});
 
 
 // --- USER / MAHASISWA ROUTES ---
@@ -197,6 +207,12 @@ Route::get('/about', function () {
 })->name('about');
 
 
+
+Route::get('/api/hitung-kembali', function (Request $request) {
+    $request->validate(['tanggal_pinjam' => 'required|date']);
+    $res = \App\Helpers\HolidayHelper::calculateReturnDate($request->tanggal_pinjam);
+    return response()->json($res);
+});
 
 Route::get('/pengajuan', function () {
     if (!session()->has('user')) return redirect('/login');

@@ -256,7 +256,8 @@ class BukuController extends Controller
                 return back()->with('error', 'The book is out of stock. Cannot borrow at this time.');
             }
 
-            $tanggalKembali = date('Y-m-d', strtotime($request->tanggal_pinjam . ' + 7 days'));
+            $calc = \App\Helpers\HolidayHelper::calculateReturnDate($request->tanggal_pinjam);
+            $tanggalKembali = $calc['return_date'];
 
             $peminjaman = Peminjaman::create([
                 'id_pengguna' => $userId,
