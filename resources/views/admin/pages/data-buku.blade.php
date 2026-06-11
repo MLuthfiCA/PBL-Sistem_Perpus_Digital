@@ -95,7 +95,7 @@
                 <!-- RIGHT SIDE (FORM) -->
                 <div class="md:col-span-2 space-y-6">
 
-                    <!-- JUDUL -->
+                    <!-- TITLE -->
                     <div>
                         <label class="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2 ml-1">
                             Book Title
@@ -166,7 +166,7 @@
                                 class="w-full px-4 py-3 border border-white bg-white/50 rounded-2xl focus:outline-none focus:ring-4 focus:ring-red-100 font-medium text-sm">
                         </div>
 
-                        <!-- RAK BUKU -->
+                        <!-- BOOK SHELF -->
                         <div>
                             <label class="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2 ml-1">
                                 Book Shelf
@@ -207,7 +207,7 @@
                             </select>
                         </div>
 
-                        <!-- TAHUN -->
+                        <!-- YEAR -->
                         <div>
                             <label class="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2 ml-1">
                                 Publication Year
@@ -216,7 +216,7 @@
                                 class="w-full px-4 py-3 border border-white bg-white/50 rounded-2xl focus:outline-none focus:ring-4 focus:ring-red-100 font-medium text-sm">
                         </div>
 
-                        <!-- CETAKAN -->
+                        <!-- BOOK EDITION -->
                         <div>
                             <label class="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2 ml-1">
                                 Edition
@@ -228,7 +228,7 @@
                                    class="w-full px-4 py-3 border border-white bg-white/50 rounded-2xl focus:outline-none focus:ring-4 focus:ring-red-100 font-medium text-sm">
                         </div>
 
-                        <!-- BAHASA -->
+                        <!-- LANGUAGE -->
                         <div>
                             <label class="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2 ml-1">
                                 Language
@@ -240,7 +240,7 @@
                                    class="w-full px-4 py-3 border border-white bg-white/50 rounded-2xl focus:outline-none focus:ring-4 focus:ring-red-100 font-medium text-sm">
                         </div>
 
-                        <!-- STOK -->
+                        <!-- STOCK -->
                         <div>
                             <label class="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2 ml-1">
                                 Stock
