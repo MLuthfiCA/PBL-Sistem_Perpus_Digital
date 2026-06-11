@@ -51,7 +51,6 @@ class PeminjamanSeeder extends Seeder
         $buku1 = Buku::where('judul', 'Laskar Pelangi')->first() ?? Buku::create([
             'judul' => 'Laskar Pelangi',
             'penulis' => 'Andrea Hirata',
-            'genre' => 'Drama',
             'isbn' => '978-979-3062-79-1',
             'penerbit' => 'Bentang Pustaka',
             'tahun_terbit' => 2005,
@@ -63,7 +62,6 @@ class PeminjamanSeeder extends Seeder
         $buku2 = Buku::where('judul', 'Bumi')->first() ?? Buku::create([
             'judul' => 'Bumi',
             'penulis' => 'Tere Liye',
-            'genre' => 'Fantasi',
             'isbn' => '978-602-03-3295-6',
             'penerbit' => 'Gramedia Pustaka Utama',
             'tahun_terbit' => 2014,
@@ -75,7 +73,6 @@ class PeminjamanSeeder extends Seeder
         $buku3 = Buku::where('judul', 'Filosofi Teras')->first() ?? Buku::create([
             'judul' => 'Filosofi Teras',
             'penulis' => 'Henry Manampiring',
-            'genre' => 'Self-Dev',
             'isbn' => '978-602-412-518-9',
             'penerbit' => 'Kompas',
             'tahun_terbit' => 2018,

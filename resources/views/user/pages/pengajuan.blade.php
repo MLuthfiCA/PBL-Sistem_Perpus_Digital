@@ -154,13 +154,29 @@
 
         if (tglPinjam && tglKembali) {
             tglPinjam.addEventListener('change', function() {
-                let startDate = new window.Date(this.value);
-                if(!isNaN(startDate.getTime())) {
-                    startDate.setDate(startDate.getDate() + 7);
-                    let year = startDate.getFullYear();
-                    let month = String(startDate.getMonth() + 1).padStart(2, '0');
-                    let day = String(startDate.getDate()).padStart(2, '0');
-                    tglKembali.value = `${year}-${month}-${day}`;
+                let val = this.value;
+                if (val) {
+                    fetch(`/api/hitung-kembali?tanggal_pinjam=${val}`)
+                        .then(res => res.json())
+                        .then(data => {
+                            tglKembali.value = data.return_date;
+                            
+                            // If extended, display warning message
+                            let extensionMsg = document.getElementById('extension-msg');
+                            if (data.extended) {
+                                if (!extensionMsg) {
+                                    extensionMsg = document.createElement('p');
+                                    extensionMsg.id = 'extension-msg';
+                                    extensionMsg.className = 'text-xs text-amber-600 mt-2 font-semibold flex items-center gap-1.5';
+                                    tglKembali.parentNode.appendChild(extensionMsg);
+                                }
+                                extensionMsg.innerHTML = `⚠️ Extended due to Sunday or holiday (originally ${data.original_date})`;
+                            } else {
+                                if (extensionMsg) {
+                                    extensionMsg.remove();
+                                }
+                            }
+                        });
                 }
             });
         }
