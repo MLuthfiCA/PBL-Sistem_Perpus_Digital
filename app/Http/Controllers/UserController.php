@@ -31,7 +31,7 @@ class UserController extends Controller
             $query->where('role', $roleFilter);
         }
         
-        $users = $query->get();
+        $users = $query->paginate(10);
         return view('admin.pages.users-index', compact('users', 'search', 'roleFilter'));
     }
 

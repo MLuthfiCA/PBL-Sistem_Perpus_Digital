@@ -7,12 +7,12 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
- * Model BUKU (ERD)
+ * Model BUKU (ERD - setelah normalisasi)
  *
  * @property int $id_buku
  * @property string $judul
- * @property string $penulis
- * @property string $penerbit
+ * @property int|null $id_penulis
+ * @property int|null $id_penerbit
  * @property int $tahun_terbit
  * @property string $isbn
  * @property int $stok
@@ -30,8 +30,8 @@ class Buku extends Model
 
     protected $fillable = [
         'judul',
-        'penulis',
-        'penerbit',
+        'id_penulis',
+        'id_penerbit',
         'tahun_terbit',
         'isbn',
         'stok',
@@ -77,5 +77,21 @@ class Buku extends Model
     public function kategori()
     {
         return $this->belongsTo(Kategori::class, 'id_kategori', 'id_kategori');
+    }
+
+    /**
+     * BUKU belongs to PENULIS
+     */
+    public function penulis()
+    {
+        return $this->belongsTo(Penulis::class, 'id_penulis', 'id_penulis');
+    }
+
+    /**
+     * BUKU belongs to PENERBIT
+     */
+    public function penerbit()
+    {
+        return $this->belongsTo(Penerbit::class, 'id_penerbit', 'id_penerbit');
     }
 }

@@ -9,6 +9,8 @@ use App\Http\Controllers\LoginController;
 use App\Http\Controllers\BukuController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\KategoriController;
+use App\Http\Controllers\PenulisController;
+use App\Http\Controllers\PenerbitController;
 use App\Models\Buku;
 
 Route::get('/', function () {
@@ -34,6 +36,8 @@ Route::get('/admin/profile', [AdminController::class, 'profile'])->name('admin.p
 Route::prefix('admin')->as('admin.')->group(function () {
     Route::resource('users', \App\Http\Controllers\UserController::class);
     Route::resource('kategori', KategoriController::class);
+    Route::resource('penulis', PenulisController::class);
+    Route::resource('penerbit', PenerbitController::class);
 });
 
 // --- GUEST & AUTH ROUTES ---
@@ -93,7 +97,9 @@ Route::get('/katalog', function (Request $request) {
             if (!empty(trim($word))) {
                 $bukuQuery->where(function ($q) use ($word) {
                     $q->where('judul', 'like', '%' . $word . '%')
-                      ->orWhere('penulis', 'like', '%' . $word . '%')
+                      ->orWhereHas('penulis', function($p) use ($word) {
+                          $p->where('nama_penulis', 'like', '%' . $word . '%');
+                      })
                       ->orWhereHas('kategori', function($k) use ($word) {
                           $k->where('nama_kategori', 'like', '%' . $word . '%');
                       })
@@ -103,17 +109,17 @@ Route::get('/katalog', function (Request $request) {
         }
     }
 
-    $paginator = $bukuQuery->with('kategori')->orderBy('id_buku', 'desc')->paginate(8);
+    $paginator = $bukuQuery->with('kategori', 'penulis', 'penerbit')->orderBy('id_buku', 'desc')->paginate(8);
 
     $paginator->getCollection()->transform(function($buku) use ($statusMap) {
         return [
             'id' => $buku->id_buku,
             'buku_id' => $buku->id_buku,
             'judul' => $buku->judul,
-            'penulis' => $buku->penulis,
+            'penulis' => $buku->penulis ? $buku->penulis->nama_penulis : 'N/A',
             'genre' => $buku->kategori ? $buku->kategori->nama_kategori : 'N/A',
             'isbn' => $buku->isbn,
-            'penerbit' => $buku->penerbit,
+            'penerbit' => $buku->penerbit ? $buku->penerbit->nama_penerbit : 'N/A',
             'tahun_terbit' => $buku->tahun_terbit,
             'cetakan' => $buku->cetakan,
             'bahasa' => $buku->bahasa,
@@ -149,7 +155,9 @@ Route::get('/search', function (Request $request) {
                 if (!empty(trim($word))) {
                     $q->orWhere(function ($q2) use ($word) {
                         $q2->where('judul', 'like', '%' . $word . '%')
-                           ->orWhere('penulis', 'like', '%' . $word . '%')
+                           ->orWhereHas('penulis', function($p) use ($word) {
+                               $p->where('nama_penulis', 'like', '%' . $word . '%');
+                           })
                            ->orWhereHas('kategori', function($k) use ($word) {
                                $k->where('nama_kategori', 'like', '%' . $word . '%');
                            })
@@ -167,8 +175,10 @@ Route::get('/search', function (Request $request) {
         });
     }
 
-    $books = $bukuQuery->get()->map(function($buku) use ($statusMap) {
+    $books = $bukuQuery->with('kategori', 'penulis', 'penerbit')->get()->map(function($buku) use ($statusMap) {
         $buku->status = $statusMap[$buku->status] ?? $buku->status;
+        $buku->penulis_nama = $buku->penulis ? $buku->penulis->nama_penulis : 'N/A';
+        $buku->penerbit_nama = $buku->penerbit ? $buku->penerbit->nama_penerbit : 'N/A';
         return $buku;
     });
 
@@ -178,7 +188,7 @@ Route::get('/search', function (Request $request) {
 })->name('search');
 
 Route::get('/katalog/{id}', function ($id) {
-    $buku = Buku::with('kategori')->findOrFail($id);
+    $buku = Buku::with('kategori', 'penulis', 'penerbit')->findOrFail($id);
 
     return view('user.pages.detail-buku', [
         'buku' => [
@@ -186,10 +196,10 @@ Route::get('/katalog/{id}', function ($id) {
             'buku_id'      => $buku->id_buku,
             'book_id'      => 'B-' . str_pad($buku->id_buku, 3, '0', STR_PAD_LEFT),
             'judul'        => $buku->judul,
-            'penulis'      => $buku->penulis,
+            'penulis'      => $buku->penulis ? $buku->penulis->nama_penulis : 'N/A',
             'genre'        => $buku->kategori ? $buku->kategori->nama_kategori : 'N/A',
             'isbn'         => $buku->isbn,
-            'penerbit'     => $buku->penerbit,
+            'penerbit'     => $buku->penerbit ? $buku->penerbit->nama_penerbit : 'N/A',
             'tahun_terbit' => $buku->tahun_terbit,
             'cetakan'      => $buku->cetakan,
             'bahasa'       => $buku->bahasa,
@@ -244,7 +254,9 @@ Route::get('/admin/search', function (Request $request) {
                 if (!empty(trim($word))) {
                     $q->orWhere(function ($q2) use ($word) {
                         $q2->where('judul', 'like', '%' . $word . '%')
-                           ->orWhere('penulis', 'like', '%' . $word . '%')
+                           ->orWhereHas('penulis', function($p) use ($word) {
+                               $p->where('nama_penulis', 'like', '%' . $word . '%');
+                           })
                            ->orWhereHas('kategori', function($k) use ($word) {
                                $k->where('nama_kategori', 'like', '%' . $word . '%');
                            })
@@ -262,8 +274,10 @@ Route::get('/admin/search', function (Request $request) {
         });
     }
     
-    $books = $bukuQuery->get()->map(function($buku) use ($statusMap) {
+    $books = $bukuQuery->with('kategori', 'penulis', 'penerbit')->get()->map(function($buku) use ($statusMap) {
         $buku->status = $statusMap[$buku->status] ?? $buku->status;
+        $buku->penulis_nama = $buku->penulis ? $buku->penulis->nama_penulis : 'N/A';
+        $buku->penerbit_nama = $buku->penerbit ? $buku->penerbit->nama_penerbit : 'N/A';
         return $buku;
     });
     $categories = \App\Models\Kategori::has('buku')->pluck('nama_kategori');
@@ -282,25 +296,25 @@ Route::prefix('admin')->group(function () {
             'maintenance' => 'Perawatan',
         ];
 
-        $paginator = Buku::orderBy('id_buku', 'desc')->paginate(8);
+        $paginator = Buku::with('kategori', 'penulis', 'penerbit')->orderBy('id_buku', 'desc')->paginate(8);
 
         $paginator->getCollection()->transform(function($buku) use ($statusMap) {
             return [
-                'id' => $buku->id_buku,
-                'buku_id' => $buku->id_buku,
-                'book_id' => $buku->id_buku,
-                'judul' => $buku->judul,
-                'penulis' => $buku->penulis,
-                'genre' => $buku->kategori ? $buku->kategori->nama_kategori : 'N/A',
-                'isbn' => $buku->isbn,
-                'penerbit' => $buku->penerbit,
-                'tahun_terbit' => $buku->tahun_terbit,
-                'cetakan' => $buku->cetakan,
-                'bahasa' => $buku->bahasa,
-                'status' => $statusMap[$buku->status] ?? $buku->status,
-                'cover' => $buku->cover,
-                'stok' => $buku->stok,
-                'deskripsi' => $buku->deskripsi,
+                'id'          => $buku->id_buku,
+                'buku_id'     => $buku->id_buku,
+                'book_id'     => $buku->id_buku,
+                'judul'       => $buku->judul,
+                'penulis'     => $buku->penulis ? $buku->penulis->nama_penulis : 'N/A',
+                'genre'       => $buku->kategori ? $buku->kategori->nama_kategori : 'N/A',
+                'isbn'        => $buku->isbn,
+                'penerbit'    => $buku->penerbit ? $buku->penerbit->nama_penerbit : 'N/A',
+                'tahun_terbit'=> $buku->tahun_terbit,
+                'cetakan'     => $buku->cetakan,
+                'bahasa'      => $buku->bahasa,
+                'status'      => $statusMap[$buku->status] ?? $buku->status,
+                'cover'       => $buku->cover,
+                'stok'        => $buku->stok,
+                'deskripsi'   => $buku->deskripsi,
             ];
         });
 
@@ -320,11 +334,14 @@ Route::prefix('admin')->group(function () {
     // Route Tambah Buku
     Route::get('/buku/tambah', function () {
         $kategoris = \App\Models\Kategori::all();
-        return view('admin.pages.data-buku', compact('kategoris'));
+        $penulis   = \App\Models\Penulis::orderBy('nama_penulis')->get();
+        $penerbit  = \App\Models\Penerbit::orderBy('nama_penerbit')->get();
+        return view('admin.pages.data-buku', compact('kategoris', 'penulis', 'penerbit'));
     })->name('admin.buku.create');
     Route::post('/buku/tambah', [BukuController::class, 'store'])->name('admin.buku.store');
 
     // Route Peminjaman Admin Actions
+    Route::post('/peminjaman/{id}/acc-ambil', [AdminController::class, 'accPengambilan'])->name('admin.peminjaman.acc_ambil');
     Route::post('/peminjaman/{id}/acc', [AdminController::class, 'accPengembalian'])->name('admin.peminjaman.acc');
     Route::post('/peminjaman/{id}/bayar', [AdminController::class, 'bayarDenda'])->name('admin.peminjaman.bayar');
 

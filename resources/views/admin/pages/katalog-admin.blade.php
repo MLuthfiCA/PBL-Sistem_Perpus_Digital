@@ -38,11 +38,6 @@
             </div>
         </div>
 
-        <div class="col-span-full mt-6">
-            @if(isset($Buku) && method_exists($Buku, 'links'))
-                <div class="flex justify-center text-gray-700">{{ $Buku->links() }}</div>
-            @endif
-        </div>
     </x-ui.page-header>
 
     <!-- Grid View -->
@@ -192,6 +187,12 @@
             </div>
         </x-ui.glass-card>
     </template>
+
+    <div class="mt-8 flex justify-center text-gray-700 w-full">
+        @if(isset($Buku) && method_exists($Buku, 'links'))
+            {{ $Buku->links() }}
+        @endif
+    </div>
 
     <!-- Success Modal Pop-up -->
     <div x-show="showModal" style="display: none;"

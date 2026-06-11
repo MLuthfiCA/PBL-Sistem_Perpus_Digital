@@ -100,13 +100,25 @@
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
                         <div>
                             <label class="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2 ml-1">Author</label>
-                            <input type="text" name="penulis" value="{{ $buku['penulis'] }}" required
-                                class="w-full px-4 py-3.5 border border-white bg-white/50 rounded-2xl focus:outline-none focus:ring-4 focus:ring-red-100 font-medium text-sm transition-all">
+                            <select name="id_penulis" required class="w-full px-4 py-3.5 border border-white bg-white/50 rounded-2xl focus:outline-none focus:ring-4 focus:ring-red-100 font-medium text-sm transition-all appearance-none cursor-pointer">
+                                <option value="">Select Author</option>
+                                @foreach($penulis as $p)
+                                    <option value="{{ $p->id_penulis }}" {{ ($buku['id_penulis'] ?? '') == $p->id_penulis ? 'selected' : '' }}>
+                                        {{ $p->nama_penulis }}
+                                    </option>
+                                @endforeach
+                            </select>
                         </div>
                         <div>
                             <label class="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2 ml-1">Publisher</label>
-                            <input type="text" name="penerbit" value="{{ $buku['penerbit'] ?? '' }}" placeholder="Publisher Name"
-                                class="w-full px-4 py-3.5 border border-white bg-white/50 rounded-2xl focus:outline-none focus:ring-4 focus:ring-red-100 font-medium text-sm transition-all">
+                            <select name="id_penerbit" class="w-full px-4 py-3.5 border border-white bg-white/50 rounded-2xl focus:outline-none focus:ring-4 focus:ring-red-100 font-medium text-sm transition-all appearance-none cursor-pointer">
+                                <option value="">Select Publisher</option>
+                                @foreach($penerbit as $pb)
+                                    <option value="{{ $pb->id_penerbit }}" {{ ($buku['id_penerbit'] ?? '') == $pb->id_penerbit ? 'selected' : '' }}>
+                                        {{ $pb->nama_penerbit }}
+                                    </option>
+                                @endforeach
+                            </select>
                         </div>
                     </div>
 

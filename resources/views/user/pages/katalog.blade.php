@@ -27,11 +27,6 @@
             </button>
         </div>
 
-        <div class="col-span-full mt-6">
-            @if(isset($daftarBuku) && method_exists($daftarBuku, 'links'))
-                <div class="flex justify-center text-gray-700">{{ $daftarBuku->links() }}</div>
-            @endif
-        </div>
     </x-ui.page-header>
 
     <!-- Grid View -->
@@ -131,6 +126,12 @@
             </div>
         </x-ui.glass-card>
     </template>
+
+    <div class="mt-8 flex justify-center text-gray-700 w-full">
+        @if(isset($daftarBuku) && method_exists($daftarBuku, 'links'))
+            {{ $daftarBuku->links() }}
+        @endif
+    </div>
 
 </div>
 @endsection

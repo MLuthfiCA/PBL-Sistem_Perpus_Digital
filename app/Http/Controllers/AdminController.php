@@ -138,6 +138,14 @@ class AdminController extends Controller
         return redirect()->back()->with('success', 'Fine marked as paid!');
     }
 
+    public function accPengambilan($id)
+    {
+        $peminjaman = Peminjaman::findOrFail($id);
+        $peminjaman->update(['is_diambil' => true]);
+
+        return redirect()->back()->with('success', 'Book pickup confirmed!');
+    }
+
     public function exportLaporan(\Illuminate\Http\Request $request)
     {
         $bulan = (int) $request->input('bulan', now()->month);

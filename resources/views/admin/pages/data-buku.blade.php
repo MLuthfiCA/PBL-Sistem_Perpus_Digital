@@ -116,11 +116,13 @@
                                 Author
                             </label>
 
-                            <input type="text" 
-                                   name="penulis" 
-                                   required
-                                   placeholder="Author Name"
-                                   class="w-full px-4 py-3 border border-white bg-white/50 rounded-2xl focus:outline-none focus:ring-4 focus:ring-red-100 font-medium text-sm">
+                            <select name="id_penulis" required
+                                class="w-full px-4 py-3 border border-white bg-white/50 rounded-2xl focus:outline-none focus:ring-4 focus:ring-red-100 font-medium text-sm appearance-none cursor-pointer">
+                                <option value="">Select Author</option>
+                                @foreach($penulis as $p)
+                                    <option value="{{ $p->id_penulis }}">{{ $p->nama_penulis }}</option>
+                                @endforeach
+                            </select>
                         </div>
 
                         <div>
@@ -128,10 +130,13 @@
                                 Publisher
                             </label>
 
-                            <input type="text" 
-                                   name="penerbit"
-                                   placeholder="Publisher Name"
-                                   class="w-full px-4 py-3 border border-white bg-white/50 rounded-2xl focus:outline-none focus:ring-4 focus:ring-red-100 font-medium text-sm">
+                            <select name="id_penerbit"
+                                class="w-full px-4 py-3 border border-white bg-white/50 rounded-2xl focus:outline-none focus:ring-4 focus:ring-red-100 font-medium text-sm appearance-none cursor-pointer">
+                                <option value="">Select Publisher</option>
+                                @foreach($penerbit as $pb)
+                                    <option value="{{ $pb->id_penerbit }}">{{ $pb->nama_penerbit }}</option>
+                                @endforeach
+                            </select>
                         </div>
 
                     </div>

@@ -245,7 +245,7 @@
                         </div>
                         <div>
                             <h3 class="font-bold text-gray-800 text-sm line-clamp-1">{{ $b->buku?->judul ?? 'Unknown Book' }}</h3>
-                            <p class="text-[10px] text-gray-400 font-medium mt-0.5">{{ $b->buku?->penulis ?? 'Unknown Author' }}</p>
+                            <p class="text-[10px] text-gray-400 font-medium mt-0.5">{{ $b->buku?->penulis?->nama_penulis ?? 'Unknown Author' }}</p>
                         </div>
                     </div>
 
@@ -263,9 +263,15 @@
 
                     <div class="col-span-2 flex flex-col md:flex-row md:items-center gap-2 mt-2 md:mt-0">
                         <span class="md:hidden text-[10px] font-bold text-gray-400 uppercase">Due Date:</span>
+                        @php
+                            $isPast = \Carbon\Carbon::parse($b->batas_kembali)->isPast();
+                            $isReturned = $b->status === 'dikembalikan';
+                            $dotColor = $isReturned ? 'bg-gray-400' : ($isPast ? 'bg-red-500 animate-pulse' : 'bg-green-500');
+                            $textColor = $isReturned ? 'text-gray-400' : ($isPast ? 'text-red-600' : 'text-gray-600');
+                        @endphp
                         <div class="flex items-center gap-2">
-                            <span class="w-2 h-2 rounded-full {{ \Carbon\Carbon::parse($b->batas_kembali)->isPast() ? 'bg-red-500 animate-pulse' : 'bg-green-500' }}"></span>
-                            <p class="font-bold {{ \Carbon\Carbon::parse($b->batas_kembali)->isPast() ? 'text-red-600' : 'text-gray-600' }} text-xs">{{ \Carbon\Carbon::parse($b->batas_kembali)->format('d M Y') }}</p>
+                            <span class="w-2 h-2 rounded-full {{ $dotColor }}"></span>
+                            <p class="font-bold {{ $textColor }} text-xs">{{ \Carbon\Carbon::parse($b->batas_kembali)->format('d M Y') }}</p>
                         </div>
                     </div>
 
@@ -293,16 +299,25 @@
                         @endif
                     </div>
 
-                    <div class="col-span-2 flex items-center md:justify-end gap-2 mt-4 md:mt-0 border-t md:border-t-0 border-gray-100 pt-3 md:pt-0">
+                    <div class="col-span-2 flex flex-col md:flex-row md:justify-end gap-2 mt-4 md:mt-0 border-t md:border-t-0 border-gray-100 pt-3 md:pt-0">
                         @if($b->status === 'dipinjam')
-                            <form action="{{ route('admin.peminjaman.acc', $b->id) }}" method="POST" onsubmit="return confirm('Confirm this book has been returned?')">
-                                @csrf
-                                <button type="submit" class="text-[10px] font-bold text-white bg-burgundy-500 hover:bg-maroon px-3 py-2 rounded-lg transition-all shadow-md shadow-red-50 whitespace-nowrap">
-                                    Confirm Return
-                                </button>
-                            </form>
+                            @if(!$b->is_diambil)
+                                <form action="{{ route('admin.peminjaman.acc_ambil', $b->id) }}" method="POST" onsubmit="return confirm('Confirm book has been picked up by student?')">
+                                    @csrf
+                                    <button type="submit" class="text-[10px] font-bold text-burgundy-600 bg-red-50 hover:bg-red-100 border border-burgundy-200 px-3 py-2 rounded-lg transition-all shadow-sm w-full md:w-auto whitespace-nowrap">
+                                        Acc Pick Up
+                                    </button>
+                                </form>
+                            @else
+                                <form action="{{ route('admin.peminjaman.acc', $b->id) }}" method="POST" onsubmit="return confirm('Confirm this book has been returned?')">
+                                    @csrf
+                                    <button type="submit" class="text-[10px] font-bold text-white bg-burgundy-500 hover:bg-maroon px-3 py-2 rounded-lg transition-all shadow-md shadow-red-50 w-full md:w-auto whitespace-nowrap">
+                                        Confirm Return
+                                    </button>
+                                </form>
+                            @endif
                         @else
-                            <span class="text-[10px] font-bold text-gray-400 bg-gray-50 px-3 py-2 rounded-lg border border-gray-100 uppercase">Returned</span>
+                            <span class="text-[10px] font-bold text-gray-400 bg-gray-50 px-3 py-2 rounded-lg border border-gray-100 uppercase text-center md:text-left">Returned</span>
                         @endif
                     </div>
 

@@ -75,5 +75,11 @@
             </table>
         </div>
     </div>
+
+    <div class="mt-4 flex justify-center w-full">
+        @if(method_exists($users, 'links'))
+            {{ $users->links() }}
+        @endif
+    </div>
 </div>
 @endsection

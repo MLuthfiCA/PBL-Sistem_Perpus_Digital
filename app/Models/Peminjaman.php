@@ -35,6 +35,7 @@ class Peminjaman extends Model
         'status_denda',
         'catatan',
         'id_buku',
+        'is_diambil',
     ];
 
     protected $casts = [

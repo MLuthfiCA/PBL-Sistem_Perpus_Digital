@@ -92,7 +92,7 @@
             </div>
             
             <h3 class="font-bold text-gray-800 line-clamp-1 mb-1 text-lg group-hover:text-burgundy-500 transition-colors">{{ $buku->judul }}</h3>
-            <p class="text-xs text-gray-400 mb-6 font-medium">{{ $buku->penulis }}</p>
+            <p class="text-xs text-gray-400 mb-6 font-medium">{{ $buku->penulis_nama }}</p>
             
             <div class="mt-auto pt-5 border-t border-red-50 flex items-center justify-between">
                 <span class="px-2 py-1 rounded bg-white/80 text-[10px] font-bold text-burgundy-500 uppercase tracking-tighter border border-red-100">{{ $buku->kategori ? $buku->kategori->nama_kategori : 'N/A' }}</span>

@@ -134,7 +134,7 @@
                 <a href="{{ route('katalog.detail', $book->buku_id) }}" class="group/title">
                     <h3 class="font-bold text-gray-800 line-clamp-1 mb-1 group-hover/title:text-burgundy-500 transition-colors">{{ $book->judul }}</h3>
                 </a>
-                <p class="text-xs text-gray-400 mb-6 font-medium">{{ $book->penulis }}</p>
+                <p class="text-xs text-gray-400 mb-6 font-medium">{{ $book->penulis_nama }}</p>
 
                 <div class="mt-auto">
                     <a href="{{ route('katalog.detail', $book->buku_id) }}" class="block text-center bg-burgundy-500 text-white py-3 rounded-2xl font-bold shadow-lg shadow-red-100 hover:bg-maroon transition-all">View Details</a>
