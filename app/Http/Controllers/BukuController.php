@@ -283,6 +283,17 @@ class BukuController extends Controller
                 'status' => $newStock === 0 ? 'Dipinjam' : 'Tersedia',
             ]);
 
+            // Catat Riwayat Peminjaman
+            \App\Models\Riwayat::create([
+                'id_pengguna' => $userId,
+                'id_peminjaman' => $peminjaman->id,
+                'tanggal' => now()->toDateString(),
+                'aktivitas' => 'Pengajuan Peminjaman',
+                'deskripsi' => 'User mengajukan peminjaman buku: ' . $buku->judul,
+                'ip_address' => $request->ip(),
+                'user_agent' => $request->userAgent(),
+            ]);
+
             return redirect()->back()->with('success', 'Borrowing successfully submitted! Please contact the admin.');
         } catch (\Exception $e) {
             Log::error('Borrowing error: ' . $e->getMessage());

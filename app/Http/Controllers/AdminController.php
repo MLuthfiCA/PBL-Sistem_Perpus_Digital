@@ -127,6 +127,17 @@ class AdminController extends Controller
                 ]);
         }
 
+        // Catat Riwayat Pengembalian
+        \App\Models\Riwayat::create([
+            'id_pengguna' => $peminjaman->id_pengguna,
+            'id_peminjaman' => $peminjaman->id_peminjaman,
+            'tanggal' => now()->toDateString(),
+            'aktivitas' => 'Pengembalian Buku',
+            'deskripsi' => 'Buku telah dikembalikan ke perpustakaan. Denda: Rp ' . number_format($denda, 0, ',', '.'),
+            'ip_address' => request()->ip(),
+            'user_agent' => request()->userAgent(),
+        ]);
+
         return redirect()->back()->with('success', 'Book return confirmed successfully!');
     }
 
@@ -142,6 +153,17 @@ class AdminController extends Controller
     {
         $peminjaman = Peminjaman::findOrFail($id);
         $peminjaman->update(['is_diambil' => true]);
+
+        // Catat Riwayat Pengambilan
+        \App\Models\Riwayat::create([
+            'id_pengguna' => $peminjaman->id_pengguna,
+            'id_peminjaman' => $peminjaman->id_peminjaman,
+            'tanggal' => now()->toDateString(),
+            'aktivitas' => 'Buku Diambil',
+            'deskripsi' => 'Buku telah diambil secara fisik oleh mahasiswa.',
+            'ip_address' => request()->ip(),
+            'user_agent' => request()->userAgent(),
+        ]);
 
         return redirect()->back()->with('success', 'Book pickup confirmed!');
     }
