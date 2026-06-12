@@ -49,7 +49,7 @@ $user = Auth::user();
                                 ->whereDate('batas_kembali', '<', now()->toDateString());
                         });
                 })
-                ->with('detailPeminjaman.buku')
+                ->with('buku')
                 ->get();
 
             // Hitung total denda

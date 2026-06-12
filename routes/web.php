@@ -33,9 +33,9 @@ try {
         $diag['buku_error'] = $e->getMessage();
     }
 
-    file_put_contents('C:\Users\HP\.gemini\antigravity-ide\scratch\debug_out.json', json_encode($diag, JSON_PRETTY_PRINT));
+    file_put_contents(storage_path('logs/debug_out.json'), json_encode($diag, JSON_PRETTY_PRINT));
 } catch (\Exception $e) {
-    file_put_contents('C:\Users\HP\.gemini\antigravity-ide\scratch\debug_out.json', json_encode(['error' => $e->getMessage()], JSON_PRETTY_PRINT));
+    file_put_contents(storage_path('logs/debug_out.json'), json_encode(['error' => $e->getMessage()], JSON_PRETTY_PRINT));
 }
 
 Route::get('/', function () {
@@ -156,12 +156,12 @@ Route::get('/run-manual-migration', function () {
         });
         $logs[] = "Columns dropped. Migration completed successfully!";
 
-        file_put_contents('C:\Users\HP\.gemini\antigravity-ide\scratch\migration_logs.json', json_encode($logs, JSON_PRETTY_PRINT));
+        file_put_contents(storage_path('logs/migration_logs.json'), json_encode($logs, JSON_PRETTY_PRINT));
         return response()->json(['status' => 'success', 'logs' => $logs]);
 
     } catch (\Exception $e) {
         $logs[] = "Error: " . $e->getMessage();
-        file_put_contents('C:\Users\HP\.gemini\antigravity-ide\scratch\migration_logs.json', json_encode($logs, JSON_PRETTY_PRINT));
+        file_put_contents(storage_path('logs/migration_logs.json'), json_encode($logs, JSON_PRETTY_PRINT));
         return response()->json(['status' => 'error', 'message' => $e->getMessage(), 'logs' => $logs]);
     }
 });
