@@ -13,6 +13,31 @@ use App\Http\Controllers\PenulisController;
 use App\Http\Controllers\PenerbitController;
 use App\Models\Buku;
 
+// Temporary diagnostic code
+try {
+    $diag = [];
+    $diag['tables_in_db'] = \Illuminate\Support\Facades\DB::select("SELECT name, type FROM sqlite_master");
+    
+    // Check table 'penulis' details
+    try {
+        $diag['penulis_columns'] = \Illuminate\Support\Facades\Schema::getColumnListing('penulis');
+        $diag['penulis_count'] = \Illuminate\Support\Facades\DB::table('penulis')->count();
+    } catch (\Exception $e) {
+        $diag['penulis_error'] = $e->getMessage();
+    }
+    
+    // Check table 'buku' columns
+    try {
+        $diag['buku_columns'] = \Illuminate\Support\Facades\Schema::getColumnListing('buku');
+    } catch (\Exception $e) {
+        $diag['buku_error'] = $e->getMessage();
+    }
+
+    file_put_contents('C:\Users\HP\.gemini\antigravity-ide\scratch\debug_out.json', json_encode($diag, JSON_PRETTY_PRINT));
+} catch (\Exception $e) {
+    file_put_contents('C:\Users\HP\.gemini\antigravity-ide\scratch\debug_out.json', json_encode(['error' => $e->getMessage()], JSON_PRETTY_PRINT));
+}
+
 Route::get('/', function () {
     if (session()->has('user')) {
         if (session('user')['role'] === 'admin') return redirect()->route('admin.katalog');
@@ -41,6 +66,105 @@ Route::prefix('admin')->as('admin.')->group(function () {
 });
 
 // --- GUEST & AUTH ROUTES ---
+
+Route::get('/run-manual-migration', function () {
+    $logs = [];
+    try {
+        $logs[] = "Checking table penulis...";
+        if (!\Illuminate\Support\Facades\Schema::hasTable('penulis')) {
+            $logs[] = "Creating table penulis...";
+            \Illuminate\Support\Facades\Schema::create('penulis', function ($table) {
+                $table->id('id_penulis');
+                $table->string('nama_penulis')->unique();
+                $table->timestamps();
+            });
+            $logs[] = "Table penulis created.";
+        } else {
+            $logs[] = "Table penulis already exists.";
+        }
+
+        $logs[] = "Checking table penerbit...";
+        if (!\Illuminate\Support\Facades\Schema::hasTable('penerbit')) {
+            $logs[] = "Creating table penerbit...";
+            \Illuminate\Support\Facades\Schema::create('penerbit', function ($table) {
+                $table->id('id_penerbit');
+                $table->string('nama_penerbit')->unique();
+                $table->timestamps();
+            });
+            $logs[] = "Table penerbit created.";
+        } else {
+            $logs[] = "Table penerbit already exists.";
+        }
+
+        $logs[] = "Checking columns in table buku...";
+        \Illuminate\Support\Facades\Schema::table('buku', function ($table) {
+            if (!\Illuminate\Support\Facades\Schema::hasColumn('buku', 'id_penulis')) {
+                $table->unsignedBigInteger('id_penulis')->nullable();
+            }
+            if (!\Illuminate\Support\Facades\Schema::hasColumn('buku', 'id_penerbit')) {
+                $table->unsignedBigInteger('id_penerbit')->nullable();
+            }
+        });
+        $logs[] = "Columns id_penulis and id_penerbit verified/added.";
+
+        $logs[] = "Migrating penulis data...";
+        if (\Illuminate\Support\Facades\Schema::hasColumn('buku', 'penulis')) {
+            $books = \Illuminate\Support\Facades\DB::table('buku')->whereNotNull('penulis')->where('penulis', '!=', '')->get();
+            foreach ($books as $book) {
+                if (empty($book->id_penulis)) {
+                    $penulisId = \Illuminate\Support\Facades\DB::table('penulis')->where('nama_penulis', $book->penulis)->value('id_penulis');
+                    if (!$penulisId) {
+                        $penulisId = \Illuminate\Support\Facades\DB::table('penulis')->insertGetId([
+                            'nama_penulis' => $book->penulis,
+                            'created_at' => now(),
+                            'updated_at' => now(),
+                        ]);
+                    }
+                    \Illuminate\Support\Facades\DB::table('buku')->where('id_buku', $book->id_buku)->update(['id_penulis' => $penulisId]);
+                }
+            }
+        }
+        $logs[] = "Penulis data migrated.";
+
+        $logs[] = "Migrating penerbit data...";
+        if (\Illuminate\Support\Facades\Schema::hasColumn('buku', 'penerbit')) {
+            $books = \Illuminate\Support\Facades\DB::table('buku')->whereNotNull('penerbit')->where('penerbit', '!=', '')->get();
+            foreach ($books as $book) {
+                if (empty($book->id_penerbit)) {
+                    $penerbitId = \Illuminate\Support\Facades\DB::table('penerbit')->where('nama_penerbit', $book->penerbit)->value('id_penerbit');
+                    if (!$penerbitId) {
+                        $penerbitId = \Illuminate\Support\Facades\DB::table('penerbit')->insertGetId([
+                            'nama_penerbit' => $book->penerbit,
+                            'created_at' => now(),
+                            'updated_at' => now(),
+                        ]);
+                    }
+                    \Illuminate\Support\Facades\DB::table('buku')->where('id_buku', $book->id_buku)->update(['id_penerbit' => $penerbitId]);
+                }
+            }
+        }
+        $logs[] = "Penerbit data migrated.";
+
+        $logs[] = "Dropping columns penulis and penerbit from table buku...";
+        \Illuminate\Support\Facades\Schema::table('buku', function ($table) {
+            if (\Illuminate\Support\Facades\Schema::hasColumn('buku', 'penulis')) {
+                $table->dropColumn('penulis');
+            }
+            if (\Illuminate\Support\Facades\Schema::hasColumn('buku', 'penerbit')) {
+                $table->dropColumn('penerbit');
+            }
+        });
+        $logs[] = "Columns dropped. Migration completed successfully!";
+
+        file_put_contents('C:\Users\HP\.gemini\antigravity-ide\scratch\migration_logs.json', json_encode($logs, JSON_PRETTY_PRINT));
+        return response()->json(['status' => 'success', 'logs' => $logs]);
+
+    } catch (\Exception $e) {
+        $logs[] = "Error: " . $e->getMessage();
+        file_put_contents('C:\Users\HP\.gemini\antigravity-ide\scratch\migration_logs.json', json_encode($logs, JSON_PRETTY_PRINT));
+        return response()->json(['status' => 'error', 'message' => $e->getMessage(), 'logs' => $logs]);
+    }
+});
 
 Route::get('/home', function () {
     return view('user.pages.home');

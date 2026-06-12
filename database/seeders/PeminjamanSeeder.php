@@ -47,12 +47,22 @@ class PeminjamanSeeder extends Seeder
             'identity_number' => '0000000001',
         ]);
 
-        // 2. Pastikan ada Buku
+        // 2. Pastikan ada Penulis dan Penerbit
+        $penulis1 = \App\Models\Penulis::firstOrCreate(['nama_penulis' => 'Andrea Hirata']);
+        $penerbit1 = \App\Models\Penerbit::firstOrCreate(['nama_penerbit' => 'Bentang Pustaka']);
+
+        $penulis2 = \App\Models\Penulis::firstOrCreate(['nama_penulis' => 'Tere Liye']);
+        $penerbit2 = \App\Models\Penerbit::firstOrCreate(['nama_penerbit' => 'Gramedia Pustaka Utama']);
+
+        $penulis3 = \App\Models\Penulis::firstOrCreate(['nama_penulis' => 'Henry Manampiring']);
+        $penerbit3 = \App\Models\Penerbit::firstOrCreate(['nama_penerbit' => 'Kompas']);
+
+        // 3. Pastikan ada Buku
         $buku1 = Buku::where('judul', 'Laskar Pelangi')->first() ?? Buku::create([
             'judul' => 'Laskar Pelangi',
-            'penulis' => 'Andrea Hirata',
+            'id_penulis' => $penulis1->id_penulis,
             'isbn' => '978-979-3062-79-1',
-            'penerbit' => 'Bentang Pustaka',
+            'id_penerbit' => $penerbit1->id_penerbit,
             'tahun_terbit' => 2005,
             'id_kategori' => $kategoriNovel->id_kategori,
             'stok' => 5,
@@ -61,9 +71,9 @@ class PeminjamanSeeder extends Seeder
 
         $buku2 = Buku::where('judul', 'Bumi')->first() ?? Buku::create([
             'judul' => 'Bumi',
-            'penulis' => 'Tere Liye',
+            'id_penulis' => $penulis2->id_penulis,
             'isbn' => '978-602-03-3295-6',
-            'penerbit' => 'Gramedia Pustaka Utama',
+            'id_penerbit' => $penerbit2->id_penerbit,
             'tahun_terbit' => 2014,
             'id_kategori' => $kategoriNovel->id_kategori,
             'stok' => 3,
@@ -72,9 +82,9 @@ class PeminjamanSeeder extends Seeder
 
         $buku3 = Buku::where('judul', 'Filosofi Teras')->first() ?? Buku::create([
             'judul' => 'Filosofi Teras',
-            'penulis' => 'Henry Manampiring',
+            'id_penulis' => $penulis3->id_penulis,
             'isbn' => '978-602-412-518-9',
-            'penerbit' => 'Kompas',
+            'id_penerbit' => $penerbit3->id_penerbit,
             'tahun_terbit' => 2018,
             'id_kategori' => $kategoriSelfHelp->id_kategori,
             'stok' => 10,
