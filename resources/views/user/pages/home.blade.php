@@ -104,7 +104,7 @@
                     </div>
                     <span class="font-bold text-gray-700">{{ $genre['name'] }}</span>
                 </div>
-                <span class="text-xs font-bold text-burgundy-500 bg-red-50 px-2 py-1 rounded-lg">{{ $genre['count'] }} buku</span>
+                <span class="text-xs font-bold text-burgundy-500 bg-red-50 px-2 py-1 rounded-lg">{{ $genre['count'] }} {{ $genre['count'] == 1 ? 'book' : 'books' }}</span>
             </div>
             @empty
             <div class="glass-panel p-4 text-gray-400 text-sm border-white/60">Belum ada kategori buku.</div>
