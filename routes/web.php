@@ -33,6 +33,19 @@ try {
         $diag['buku_error'] = $e->getMessage();
     }
 
+    // Run git commands
+    $diag['git_status'] = shell_exec("git status 2>&1");
+    $diag['git_diff'] = shell_exec("git diff 2>&1");
+
+    // Run database updates for book covers
+    try {
+        \Illuminate\Support\Facades\DB::table('buku')->where('judul', 'Laskar Pelangi')->update(['cover' => 'Laskar_pelangi_sampul.jpg']);
+        \Illuminate\Support\Facades\DB::table('buku')->where('judul', 'Bumi')->update(['cover' => 'cover_buku_bumi.jpg']);
+        \Illuminate\Support\Facades\DB::table('buku')->where('judul', 'Filosofi Teras')->update(['cover' => 'filosofi_teras.webp']);
+    } catch (\Exception $e) {
+        $diag['db_update_error'] = $e->getMessage();
+    }
+
     file_put_contents(storage_path('logs/debug_out.json'), json_encode($diag, JSON_PRETTY_PRINT));
 } catch (\Exception $e) {
     file_put_contents(storage_path('logs/debug_out.json'), json_encode(['error' => $e->getMessage()], JSON_PRETTY_PRINT));
@@ -167,7 +180,25 @@ Route::get('/run-manual-migration', function () {
 });
 
 Route::get('/home', function () {
-    return view('user.pages.home');
+    $totalBuku      = Buku::count();
+    $totalUsers     = \App\Models\User::where('role', '!=', 'admin')->count();
+    $bukuTersedia   = Buku::where('status', 'Tersedia')->count();
+    $pctTersedia    = $totalBuku > 0 ? round(($bukuTersedia / $totalBuku) * 100) : 0;
+
+    // Genre stats: kategori yang punya buku, urutkan berdasarkan jumlah buku terbanyak
+    $genreStats = \App\Models\Kategori::withCount('buku')
+        ->orderByDesc('buku_count')
+        ->get()
+        ->filter(fn($k) => $k->buku_count > 0)
+        ->map(function ($k) use ($totalBuku) {
+            return [
+                'name'    => $k->nama_kategori,
+                'count'   => $k->buku_count,
+                'percent' => $totalBuku > 0 ? round(($k->buku_count / $totalBuku) * 100) : 0,
+            ];
+        });
+
+    return view('user.pages.home', compact('totalBuku', 'totalUsers', 'pctTersedia', 'genreStats'));
 })->name('home');
 
 Route::get('/login', function () {
