@@ -55,10 +55,15 @@
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
                     </svg>
                 </div>
-                <span class="text-xs font-bold text-red-400 group-hover:text-red-200">Active Member</span>
+                <span class="text-xs font-bold text-red-400 group-hover:text-red-200">Registered Member</span>
             </div>
+<<<<<<< HEAD
             <p class="text-sm font-medium text-gray-500 group-hover:text-red-100">Monthly Users</p>
             <h3 class="text-3xl font-bold text-gray-800 group-hover:text-white">{{ number_format($totalMember) }}</h3>
+=======
+            <p class="text-sm font-medium text-gray-500 group-hover:text-red-100">Total Users</p>
+            <h3 class="text-3xl font-bold text-gray-800 group-hover:text-white">{{ number_format($totalUsers) }}</h3>
+>>>>>>> f204e9327d0f7fc8f360f72a746a706d75e5bf9a
         </div>
 
         <div class="glass-panel p-6 animate-fade-up delay-300 group hover:bg-burgundy-900 transition-all duration-500 border-white/60">
@@ -71,18 +76,27 @@
                 <span class="text-xs font-bold text-red-400 group-hover:text-red-200">Available Now</span>
             </div>
             <p class="text-sm font-medium text-gray-500 group-hover:text-red-100">Open Resources</p>
+<<<<<<< HEAD
             <h3 class="text-3xl font-bold text-gray-800 group-hover:text-white">{{ $availablePercent }}%</h3>
+=======
+            <h3 class="text-3xl font-bold text-gray-800 group-hover:text-white">{{ $pctTersedia }}%</h3>
+>>>>>>> f204e9327d0f7fc8f360f72a746a706d75e5bf9a
         </div>
     </div>
 
     @php
-        $genres = [
-            ['name' => 'Self-Dev', 'icon' => '🌱', 'growth' => '25%', 'color' => 'from-red-400 to-burgundy-500'],
-            ['name' => 'Technology', 'icon' => '💻', 'growth' => '18%', 'color' => 'from-rose-400 to-maroon'],
-            ['name' => 'Finance', 'icon' => '💰', 'growth' => '15%', 'color' => 'from-amber-600 to-orange-700'],
-            ['name' => 'Literature', 'icon' => '📚', 'growth' => '10%', 'color' => 'from-purple-600 to-indigo-900'],
-            ['name' => 'Psychology', 'icon' => '🧠', 'growth' => '22%', 'color' => 'from-pink-500 to-rose-700'],
+        // Palette warna untuk genre cards
+        $genreColors = [
+            'from-red-400 to-burgundy-500',
+            'from-rose-400 to-maroon',
+            'from-amber-600 to-orange-700',
+            'from-purple-600 to-indigo-900',
+            'from-pink-500 to-rose-700',
+            'from-teal-500 to-emerald-700',
+            'from-blue-500 to-indigo-700',
+            'from-green-500 to-teal-700',
         ];
+        $genreIcons = ['📚', '💻', '🌱', '🧠', '💰', '🔬', '🎨', '📖'];
     @endphp
 
     <!-- Trending Genres & Chart Section -->
@@ -91,17 +105,19 @@
         <!-- Left: Genre Cards -->
         <div class="lg:col-span-1 space-y-4">
             <h2 class="text-2xl font-bold text-gray-800 mb-6 px-1">Genre Statistics</h2>
-            @foreach($genres as $genre)
+            @forelse($genreStats as $i => $genre)
             <div class="glass-panel p-4 flex items-center justify-between group hover:border-burgundy-500 transition-all cursor-pointer border-white/60">
                 <div class="flex items-center gap-4">
-                    <div class="w-10 h-10 rounded-xl bg-gradient-to-br {{ $genre['color'] }} flex items-center justify-center text-xl shadow-sm">
-                        {{ $genre['icon'] }}
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-br {{ $genreColors[$i % count($genreColors)] }} flex items-center justify-center text-xl shadow-sm">
+                        {{ $genreIcons[$i % count($genreIcons)] }}
                     </div>
                     <span class="font-bold text-gray-700">{{ $genre['name'] }}</span>
                 </div>
-                <span class="text-xs font-bold text-burgundy-500 bg-red-50 px-2 py-1 rounded-lg">{{ $genre['growth'] }}</span>
+                <span class="text-xs font-bold text-burgundy-500 bg-red-50 px-2 py-1 rounded-lg">{{ $genre['count'] }} {{ $genre['count'] == 1 ? 'book' : 'books' }}</span>
             </div>
-            @endforeach
+            @empty
+            <div class="glass-panel p-4 text-gray-400 text-sm border-white/60">Belum ada kategori buku.</div>
+            @endforelse
         </div>
 
         <!-- Right: The Graph Card -->
@@ -144,20 +160,31 @@
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         const ctx = document.getElementById('trendingChart').getContext('2d');
-        
+
+        // Data dari PHP — genre dari katalog nyata
+        const chartLabels = {!! json_encode($genreStats->pluck('name')) !!};
+        const chartData   = {!! json_encode($genreStats->pluck('count')) !!};
+
+        const palette = [
+            '#800020', '#630330', '#B45309', '#10B981',
+            '#6366F1', '#EC4899', '#0EA5E9', '#F59E0B'
+        ];
+        const colors = chartLabels.map((_, i) => palette[i % palette.length]);
+
+        if (chartLabels.length === 0) {
+            document.getElementById('trendingChart').parentElement.innerHTML =
+                '<p class="text-center text-gray-400 text-sm mt-20">Belum ada data genre.</p>';
+            return;
+        }
+
         new Chart(ctx, {
             type: 'pie',
             plugins: [ChartDataLabels],
             data: {
-                labels: ['Self-Dev', 'Technology', 'Literature', 'Psychology'],
+                labels: chartLabels,
                 datasets: [{
-                    data: [30, 20, 15, 35],
-                    backgroundColor: [
-                        '#800020', // Burgundy
-                        '#630330', // Maroon
-                        '#B45309', // Amber/Gold tone
-                        '#10B981'  // Emerald
-                    ],
+                    data: chartData,
+                    backgroundColor: colors,
                     borderColor: '#ffffff',
                     borderWidth: 2
                 }]
@@ -170,14 +197,11 @@
                     datalabels: {
                         color: '#ffffff',
                         formatter: (value, ctx) => {
-                            let label = ctx.chart.data.labels[ctx.dataIndex];
-                            return label + '\n' + value + '%';
+                            const total = ctx.chart.data.datasets[0].data.reduce((a, b) => a + b, 0);
+                            const pct   = total > 0 ? Math.round((value / total) * 100) : 0;
+                            return ctx.chart.data.labels[ctx.dataIndex] + '\n' + pct + '%';
                         },
-                        font: {
-                            weight: 'bold',
-                            size: 11,
-                            family: 'DM Sans'
-                        },
+                        font: { weight: 'bold', size: 11, family: 'DM Sans' },
                         textAlign: 'center'
                     },
                     tooltip: { enabled: false }
