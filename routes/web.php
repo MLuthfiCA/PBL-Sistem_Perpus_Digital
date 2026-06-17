@@ -180,7 +180,6 @@ Route::get('/run-manual-migration', function () {
 });
 
 Route::get('/home', function () {
-<<<<<<< HEAD
     $totalBuku = \App\Models\Buku::count();
     $totalMember = \App\Models\User::where('role', 'mahasiswa')->count();
     $tersediaBuku = \App\Models\Buku::where('status', 'Tersedia')->where('stok', '>', 0)->count();
@@ -191,14 +190,7 @@ Route::get('/home', function () {
                             ->limit(6)
                             ->pluck('nama_kategori');
 
-    return view('user.pages.home', compact('totalBuku', 'totalMember', 'availablePercent', 'trendingCategories'));
-=======
-    $totalBuku      = Buku::count();
-    $totalUsers     = \App\Models\User::where('role', '!=', 'admin')->count();
-    $bukuTersedia   = Buku::where('status', 'Tersedia')->count();
-    $pctTersedia    = $totalBuku > 0 ? round(($bukuTersedia / $totalBuku) * 100) : 0;
-
-    // Genre stats: kategori yang punya buku, urutkan berdasarkan jumlah buku terbanyak
+    // Genre stats untuk chart
     $genreStats = \App\Models\Kategori::withCount('buku')
         ->orderByDesc('buku_count')
         ->get()
@@ -211,8 +203,7 @@ Route::get('/home', function () {
             ];
         });
 
-    return view('user.pages.home', compact('totalBuku', 'totalUsers', 'pctTersedia', 'genreStats'));
->>>>>>> f204e9327d0f7fc8f360f72a746a706d75e5bf9a
+    return view('user.pages.home', compact('totalBuku', 'totalMember', 'availablePercent', 'trendingCategories', 'genreStats'));
 })->name('home');
 
 Route::get('/login', function () {

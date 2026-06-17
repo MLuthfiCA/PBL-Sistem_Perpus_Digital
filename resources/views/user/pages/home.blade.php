@@ -57,13 +57,8 @@
                 </div>
                 <span class="text-xs font-bold text-red-400 group-hover:text-red-200">Registered Member</span>
             </div>
-<<<<<<< HEAD
             <p class="text-sm font-medium text-gray-500 group-hover:text-red-100">Monthly Users</p>
             <h3 class="text-3xl font-bold text-gray-800 group-hover:text-white">{{ number_format($totalMember) }}</h3>
-=======
-            <p class="text-sm font-medium text-gray-500 group-hover:text-red-100">Total Users</p>
-            <h3 class="text-3xl font-bold text-gray-800 group-hover:text-white">{{ number_format($totalUsers) }}</h3>
->>>>>>> f204e9327d0f7fc8f360f72a746a706d75e5bf9a
         </div>
 
         <div class="glass-panel p-6 animate-fade-up delay-300 group hover:bg-burgundy-900 transition-all duration-500 border-white/60">
@@ -76,11 +71,7 @@
                 <span class="text-xs font-bold text-red-400 group-hover:text-red-200">Available Now</span>
             </div>
             <p class="text-sm font-medium text-gray-500 group-hover:text-red-100">Open Resources</p>
-<<<<<<< HEAD
             <h3 class="text-3xl font-bold text-gray-800 group-hover:text-white">{{ $availablePercent }}%</h3>
-=======
-            <h3 class="text-3xl font-bold text-gray-800 group-hover:text-white">{{ $pctTersedia }}%</h3>
->>>>>>> f204e9327d0f7fc8f360f72a746a706d75e5bf9a
         </div>
     </div>
 
