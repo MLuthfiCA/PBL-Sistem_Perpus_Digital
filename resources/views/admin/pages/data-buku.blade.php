@@ -189,22 +189,19 @@
                             </select>
                         </div>
 
-                        <!-- STATUS -->
+                        <!-- STATUS (fixed: new books are always Available) -->
                         <div>
                             <label class="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2 ml-1">
                                 Status
                             </label>
 
-                            <select name="status" required
-                                class="w-full px-4 py-3 border border-white bg-white/50 rounded-2xl focus:outline-none focus:ring-4 focus:ring-red-100 font-medium text-sm">
+                            <!-- Hidden input so the value is still sent with the form -->
+                            <input type="hidden" name="status" value="Tersedia">
 
-                                <option value="">Select Status</option>
-                                <option value="Tersedia">Available</option>
-                                <option value="Dipinjam">Borrowed</option>
-                                <option value="Hilang">Lost</option>
-                                <option value="Perawatan">Maintenance</option>
-
-                            </select>
+                            <!-- Read-only display -->
+                            <div class="w-full px-4 py-3 border border-white bg-white/50 rounded-2xl font-medium text-sm text-gray-800 select-none">
+                                Available
+                            </div>
                         </div>
 
                         <!-- YEAR -->

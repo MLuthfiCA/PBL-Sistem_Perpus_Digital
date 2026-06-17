@@ -167,7 +167,17 @@ Route::get('/run-manual-migration', function () {
 });
 
 Route::get('/home', function () {
-    return view('user.pages.home');
+    $totalBuku = \App\Models\Buku::count();
+    $totalMember = \App\Models\User::where('role', 'mahasiswa')->count();
+    $tersediaBuku = \App\Models\Buku::where('status', 'Tersedia')->where('stok', '>', 0)->count();
+    $availablePercent = $totalBuku > 0 ? round(($tersediaBuku / $totalBuku) * 100) : 0;
+
+    $trendingCategories = \App\Models\Kategori::withCount('buku')
+                            ->orderByDesc('buku_count')
+                            ->limit(6)
+                            ->pluck('nama_kategori');
+
+    return view('user.pages.home', compact('totalBuku', 'totalMember', 'availablePercent', 'trendingCategories'));
 })->name('home');
 
 Route::get('/login', function () {

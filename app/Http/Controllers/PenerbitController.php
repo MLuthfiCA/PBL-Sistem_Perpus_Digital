@@ -29,7 +29,7 @@ class PenerbitController extends Controller
             'nama_penerbit' => $request->nama_penerbit,
         ]);
 
-        return redirect()->route('admin.penerbit.index')->with('success', 'Penerbit berhasil ditambahkan.');
+        return redirect()->route('admin.penerbit.index')->with('success', 'Publisher successfully added.');
     }
 
     /**
@@ -46,7 +46,7 @@ class PenerbitController extends Controller
             'nama_penerbit' => $request->nama_penerbit,
         ]);
 
-        return redirect()->route('admin.penerbit.index')->with('success', 'Penerbit berhasil diperbarui.');
+        return redirect()->route('admin.penerbit.index')->with('success', 'Publisher successfully updated.');
     }
 
     /**
@@ -63,6 +63,6 @@ class PenerbitController extends Controller
 
         $penerbit->delete();
 
-        return redirect()->route('admin.penerbit.index')->with('success', 'Penerbit berhasil dihapus.');
+        return redirect()->route('admin.penerbit.index')->with('success', 'Publisher successfully deleted.');
     }
 }

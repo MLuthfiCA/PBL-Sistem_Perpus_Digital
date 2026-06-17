@@ -29,7 +29,7 @@ class PenulisController extends Controller
             'nama_penulis' => $request->nama_penulis,
         ]);
 
-        return redirect()->route('admin.penulis.index')->with('success', 'Penulis berhasil ditambahkan.');
+        return redirect()->route('admin.penulis.index')->with('success', 'Author successfully added.');
     }
 
     /**
@@ -46,7 +46,7 @@ class PenulisController extends Controller
             'nama_penulis' => $request->nama_penulis,
         ]);
 
-        return redirect()->route('admin.penulis.index')->with('success', 'Penulis berhasil diperbarui.');
+        return redirect()->route('admin.penulis.index')->with('success', 'Author successfully updated.');
     }
 
     /**
@@ -63,6 +63,6 @@ class PenulisController extends Controller
 
         $penulis->delete();
 
-        return redirect()->route('admin.penulis.index')->with('success', 'Penulis berhasil dihapus.');
+        return redirect()->route('admin.penulis.index')->with('success', 'Author successfully deleted.');
     }
 }

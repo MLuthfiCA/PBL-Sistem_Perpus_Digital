@@ -73,7 +73,7 @@ class AdminController extends Controller
             ->select('id_buku', DB::raw('count(*) as total'))
             ->groupBy('id_buku')
             ->orderByDesc('total')
-            ->limit(5)
+            ->limit(3)
             ->get();
 
         // Anggota paling aktif bulan ini
@@ -84,7 +84,7 @@ class AdminController extends Controller
             ->select('id_pengguna', DB::raw('count(*) as total'))
             ->groupBy('id_pengguna')
             ->orderByDesc('total')
-            ->limit(5)
+            ->limit(3)
             ->get();
 
         // Daftar bulan-tahun yang tersedia (untuk dropdown)

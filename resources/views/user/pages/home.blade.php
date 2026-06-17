@@ -45,7 +45,7 @@
                 <span class="text-xs font-bold text-red-400 group-hover:text-red-200">+12% this week</span>
             </div>
             <p class="text-sm font-medium text-gray-500 group-hover:text-red-100">Total Collection</p>
-            <h3 class="text-3xl font-bold text-gray-800 group-hover:text-white">1,240</h3>
+            <h3 class="text-3xl font-bold text-gray-800 group-hover:text-white">{{ number_format($totalBuku) }}</h3>
         </div>
 
         <div class="glass-panel p-6 animate-fade-up delay-200 group hover:bg-maroon transition-all duration-500 border-white/60">
@@ -58,7 +58,7 @@
                 <span class="text-xs font-bold text-red-400 group-hover:text-red-200">Active Member</span>
             </div>
             <p class="text-sm font-medium text-gray-500 group-hover:text-red-100">Monthly Users</p>
-            <h3 class="text-3xl font-bold text-gray-800 group-hover:text-white">852</h3>
+            <h3 class="text-3xl font-bold text-gray-800 group-hover:text-white">{{ number_format($totalMember) }}</h3>
         </div>
 
         <div class="glass-panel p-6 animate-fade-up delay-300 group hover:bg-burgundy-900 transition-all duration-500 border-white/60">
@@ -71,7 +71,7 @@
                 <span class="text-xs font-bold text-red-400 group-hover:text-red-200">Available Now</span>
             </div>
             <p class="text-sm font-medium text-gray-500 group-hover:text-red-100">Open Resources</p>
-            <h3 class="text-3xl font-bold text-gray-800 group-hover:text-white">94%</h3>
+            <h3 class="text-3xl font-bold text-gray-800 group-hover:text-white">{{ $availablePercent }}%</h3>
         </div>
     </div>
 
@@ -124,29 +124,18 @@
     </div>
 
     <!-- Quick Links / Popular Section -->
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+    <div class="grid grid-cols-1 gap-8">
         <div class="glass-panel p-8 animate-fade-up delay-300 border-white/60">
             <h3 class="text-xl font-bold text-gray-800 mb-6">Trending Category</h3>
             <div class="flex flex-wrap gap-3">
-                @foreach(['Technology', 'Literature', 'Science', 'History', 'Art', 'Design'] as $cat)
+                @forelse($trendingCategories as $cat)
                 <span class="px-4 py-2 rounded-xl bg-white/80 text-gray-600 text-sm font-medium border border-white hover:bg-burgundy-500 hover:text-white transition-all cursor-pointer shadow-sm">
                     {{ $cat }}
                 </span>
-                @endforeach
+                @empty
+                <span class="text-sm text-gray-500">No categories available yet.</span>
+                @endforelse
             </div>
-        </div>
-
-        <div class="glass-panel p-8 animate-fade-up delay-300 border-white/60">
-             <h3 class="text-xl font-bold text-gray-800 mb-6">Library News</h3>
-             <div class="space-y-4">
-                <div class="flex items-center gap-4 p-4 rounded-2xl bg-white/60 border border-white hover:bg-white transition-all group">
-                    <div class="w-12 h-12 rounded-xl bg-red-50 flex items-center justify-center text-burgundy-500 font-bold text-xs group-hover:bg-burgundy-500 group-hover:text-white transition-colors">NEW</div>
-                    <div>
-                        <p class="text-sm font-bold text-gray-800">Extended Opening Hours</p>
-                        <p class="text-xs text-gray-500">Starting next Monday, we open at 07.00 WIB.</p>
-                    </div>
-                </div>
-             </div>
         </div>
     </div>
 
