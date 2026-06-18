@@ -17,10 +17,10 @@ class Penulis extends Model
     ];
 
     /**
-     * PENULIS has many BUKU
+     * PENULIS has many BUKU (Many-to-Many)
      */
     public function buku()
     {
-        return $this->hasMany(Buku::class, 'id_penulis', 'id_penulis');
+        return $this->belongsToMany(Buku::class, 'buku_penulis', 'id_penulis', 'id_buku');
     }
 }

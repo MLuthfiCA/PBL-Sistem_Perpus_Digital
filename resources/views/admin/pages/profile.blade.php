@@ -245,7 +245,7 @@
                         </div>
                         <div>
                             <h3 class="font-bold text-gray-800 text-sm line-clamp-1">{{ $b->buku?->judul ?? 'Unknown Book' }}</h3>
-                            <p class="text-[10px] text-gray-400 font-medium mt-0.5">{{ $b->buku?->penulis?->nama_penulis ?? 'Unknown Author' }}</p>
+                            <p class="text-[10px] text-gray-400 font-medium mt-0.5">{{ $b->buku && $b->buku->penulis->isNotEmpty() ? $b->buku->penulis->pluck('nama_penulis')->implode(', ') : 'Unknown Author' }}</p>
                         </div>
                     </div>
 

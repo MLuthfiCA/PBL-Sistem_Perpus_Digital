@@ -43,7 +43,7 @@
         </div>
 
         <p class="text-sm mb-4">
-            {{ $buku->penulis ?? 'Tere Liye' }}
+            {{ $buku && $buku->penulis->isNotEmpty() ? $buku->penulis->pluck('nama_penulis')->implode(', ') : 'Unknown Author' }}
         </p>
 
         <p class="text-sm mb-4">

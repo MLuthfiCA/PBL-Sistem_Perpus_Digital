@@ -145,7 +145,7 @@
                         <tr class="hover:bg-red-50/30 transition-colors">
                             <td class="px-8 py-6">
                                 <p class="font-bold text-gray-800">{{ $k->buku?->judul ?? 'Unknown Book' }}</p>
-                                <p class="text-[10px] text-gray-400">{{ $k->buku?->penulis?->nama_penulis ?? 'Unknown Author' }}</p>
+                                <p class="text-[10px] text-gray-400">{{ $k->buku && $k->buku->penulis->isNotEmpty() ? $k->buku->penulis->pluck('nama_penulis')->implode(', ') : 'Unknown Author' }}</p>
                             </td>
                             <td class="px-8 py-6 text-sm text-gray-500 font-medium">#{{ $k->id }}</td>
                             <td class="px-8 py-6 text-center">

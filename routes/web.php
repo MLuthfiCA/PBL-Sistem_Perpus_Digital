@@ -276,7 +276,7 @@ Route::get('/katalog', function (Request $request) {
             'id' => $buku->id_buku,
             'buku_id' => $buku->id_buku,
             'judul' => $buku->judul,
-            'penulis' => $buku->penulis ? $buku->penulis->nama_penulis : 'N/A',
+            'penulis' => $buku->penulis->isNotEmpty() ? $buku->penulis->pluck('nama_penulis')->implode(', ') : 'N/A',
             'genre' => $buku->kategori ? $buku->kategori->nama_kategori : 'N/A',
             'isbn' => $buku->isbn,
             'penerbit' => $buku->penerbit ? $buku->penerbit->nama_penerbit : 'N/A',
@@ -337,7 +337,7 @@ Route::get('/search', function (Request $request) {
 
     $books = $bukuQuery->with('kategori', 'penulis', 'penerbit')->get()->map(function($buku) use ($statusMap) {
         $buku->status = $statusMap[$buku->status] ?? $buku->status;
-        $buku->penulis_nama = $buku->penulis ? $buku->penulis->nama_penulis : 'N/A';
+        $buku->penulis_nama = $buku->penulis->isNotEmpty() ? $buku->penulis->pluck('nama_penulis')->implode(', ') : 'N/A';
         $buku->penerbit_nama = $buku->penerbit ? $buku->penerbit->nama_penerbit : 'N/A';
         return $buku;
     });
@@ -356,7 +356,7 @@ Route::get('/katalog/{id}', function ($id) {
             'buku_id'      => $buku->id_buku,
             'book_id'      => 'B-' . str_pad($buku->id_buku, 3, '0', STR_PAD_LEFT),
             'judul'        => $buku->judul,
-            'penulis'      => $buku->penulis ? $buku->penulis->nama_penulis : 'N/A',
+            'penulis'      => $buku->penulis->isNotEmpty() ? $buku->penulis->pluck('nama_penulis')->implode(', ') : 'N/A',
             'genre'        => $buku->kategori ? $buku->kategori->nama_kategori : 'N/A',
             'isbn'         => $buku->isbn,
             'penerbit'     => $buku->penerbit ? $buku->penerbit->nama_penerbit : 'N/A',
@@ -436,7 +436,7 @@ Route::get('/admin/search', function (Request $request) {
     
     $books = $bukuQuery->with('kategori', 'penulis', 'penerbit')->get()->map(function($buku) use ($statusMap) {
         $buku->status = $statusMap[$buku->status] ?? $buku->status;
-        $buku->penulis_nama = $buku->penulis ? $buku->penulis->nama_penulis : 'N/A';
+        $buku->penulis_nama = $buku->penulis->isNotEmpty() ? $buku->penulis->pluck('nama_penulis')->implode(', ') : 'N/A';
         $buku->penerbit_nama = $buku->penerbit ? $buku->penerbit->nama_penerbit : 'N/A';
         return $buku;
     });
@@ -464,7 +464,7 @@ Route::prefix('admin')->group(function () {
                 'buku_id'     => $buku->id_buku,
                 'book_id'     => $buku->id_buku,
                 'judul'       => $buku->judul,
-                'penulis'     => $buku->penulis ? $buku->penulis->nama_penulis : 'N/A',
+                'penulis'     => $buku->penulis->isNotEmpty() ? $buku->penulis->pluck('nama_penulis')->implode(', ') : 'N/A',
                 'genre'       => $buku->kategori ? $buku->kategori->nama_kategori : 'N/A',
                 'isbn'        => $buku->isbn,
                 'penerbit'    => $buku->penerbit ? $buku->penerbit->nama_penerbit : 'N/A',
@@ -507,6 +507,22 @@ Route::prefix('admin')->group(function () {
 
     // Route Export Laporan
     Route::get('/laporan/export', [AdminController::class, 'exportLaporan'])->name('admin.laporan.export');
+
+    // Route: check if a book ID is already taken (for real-time validation)
+    Route::get('/check-buku-id', function (Request $request) {
+        $id      = (int) $request->query('id');
+        $current = (int) $request->query('current', 0);
+
+        if ($id <= 0) {
+            return response()->json(['taken' => false]);
+        }
+
+        $taken = Buku::where('id_buku', $id)
+                     ->where('id_buku', '!=', $current)
+                     ->exists();
+
+        return response()->json(['taken' => $taken]);
+    })->name('admin.check_buku_id');
 });
 
 

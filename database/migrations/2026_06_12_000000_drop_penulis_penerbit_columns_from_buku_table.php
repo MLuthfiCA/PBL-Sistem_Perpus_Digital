@@ -85,10 +85,9 @@ return new class extends Migration
             }
             
             // Add constraints (only if supported)
-            try {
-                $table->foreign('id_penulis')->references('id_penulis')->on('penulis')->onDelete('set null');
-                $table->foreign('id_penerbit')->references('id_penerbit')->on('penerbit')->onDelete('set null');
-            } catch (\Exception $e) {}
+            // Commented out to avoid Duplicate key error since they might already exist
+            // $table->foreign('id_penulis')->references('id_penulis')->on('penulis')->onDelete('set null');
+            // $table->foreign('id_penerbit')->references('id_penerbit')->on('penerbit')->onDelete('set null');
         });
     }
 

@@ -195,7 +195,7 @@
     </div>
 
     <!-- Success Modal Pop-up -->
-    <!-- Overlay background: full opaque dark cover -->
+    <!-- Full-screen overlay -->
     <div x-show="showModal" style="display: none;"
         x-transition:enter="transition ease-out duration-300"
         x-transition:enter-start="opacity-0"
@@ -205,11 +205,11 @@
         x-transition:leave-end="opacity-0"
         class="fixed inset-0 z-[9999]">
 
-        <!-- Full dark overlay -->
-        <div class="absolute inset-0 bg-black/70 backdrop-blur-sm"></div>
+        <!-- Dark overlay fills entire viewport -->
+        <div class="fixed inset-0 bg-black/70 backdrop-blur-sm" @click="showModal = false"></div>
 
-        <!-- Modal card centered -->
-        <div class="relative z-10 flex items-center justify-center min-h-screen p-4"
+        <!-- Centered modal card -->
+        <div class="fixed inset-0 flex items-center justify-center p-4"
             x-transition:enter="transition ease-out duration-300"
             x-transition:enter-start="opacity-0 scale-90"
             x-transition:enter-end="opacity-100 scale-100"
@@ -217,7 +217,7 @@
             x-transition:leave-start="opacity-100 scale-100"
             x-transition:leave-end="opacity-0 scale-90">
 
-            <x-ui.glass-card class="max-w-sm w-full p-8 text-center border-white shadow-2xl relative overflow-hidden" style="background-color: #FDFBD4;">
+            <x-ui.glass-card class="max-w-sm w-full p-8 text-center border-white shadow-2xl relative overflow-hidden z-10" style="background-color: #FDFBD4;">
                 <!-- Decorative Background Icon -->
                 <div class="absolute -top-10 -right-10 w-32 h-32 bg-green-50 rounded-full opacity-20"></div>
                 
@@ -227,7 +227,7 @@
                     </svg>
                 </div>
                 
-                <h2 class="text-2xl font-bold text-gray-800 mb-4">A new book was succesfully added to the archive</h2>
+                <h2 class="text-2xl font-bold text-gray-800 mb-4">A new book was successfully added to the archive</h2>
                 <p class="text-gray-500 text-sm leading-relaxed mb-8">
                     {{ session('success') ?? 'A new book has been successfully added to the catalog.' }}
                 </p>

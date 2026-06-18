@@ -22,7 +22,7 @@ class BukuController extends Controller
                 'buku_id'     => $buku->id_buku,
                 'book_id'     => 'B-' . str_pad($buku->id_buku, 3, '0', STR_PAD_LEFT),
                 'judul'       => $buku->judul,
-                'penulis'     => $buku->penulis ? $buku->penulis->nama_penulis : 'N/A',
+                'penulis'     => $buku->penulis->isNotEmpty() ? $buku->penulis->pluck('nama_penulis')->implode(', ') : 'N/A',
                 'id_kategori' => $buku->id_kategori,
                 'genre'       => $buku->kategori ? $buku->kategori->nama_kategori : 'N/A',
                 'isbn'        => $buku->isbn,
@@ -51,9 +51,9 @@ class BukuController extends Controller
                 'id'          => $buku->id_buku,
                 'buku_id'     => $buku->id_buku,
                 'judul'       => $buku->judul,
-                'id_penulis'  => $buku->id_penulis,
+                'id_penulis'  => $buku->penulis->pluck('id_penulis')->toArray(),
                 'id_penerbit' => $buku->id_penerbit,
-                'penulis'     => $buku->penulis ? $buku->penulis->nama_penulis : 'N/A',
+                'penulis'     => $buku->penulis->isNotEmpty() ? $buku->penulis->pluck('nama_penulis')->implode(', ') : 'N/A',
                 'id_kategori' => $buku->id_kategori,
                 'genre'       => $buku->kategori ? $buku->kategori->nama_kategori : 'N/A',
                 'isbn'        => $buku->isbn,
@@ -80,7 +80,8 @@ class BukuController extends Controller
         // Validate book data
         $validated = $request->validate([
             'judul'        => 'required|string|max:255',
-            'id_penulis'   => 'required|exists:penulis,id_penulis',
+            'id_penulis'   => 'required|array',
+            'id_penulis.*' => 'exists:penulis,id_penulis',
             'isbn'         => 'nullable|string|max:50|unique:buku,isbn,' . $id . ',id_buku',
             'id_kategori'  => 'required|exists:kategori,id_kategori',
             'id_penerbit'  => 'nullable|exists:penerbit,id_penerbit',
@@ -101,8 +102,11 @@ class BukuController extends Controller
             $validated['cover'] = $coverName;
         }
 
-        // Update the book record
+        // Update the book record (excluding id_penulis from direct update if it was still in validated array, but it's safe since it's not fillable anymore)
         $buku->update($validated);
+        
+        // Sync the pivot table
+        $buku->penulis()->sync($validated['id_penulis']);
 
         return redirect()->route('admin.katalog')->with('success', 'Data updated successfully');
     }
@@ -119,7 +123,8 @@ class BukuController extends Controller
     {
         $validated = $request->validate([
             'judul'        => 'required|string|max:255',
-            'id_penulis'   => 'required|exists:penulis,id_penulis',
+            'id_penulis'   => 'required|array',
+            'id_penulis.*' => 'exists:penulis,id_penulis',
             'isbn'         => 'nullable|string|max:50|unique:buku,isbn',
             'id_kategori'  => 'required|exists:kategori,id_kategori',
             'id_penerbit'  => 'nullable|exists:penerbit,id_penerbit',
@@ -148,9 +153,8 @@ class BukuController extends Controller
             }
 
             // Simpan buku
-            Buku::create([
+            $buku = Buku::create([
                 'judul'        => $validated['judul'],
-                'id_penulis'   => $validated['id_penulis'],
                 'id_kategori'  => $validated['id_kategori'],
                 'isbn'         => $validated['isbn'] ?? null,
                 'id_penerbit'  => $validated['id_penerbit'] ?? null,
@@ -164,6 +168,9 @@ class BukuController extends Controller
                 'cover'        => $coverName,
                 'tampil_katalog' => 1,
             ]);
+
+            // Sync the pivot table
+            $buku->penulis()->sync($validated['id_penulis']);
 
             return redirect()
                 ->route('admin.katalog')
@@ -190,7 +197,7 @@ class BukuController extends Controller
             return [
                 'id'         => $buku->id_buku,
                 'judul'      => $buku->judul,
-                'penulis'    => $buku->penulis ? $buku->penulis->nama_penulis : 'N/A',
+                'penulis'    => $buku->penulis->isNotEmpty() ? $buku->penulis->pluck('nama_penulis')->implode(', ') : 'N/A',
                 'isbn'       => $buku->isbn,
                 'stok'       => $buku->stok,
                 'cover'      => $buku->cover,

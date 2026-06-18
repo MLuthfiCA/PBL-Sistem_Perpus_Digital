@@ -9,6 +9,10 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
     
+    <!-- Tom Select for advanced multi-select -->
+    <link href="https://cdn.jsdelivr.net/npm/tom-select@2.2.2/dist/css/tom-select.default.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/tom-select@2.2.2/dist/js/tom-select.complete.min.js"></script>
+    
     <script>
         tailwind.config = {
             theme: {
@@ -76,6 +80,83 @@
         ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: rgba(128, 0, 32, 0.1); border-radius: 10px; }
+
+        /* Tom Select Customization to match theme */
+        .ts-control {
+            background: rgba(255, 255, 255, 0.5) !important;
+            border: 1px solid white !important;
+            border-radius: 1rem !important;
+            padding: 0.75rem 1rem !important;
+            box-shadow: none !important;
+            font-family: 'DM Sans', sans-serif;
+            transition: all 0.3s ease;
+        }
+        .ts-control.focus {
+            box-shadow: 0 0 0 4px rgba(254, 226, 226, 1) !important; /* ring-red-100 */
+        }
+        .ts-dropdown {
+            border-radius: 1rem !important;
+            border: 1px solid white !important;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1) !important;
+            padding: 0.5rem !important;
+            font-family: 'DM Sans', sans-serif;
+            background: rgba(255, 255, 255, 0.95) !important;
+            backdrop-filter: blur(10px);
+            margin-top: 0.25rem !important;
+        }
+        .ts-dropdown .option {
+            border-radius: 0.5rem !important;
+            padding: 0.5rem 1rem !important;
+            transition: background 0.2s ease;
+            color: #4b5563; /* text-gray-600 */
+        }
+        .ts-dropdown .option.active, 
+        .ts-dropdown .option:hover {
+            background: #fff1f2 !important; /* bg-burgundy-50 / red-50 */
+            color: #800020 !important; /* burgundy-500 */
+            font-weight: bold !important;
+        }
+        .ts-wrapper.multi .ts-control > div {
+            background: #800020 !important; /* burgundy-500 */
+            color: white !important;
+            border-radius: 999px !important; /* full pill */
+            padding: 3px 10px !important;
+            border: none !important;
+            font-size: 0.7rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            letter-spacing: 0.03em;
+            max-width: 100%;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .ts-wrapper.multi .ts-control > div > span:first-child {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            max-width: 120px;
+        }
+        .ts-wrapper.multi .ts-control > div .remove {
+            border-left: 1px solid rgba(255, 255, 255, 0.3) !important;
+            color: white !important;
+            padding-left: 6px !important;
+            margin-left: 5px !important;
+            margin-right: -3px !important;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+        .ts-wrapper.multi .ts-control > div .remove:hover {
+            background: transparent !important;
+            color: #ffcccc !important;
+        }
+        .ts-wrapper.multi .ts-control {
+            flex-wrap: wrap !important;
+            gap: 4px;
+        }
     </style>
 </head>
 <body class="flex flex-col min-h-screen">

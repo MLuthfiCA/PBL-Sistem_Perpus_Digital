@@ -30,7 +30,6 @@ class Buku extends Model
 
     protected $fillable = [
         'judul',
-        'id_penulis',
         'id_penerbit',
         'tahun_terbit',
         'isbn',
@@ -80,11 +79,11 @@ class Buku extends Model
     }
 
     /**
-     * BUKU belongs to PENULIS
+     * BUKU belongs to many PENULIS
      */
     public function penulis()
     {
-        return $this->belongsTo(Penulis::class, 'id_penulis', 'id_penulis');
+        return $this->belongsToMany(Penulis::class, 'buku_penulis', 'id_buku', 'id_penulis');
     }
 
     /**

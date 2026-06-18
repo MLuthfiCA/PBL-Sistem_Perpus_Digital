@@ -53,13 +53,13 @@
                     </label>
 
                     <label for="cover_input"
-                        class="cursor-pointer flex-1 min-h-[300px] border-2 border-dashed border-gray-300 bg-white/50 rounded-3xl flex flex-col items-center justify-center hover:bg-gray-50 hover:border-red-200 transition-all group relative overflow-hidden">
+                        class="cursor-pointer aspect-[3/4] w-full md:max-w-xs mx-auto border-2 border-dashed border-gray-300 bg-white/50 rounded-3xl flex flex-col items-center justify-center hover:bg-gray-50 hover:border-red-200 transition-all group relative overflow-hidden">
 
                         <!-- FIXED -->
                         <input type="file" name="cover" id="cover_input" class="hidden" accept="image/*">
-                        <img id="cover_preview" src="{{ asset('images/readspace-library.png') }}" alt="Cover Preview" class="w-full h-full object-contain">
+                        <img id="cover_preview" src="{{ asset('images/readspace-library.png') }}" alt="Cover Preview" class="w-full h-full object-cover">
 
-                        <div class="text-center group-hover:scale-105 transition-transform">
+                        <div class="absolute inset-0 bg-white/80 flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity text-center">
 
                             <div class="w-16 h-16 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-4 text-burgundy-500 group-hover:bg-red-100 transition-colors">
 
@@ -116,13 +116,13 @@
                                 Author
                             </label>
 
-                            <select name="id_penulis" required
-                                class="w-full px-4 py-3 border border-white bg-white/50 rounded-2xl focus:outline-none focus:ring-4 focus:ring-red-100 font-medium text-sm appearance-none cursor-pointer">
-                                <option value="">Select Author</option>
+                            <select name="id_penulis[]" id="penulis-select" required multiple
+                                class="w-full px-4 py-3 border border-white bg-white/50 rounded-2xl focus:outline-none focus:ring-4 focus:ring-red-100 font-medium text-sm">
                                 @foreach($penulis as $p)
                                     <option value="{{ $p->id_penulis }}">{{ $p->nama_penulis }}</option>
                                 @endforeach
                             </select>
+                            <p class="text-[10px] text-gray-400 mt-1">Search and click to add multiple authors.</p>
                         </div>
 
                         <div>
@@ -162,8 +162,9 @@
                             <label class="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2 ml-1">
                                 Book ID (Optional)
                             </label>
-                            <input type="number" name="buku_id" min="1" placeholder="Optional — leave blank to auto-generate"
+                            <input type="number" name="buku_id" id="buku-id-input" min="1" placeholder="Optional — leave blank to auto-generate"
                                 class="w-full px-4 py-3 border border-white bg-white/50 rounded-2xl focus:outline-none focus:ring-4 focus:ring-red-100 font-medium text-sm">
+                            <p id="buku-id-warning" class="text-[11px] text-red-500 font-bold mt-1 hidden">⚠️ This Book ID is already taken by another book.</p>
                         </div>
 
                         <!-- BOOK SHELF -->
@@ -289,6 +290,39 @@
                 const url = URL.createObjectURL(file);
                 preview.src = url;
             });
+
+            if (document.getElementById('penulis-select')) {
+                new TomSelect("#penulis-select", {
+                    plugins: ['remove_button'],
+                    placeholder: "Select Author(s)...",
+                    maxOptions: 50
+                });
+            }
+
+            // Book ID duplicate check
+            const bookIdInput = document.getElementById('buku-id-input');
+            const bookIdWarning = document.getElementById('buku-id-warning');
+            if (bookIdInput && bookIdWarning) {
+                let debounceTimer;
+                bookIdInput.addEventListener('input', function() {
+                    clearTimeout(debounceTimer);
+                    const val = this.value.trim();
+                    if (!val) { bookIdWarning.classList.add('hidden'); return; }
+                    debounceTimer = setTimeout(() => {
+                        fetch('/admin/check-buku-id?id=' + val)
+                            .then(r => r.json())
+                            .then(data => {
+                                if (data.taken) {
+                                    bookIdWarning.classList.remove('hidden');
+                                    bookIdInput.classList.add('border-red-400');
+                                } else {
+                                    bookIdWarning.classList.add('hidden');
+                                    bookIdInput.classList.remove('border-red-400');
+                                }
+                            });
+                    }, 500);
+                });
+            }
         })();
     </script>
 </div>

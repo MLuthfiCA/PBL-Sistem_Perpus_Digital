@@ -52,12 +52,20 @@
                         Book Cover
                     </label>
 
-                    <label for="cover_input" class="cursor-pointer flex-1 min-h-[300px] border-2 border-dashed border-gray-300 bg-white/50 rounded-3xl flex flex-col items-center justify-center hover:bg-gray-50 hover:border-red-200 transition-all group relative overflow-hidden">
+                    <label for="cover_input" class="cursor-pointer aspect-[3/4] w-full md:max-w-xs mx-auto border-2 border-dashed border-gray-300 bg-white/50 rounded-3xl flex flex-col items-center justify-center hover:bg-gray-50 hover:border-red-200 transition-all group relative overflow-hidden">
 
                         <input type="file" name="cover" id="cover_input" class="hidden" accept="image/*">
 
                         @if(isset($buku['cover']) && $buku['cover'])
-                            <img id="cover_preview" src="{{ asset('images/' . $buku['cover']) }}" alt="Cover" class="w-full h-full object-contain">
+                            <img id="cover_preview" src="{{ asset('images/' . $buku['cover']) }}" alt="Cover" class="w-full h-full object-cover">
+                            <div class="absolute inset-0 bg-white/80 flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity text-center">
+                                <div class="w-12 h-12 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-2 text-burgundy-500">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+                                    </svg>
+                                </div>
+                                <p class="text-xs font-bold text-gray-500">Click to replace cover</p>
+                            </div>
                         @else
                             <div class="text-center group-hover:scale-105 transition-transform">
                                 <div class="w-16 h-16 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-4 text-burgundy-500 group-hover:bg-red-100 transition-colors">
@@ -65,7 +73,7 @@
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
                                     </svg>
                                 </div>
-                                <p class="text-sm font-bold text-gray-500 group-hover:text-burgundy-500 transition-colors">Upload / Replace Cover</p>
+                                <p class="text-sm font-bold text-gray-500 group-hover:text-burgundy-500 transition-colors">Upload Cover</p>
                             </div>
                         @endif
 
@@ -85,9 +93,10 @@
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
                         <div>
                             <label class="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2 ml-1">Book ID (Optional)</label>
-                            <input type="number" name="buku_id" value="{{ $buku['buku_id'] ?? '' }}" min="1"
+                            <input type="number" name="buku_id" id="buku-id-input" value="{{ $buku['buku_id'] ?? '' }}" min="1"
                                 class="w-full px-4 py-3.5 border border-white bg-white/50 rounded-2xl focus:outline-none focus:ring-4 focus:ring-red-100 font-medium text-sm transition-all"
                                 placeholder="Optional — leave blank to keep current">
+                            <p id="buku-id-warning" class="text-[11px] text-red-500 font-bold mt-1 hidden">⚠️ This Book ID is already taken by another book.</p>
                         </div>
                         <div>
                             <label class="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2 ml-1">Book Shelf</label>
@@ -100,14 +109,14 @@
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
                         <div>
                             <label class="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2 ml-1">Author</label>
-                            <select name="id_penulis" required class="w-full px-4 py-3.5 border border-white bg-white/50 rounded-2xl focus:outline-none focus:ring-4 focus:ring-red-100 font-medium text-sm transition-all appearance-none cursor-pointer">
-                                <option value="">Select Author</option>
+                            <select name="id_penulis[]" id="penulis-select" required multiple class="w-full px-4 py-3.5 border border-white bg-white/50 rounded-2xl focus:outline-none focus:ring-4 focus:ring-red-100 font-medium text-sm transition-all">
                                 @foreach($penulis as $p)
-                                    <option value="{{ $p->id_penulis }}" {{ ($buku['id_penulis'] ?? '') == $p->id_penulis ? 'selected' : '' }}>
+                                    <option value="{{ $p->id_penulis }}" {{ in_array($p->id_penulis, (array) ($buku['id_penulis'] ?? [])) ? 'selected' : '' }}>
                                         {{ $p->nama_penulis }}
                                     </option>
                                 @endforeach
                             </select>
+                            <p class="text-[10px] text-gray-400 mt-1">Search and click to add multiple authors.</p>
                         </div>
                         <div>
                             <label class="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2 ml-1">Publisher</label>
@@ -199,13 +208,64 @@
         (function(){
             const input = document.getElementById('cover_input');
             const preview = document.getElementById('cover_preview');
-            if (!input) return;
-            input.addEventListener('change', function(e){
-                const file = this.files && this.files[0];
-                if (!file) return;
-                const url = URL.createObjectURL(file);
-                if (preview) preview.src = url;
-            });
+            if (input) {
+                input.addEventListener('change', function(e){
+                    const file = this.files && this.files[0];
+                    if (!file) return;
+                    const url = URL.createObjectURL(file);
+                    if (preview) {
+                        preview.src = url;
+                    } else {
+                        // create preview img dynamically
+                        const label = input.closest('label');
+                        const img = document.createElement('img');
+                        img.id = 'cover_preview';
+                        img.src = url;
+                        img.className = 'w-full h-full object-cover absolute inset-0';
+                        label.appendChild(img);
+                    }
+                });
+            }
+
+            // Book ID duplicate check
+            const bookIdInput = document.getElementById('buku-id-input');
+            const bookIdWarning = document.getElementById('buku-id-warning');
+            const currentId = {{ $buku['buku_id'] ?? 'null' }};
+
+            if (bookIdInput && bookIdWarning) {
+                let debounceTimer;
+                bookIdInput.addEventListener('input', function() {
+                    clearTimeout(debounceTimer);
+                    const val = this.value.trim();
+                    if (!val || parseInt(val) === currentId) {
+                        bookIdWarning.classList.add('hidden');
+                        bookIdInput.classList.remove('border-red-400', 'ring-red-200');
+                        return;
+                    }
+                    debounceTimer = setTimeout(() => {
+                        fetch('/admin/check-buku-id?id=' + val + '&current=' + currentId)
+                            .then(r => r.json())
+                            .then(data => {
+                                if (data.taken) {
+                                    bookIdWarning.classList.remove('hidden');
+                                    bookIdInput.classList.add('border-red-400');
+                                    bookIdInput.style.setProperty('--tw-ring-color', 'rgba(252,165,165,1)');
+                                } else {
+                                    bookIdWarning.classList.add('hidden');
+                                    bookIdInput.classList.remove('border-red-400');
+                                }
+                            });
+                    }, 500);
+                });
+            }
+
+            if (document.getElementById('penulis-select')) {
+                new TomSelect("#penulis-select", {
+                    plugins: ['remove_button'],
+                    placeholder: "Select Author(s)...",
+                    maxOptions: 50
+                });
+            }
         })();
     </script>
 </div>

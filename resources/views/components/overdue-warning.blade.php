@@ -34,7 +34,7 @@
                             </p>
                             @if($overdue->buku)
                             <p class="text-sm text-gray-600">
-                                {{ $overdue->buku->penulis ?? 'Unknown Author' }}
+                                {{ $overdue->buku && $overdue->buku->penulis->isNotEmpty() ? $overdue->buku->penulis->pluck('nama_penulis')->implode(', ') : 'Unknown Author' }}
                             </p>
                             @endif
                         </div>
