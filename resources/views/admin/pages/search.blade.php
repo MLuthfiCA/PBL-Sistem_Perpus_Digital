@@ -15,7 +15,7 @@
             
             <div class="relative w-full group">
                 <input type="text" name="query" value="{{ request('query') }}" 
-                    placeholder="Search for ID, title or author..." 
+                    placeholder="Search by title, genre, author or publisher..." 
                     class="w-full pl-8 pr-20 py-5 sm:py-6 bg-white/70 backdrop-blur-xl border border-white shadow-2xl shadow-red-50 rounded-3xl focus:ring-4 focus:ring-red-100 focus:outline-none transition-all text-lg text-gray-700 placeholder-gray-400">
                 <button type="submit" class="absolute right-3 top-2 sm:top-3 bg-burgundy-500 text-white p-3 sm:p-4 rounded-2xl hover:bg-maroon transition-all shadow-lg shadow-red-200 group-hover:scale-105 active:scale-95">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">

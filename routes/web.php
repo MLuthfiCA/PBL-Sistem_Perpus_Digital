@@ -420,6 +420,9 @@ Route::get('/admin/search', function (Request $request) {
                            ->orWhereHas('kategori', function($k) use ($word) {
                                $k->where('nama_kategori', 'like', '%' . $word . '%');
                            })
+                           ->orWhereHas('penerbit', function($pb) use ($word) {
+                               $pb->where('nama_penerbit', 'like', '%' . $word . '%');
+                           })
                            ->orWhere('isbn', 'like', '%' . $word . '%')
                            ->orWhere('lokasi_rak', 'like', '%' . $word . '%');
                     });

@@ -20,7 +20,7 @@
             </a>
             <div class="relative group">
                 <a href="#" class="px-5 py-2 rounded-xl transition-all duration-300 {{ request()->routeIs('admin.kategori.*', 'admin.penulis.*', 'admin.penerbit.*') ? 'bg-burgundy-500 text-white shadow-lg shadow-red-100' : 'text-gray-500 hover:text-burgundy-500 hover:bg-white/80' }} font-medium text-sm flex items-center gap-1">
-                    Master Data
+                    Categories
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 transition-transform group-hover:rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
                 </a>
                 <div class="absolute left-0 top-full mt-2 w-48 bg-white/90 backdrop-blur-2xl border border-white/60 rounded-2xl shadow-2xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-50 overflow-hidden">
