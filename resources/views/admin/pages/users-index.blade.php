@@ -22,7 +22,7 @@
                 <label class="text-xs font-bold text-gray-400 uppercase tracking-widest whitespace-nowrap">Filter Role:</label>
                 <select name="role" class="w-full md:w-44 px-4 py-2.5 border border-white bg-white/50 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-200 font-medium text-sm text-gray-700">
                     <option value="" {{ request('role') === '' ? 'selected' : '' }}>All Roles</option>
-                    <option value="student" {{ request('role') === 'student' ? 'selected' : '' }}>Student</option>
+                    <option value="mahasiswa" {{ request('role') === 'mahasiswa' ? 'selected' : '' }}>Student</option>
                     <option value="admin" {{ request('role') === 'admin' ? 'selected' : '' }}>Admin</option>
                 </select>
             </div>

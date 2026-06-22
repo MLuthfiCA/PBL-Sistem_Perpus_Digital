@@ -10,10 +10,18 @@ class PenulisController extends Controller
     /**
      * Display a listing of authors.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $penulis = Penulis::withCount('buku')->paginate(10);
-        return view('admin.pages.penulis', compact('penulis'));
+        $search = $request->get('search', '');
+        
+        $query = Penulis::withCount('buku');
+        
+        if ($search) {
+            $query->where('nama_penulis', 'like', "%$search%");
+        }
+        
+        $penulis = $query->paginate(10)->appends(['search' => $search]);
+        return view('admin.pages.penulis', compact('penulis', 'search'));
     }
 
     /**

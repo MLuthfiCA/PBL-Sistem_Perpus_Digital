@@ -17,6 +17,21 @@
         <div class="p-4 bg-red-100 text-red-700 rounded-xl font-bold">{{ session('error') }}</div>
     @endif
 
+    <form action="{{ route('admin.kategori.index') }}" method="GET" class="p-6 bg-white/80 rounded-2xl shadow-xl">
+        <div class="flex flex-col md:flex-row gap-4 items-center">
+            <div class="relative w-full md:w-1/2">
+                <input type="text" name="search" value="{{ request('search', '') }}" placeholder="Search category name..." class="w-full pl-10 pr-4 py-2.5 rounded-xl border border-white bg-white/50 focus:ring-2 focus:ring-red-200 outline-none transition-all font-medium text-sm">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400 absolute left-3 top-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+            </div>
+            <div class="flex items-center gap-3">
+                <button type="submit" class="px-6 py-2.5 bg-burgundy-500 text-white rounded-xl hover:bg-maroon font-bold text-sm transition-all">Search</button>
+                <a href="{{ route('admin.kategori.index') }}" class="px-6 py-2.5 bg-gray-200 text-gray-700 rounded-xl hover:bg-gray-300 font-bold text-sm transition-all">Reset</a>
+            </div>
+        </div>
+    </form>
+
     <div class="p-6 bg-white/80 rounded-2xl shadow-xl">
         <div class="overflow-x-auto">
             <table class="w-full text-left border-collapse">

@@ -10,10 +10,18 @@ class KategoriController extends Controller
     /**
      * Display a listing of the categories.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $kategoris = Kategori::paginate(10);
-        return view('admin.pages.kategori', compact('kategoris'));
+        $search = $request->get('search', '');
+        
+        $query = Kategori::query();
+        
+        if ($search) {
+            $query->where('nama_kategori', 'like', "%$search%");
+        }
+        
+        $kategoris = $query->paginate(10)->appends(['search' => $search]);
+        return view('admin.pages.kategori', compact('kategoris', 'search'));
     }
 
     /**

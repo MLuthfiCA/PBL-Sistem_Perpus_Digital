@@ -335,7 +335,7 @@ Route::get('/search', function (Request $request) {
         });
     }
 
-    $books = $bukuQuery->with('kategori', 'penulis', 'penerbit')->get()->map(function($buku) use ($statusMap) {
+    $books = $bukuQuery->with('kategori', 'penulis', 'penerbit')->take(4)->get()->map(function($buku) use ($statusMap) {
         $buku->status = $statusMap[$buku->status] ?? $buku->status;
         $buku->penulis_nama = $buku->penulis->isNotEmpty() ? $buku->penulis->pluck('nama_penulis')->implode(', ') : 'N/A';
         $buku->penerbit_nama = $buku->penerbit ? $buku->penerbit->nama_penerbit : 'N/A';
@@ -437,7 +437,7 @@ Route::get('/admin/search', function (Request $request) {
         });
     }
     
-    $books = $bukuQuery->with('kategori', 'penulis', 'penerbit')->get()->map(function($buku) use ($statusMap) {
+    $books = $bukuQuery->with('kategori', 'penulis', 'penerbit')->take(4)->get()->map(function($buku) use ($statusMap) {
         $buku->status = $statusMap[$buku->status] ?? $buku->status;
         $buku->penulis_nama = $buku->penulis->isNotEmpty() ? $buku->penulis->pluck('nama_penulis')->implode(', ') : 'N/A';
         $buku->penerbit_nama = $buku->penerbit ? $buku->penerbit->nama_penerbit : 'N/A';

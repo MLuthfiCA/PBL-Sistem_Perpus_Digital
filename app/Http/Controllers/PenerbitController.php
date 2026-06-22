@@ -10,10 +10,18 @@ class PenerbitController extends Controller
     /**
      * Display a listing of publishers.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $penerbit = Penerbit::withCount('buku')->paginate(10);
-        return view('admin.pages.penerbit', compact('penerbit'));
+        $search = $request->get('search', '');
+        
+        $query = Penerbit::withCount('buku');
+        
+        if ($search) {
+            $query->where('nama_penerbit', 'like', "%$search%");
+        }
+        
+        $penerbit = $query->paginate(10)->appends(['search' => $search]);
+        return view('admin.pages.penerbit', compact('penerbit', 'search'));
     }
 
     /**
