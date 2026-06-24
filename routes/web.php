@@ -69,7 +69,6 @@ Route::get('/dashboard', function() {
 Route::get('/profile', [RiwayatController::class, 'tampilkanRiwayat'])->name('profile');
 
 Route::get('/admin/profile', [AdminController::class, 'profile'])->name('admin.profile');
-Route::get('/admin/manage-data', [AdminController::class, 'manageData'])->name('admin.manage-data');
 
     // Admin User Management Routes
 Route::prefix('admin')->as('admin.')->group(function () {
@@ -385,8 +384,17 @@ Route::get('/api/hitung-kembali', function (Request $request) {
     return response()->json($res);
 });
 
-Route::get('/pengajuan', function () {
+Route::get('/pengajuan', function (Request $request) {
     if (!session()->has('user')) return redirect('/login');
+
+    $bukuId = $request->input('id');
+    if ($bukuId) {
+        $buku = Buku::find($bukuId);
+        if (!$buku || $buku->status !== 'Tersedia' || $buku->stok <= 0) {
+            return redirect()->back()->with('error', 'Buku ini tidak tersedia untuk dipinjam.');
+        }
+    }
+
     return view('user.pages.pengajuan');
 })->name('pengajuan');
 
@@ -528,5 +536,4 @@ Route::prefix('admin')->group(function () {
         return response()->json(['taken' => $taken]);
     })->name('admin.check_buku_id');
 });
-
 
