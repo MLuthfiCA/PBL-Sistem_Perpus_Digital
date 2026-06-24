@@ -25,6 +25,11 @@ class AdminController extends Controller
 
     public function profile(\Illuminate\Http\Request $request)
     {
+        return view('admin.pages.profile');
+    }
+
+    public function manageData(\Illuminate\Http\Request $request)
+    {
         $query = Peminjaman::with(['user', 'buku']);
 
         // Search by borrower name or book title
@@ -93,7 +98,7 @@ class AdminController extends Controller
             ->orderByRaw('YEAR(tanggal_pinjam) DESC, MONTH(tanggal_pinjam) DESC')
             ->get();
 
-        return view('admin.pages.profile', compact(
+        return view('admin.pages.manage-data', compact(
             'books',
             'totalDipinjam', 'sudahKembali', 'sedangDipinjam', 'totalDenda',
             'bukuTerpopuler', 'anggotaAktif', 'availableMonths',

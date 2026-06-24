@@ -69,6 +69,7 @@ Route::get('/dashboard', function() {
 Route::get('/profile', [RiwayatController::class, 'tampilkanRiwayat'])->name('profile');
 
 Route::get('/admin/profile', [AdminController::class, 'profile'])->name('admin.profile');
+Route::get('/admin/manage-data', [AdminController::class, 'manageData'])->name('admin.manage-data');
 
     // Admin User Management Routes
 Route::prefix('admin')->as('admin.')->group(function () {

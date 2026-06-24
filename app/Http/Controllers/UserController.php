@@ -60,7 +60,7 @@ class UserController extends Controller
             'role' => 'required|in:admin,mahasiswa',
             'status' => 'required|in:active,inactive,suspended',
         ], [
-            'identity_number.unique' => 'ID Number sudah terdaftar. Tidak bisa menambahkan data dengan ID Number yang sama.',
+            'identity_number.unique' => 'Student ID sudah terdaftar. Tidak bisa menambahkan data dengan Student ID yang sama.',
         ]);
 
         $validated['password'] = Hash::make($validated['password']);
