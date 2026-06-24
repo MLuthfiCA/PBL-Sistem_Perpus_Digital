@@ -163,7 +163,7 @@
                             </li>
                             <li class="flex justify-between text-sm">
                                 <span class="text-gray-400">Saturday</span>
-                                <span class="font-bold text-gray-700">09:00 - 15:00</span>
+                                <span class="font-bold text-red-500 uppercase tracking-widest text-[10px]">Closed</span>
                             </li>
                             <li class="flex justify-between text-sm">
                                 <span class="text-gray-400">Sunday</span>

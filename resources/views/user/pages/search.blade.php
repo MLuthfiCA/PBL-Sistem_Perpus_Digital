@@ -55,7 +55,7 @@
                      class="absolute top-full right-0 mt-3 w-64 bg-white rounded-xl shadow-2xl overflow-hidden z-50 border border-gray-100">
 
                     <div class="bg-burgundy-500 text-white px-5 py-3 font-bold text-sm flex items-center justify-between">
-                        <span>Filter Kategori</span>
+                        <span>Filter's Category</span>
                         <button type="button"
                             @click="selectedCategories = []; $nextTick(() => document.getElementById('search-form').submit())"
                             x-show="selectedCategories.length > 0"
