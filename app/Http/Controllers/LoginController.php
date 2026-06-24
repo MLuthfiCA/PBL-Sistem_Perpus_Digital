@@ -59,6 +59,7 @@ $user = Auth::user();
             session(['user' => [
                 'id' => $user->id_pengguna,
                 'name' => $user->nama,
+                'nim' => $user->identity_number,
                 'role' => $user->role,
                 'username' => $user->username,
                 'email' => $user->email,

@@ -11,10 +11,30 @@
     </x-ui.page-header>
 
     @if(session('success'))
-        <div class="p-4 bg-green-100 text-green-700 rounded-xl font-bold">{{ session('success') }}</div>
+    <div class="mb-6 p-4 bg-green-50 border-l-4 border-green-500 rounded-xl text-green-700 shadow-sm animate-fade-down flex items-start gap-3">
+        <div class="w-6 h-6 rounded-full bg-green-100 text-green-600 flex items-center justify-center flex-shrink-0 mt-0.5">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+            </svg>
+        </div>
+        <div>
+            <h4 class="font-bold text-green-800 text-sm">Success!</h4>
+            <p class="text-xs text-green-600 mt-0.5 leading-relaxed">{{ session('success') }}</p>
+        </div>
+    </div>
     @endif
     @if(session('error'))
-        <div class="p-4 bg-red-100 text-red-700 rounded-xl font-bold">{{ session('error') }}</div>
+    <div class="mb-6 p-4 bg-red-50 border-l-4 border-red-500 rounded-xl text-red-700 shadow-sm animate-fade-down flex items-start gap-3">
+        <div class="w-6 h-6 rounded-full bg-red-100 text-red-600 flex items-center justify-center flex-shrink-0 mt-0.5">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+        </div>
+        <div>
+            <h4 class="font-bold text-red-800 text-sm">Action Failed!</h4>
+            <p class="text-xs text-red-600 mt-0.5 leading-relaxed">{{ session('error') }}</p>
+        </div>
+    </div>
     @endif
 
     <form action="{{ route('admin.kategori.index') }}" method="GET" class="p-6 bg-white/80 rounded-2xl shadow-xl">

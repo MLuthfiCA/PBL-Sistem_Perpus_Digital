@@ -33,14 +33,15 @@
                     <div class="space-y-2">
                         <label class="block text-xs font-bold text-gray-400 uppercase tracking-widest ml-1">Borrower Name</label>
                         <input type="text" placeholder="Enter Your Full Name" 
-                            value="{{ session()->has('user') ? session('user')['name'] : '' }}"
-                            class="w-full p-4 bg-white/50 border border-white rounded-2xl focus:ring-4 focus:ring-red-100 focus:outline-none transition-all font-medium text-gray-700 shadow-sm">
+                            value="{{ auth()->check() ? auth()->user()->nama : (session()->has('user') ? session('user')['name'] : '') }}" readonly
+                            class="w-full p-4 bg-red-50/30 border border-white rounded-2xl text-gray-400 font-bold cursor-not-allowed">
                     </div>
 
                     <div class="space-y-2">
                         <label class="block text-xs font-bold text-gray-400 uppercase tracking-widest ml-1">NIM / Member ID</label>
                         <input type="text" placeholder="Enter Your NIM" 
-                            class="w-full p-4 bg-white/50 border border-white rounded-2xl focus:ring-4 focus:ring-red-100 focus:outline-none transition-all font-medium text-gray-700 shadow-sm">
+                            value="{{ auth()->check() ? auth()->user()->identity_number : (session()->has('user') ? session('user')['nim'] ?? '' : '') }}" readonly
+                            class="w-full p-4 bg-red-50/30 border border-white rounded-2xl text-gray-400 font-bold cursor-not-allowed">
                     </div>
                 </div>
 

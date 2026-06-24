@@ -115,8 +115,13 @@
         <div class="lg:col-span-2 glass-panel p-8 border-white/60">
             <div class="flex items-center justify-between mb-8">
                 <div>
-                    <h3 class="text-xl font-bold text-gray-800">Weekly Lending Trends</h3>
-                    <p class="text-xs text-gray-400 mt-1">Data collected from the last 7 days</p>
+                    <h3 class="text-xl font-bold text-gray-800 flex items-center gap-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-burgundy-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z" />
+                        </svg>
+                        Weekly Lending Trends
+                    </h3>
+                    <p class="text-xs font-semibold text-gray-400 mt-1.5 uppercase tracking-widest ml-7">Data collected from the last 7 days</p>
                 </div>
                 <select class="text-xs font-bold text-gray-500 bg-white/50 border-none rounded-xl focus:ring-0">
                     <option>This Week</option>
