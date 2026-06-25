@@ -82,7 +82,7 @@
                         <td class="px-8 py-6 text-sm text-gray-600">{{ $user->identity_number }}</td>
                         <td class="px-8 py-6">
                             <span class="px-3 py-1.5 rounded-lg text-[10px] font-bold uppercase border {{ $user->role === 'admin' ? 'bg-burgundy-50/80 text-burgundy-600 border-burgundy-100' : 'bg-white/80 text-gray-500 border-red-50' }}">
-                                {{ $user->role }}
+                                {{ $user->role === 'mahasiswa' ? 'student' : $user->role }}
                             </span>
                         </td>
                         <td class="px-8 py-6 text-right opacity-100 md:opacity-0 group-hover:opacity-100 transition-opacity duration-300">

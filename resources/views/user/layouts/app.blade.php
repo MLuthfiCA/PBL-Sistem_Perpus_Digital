@@ -9,6 +9,7 @@
     
     <script src="https://cdn.tailwindcss.com"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <script src="https://unpkg.com/htmx.org@1.9.10"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
     
@@ -81,7 +82,7 @@
         ::-webkit-scrollbar-thumb { background: rgba(128, 0, 32, 0.1); border-radius: 10px; }
     </style>
 </head>
-<body class="flex flex-col min-h-screen">
+<body class="flex flex-col min-h-screen" hx-boost="true">
 
     <!-- Background Elements -->
     <div class="fixed inset-0 pointer-events-none z-[-1] overflow-hidden">

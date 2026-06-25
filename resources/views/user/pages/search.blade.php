@@ -57,7 +57,7 @@
                     <div class="bg-burgundy-500 text-white px-5 py-3 font-bold text-sm flex items-center justify-between">
                         <span>Filter's Category</span>
                         <button type="button"
-                            @click="selectedCategories = []; $nextTick(() => document.getElementById('search-form').submit())"
+                            @click="selectedCategories = []; $nextTick(() => document.getElementById('search-form').dispatchEvent(new Event('submit', { cancelable: true, bubbles: true })))"
                             x-show="selectedCategories.length > 0"
                             class="text-[10px] bg-white/20 hover:bg-white/30 px-2 py-1 rounded-lg transition-colors font-medium">
                             Reset
@@ -91,7 +91,7 @@
                     {{-- Tombol Apply --}}
                     <div class="px-5 py-3 border-t border-gray-100">
                         <button type="button"
-                            @click="showFilters = false; $nextTick(() => document.getElementById('search-form').submit())"
+                            @click="showFilters = false; $nextTick(() => document.getElementById('search-form').dispatchEvent(new Event('submit', { cancelable: true, bubbles: true })))"
                             class="w-full bg-burgundy-500 text-white py-2.5 rounded-xl font-bold text-sm hover:bg-maroon transition-all">
                             Terapkan Filter
                         </button>
@@ -106,7 +106,7 @@
                 <span class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-burgundy-500/10 text-burgundy-500 border border-burgundy-200 rounded-full text-xs font-semibold">
                     <span x-text="cat"></span>
                     <button type="button"
-                        @click="selectedCategories = selectedCategories.filter(c => c !== cat); $nextTick(() => document.getElementById('search-form').submit())"
+                        @click="selectedCategories = selectedCategories.filter(c => c !== cat); $nextTick(() => document.getElementById('search-form').dispatchEvent(new Event('submit', { cancelable: true, bubbles: true })))"
                         class="hover:text-maroon transition-colors">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M6 18L18 6M6 6l12 12"/>

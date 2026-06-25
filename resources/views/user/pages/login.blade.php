@@ -52,10 +52,7 @@
                     </div>
                 </div>
 
-                <div class="flex items-center">
-                    <input id="remember-me" name="remember-me" type="checkbox" class="h-4 w-4 text-burgundy-600 focus:ring-burgundy-500 border-gray-300 rounded transition-all">
-                    <label for="remember-me" class="ml-2 block text-sm text-gray-500 font-medium cursor-pointer">Remember me</label>
-                </div>
+
 
                 <div>
                     <button type="submit" class="group relative w-full flex justify-center py-4 px-4 border border-transparent text-sm font-bold rounded-2xl text-white bg-burgundy-500 hover:bg-maroon focus:outline-none focus:ring-4 focus:ring-red-100 transition-all shadow-lg shadow-red-100 transform active:scale-95">

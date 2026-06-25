@@ -53,7 +53,7 @@ try {
 
 Route::get('/', function () {
     if (session()->has('user')) {
-        if (session('user')['role'] === 'admin') return redirect()->route('admin.katalog');
+        if (session('user')['role'] === 'admin') return redirect()->route('admin.profile');
         return redirect()->route('katalog');
     }
     return redirect('/home');
@@ -61,7 +61,7 @@ Route::get('/', function () {
 
 Route::get('/dashboard', function() {
     if (session()->has('user')) {
-        if (session('user')['role'] === 'admin') return redirect()->route('admin.katalog');
+        if (session('user')['role'] === 'admin') return redirect()->route('admin.profile');
         return redirect()->route('katalog');
     }
     return redirect('/home');
@@ -209,7 +209,7 @@ Route::get('/home', function () {
 
 Route::get('/login', function () {
     if (session()->has('user')) {
-        if (session('user')['role'] === 'admin') return redirect()->route('admin.katalog');
+        if (session('user')['role'] === 'admin') return redirect()->route('admin.profile');
         return redirect()->route('katalog');
     }
     return view('user.pages.login');

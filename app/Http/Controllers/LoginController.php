@@ -35,6 +35,12 @@ class LoginController extends Controller
                 Auth::logout();
                 return back()->withErrors(['login_error' => 'Username and role do not match.']);
             }
+            
+            // Verify account status
+            if ($user->status === 'inactive' || $user->status === 'suspended') {
+                Auth::logout();
+                return back()->withErrors(['login_error' => 'Your account is ' . $user->status . '. Please contact the administrator.']);
+            }
 
             /** @var \App\Models\User $user */
 $user = Auth::user();
@@ -79,7 +85,7 @@ $user = Auth::user();
             ]);
 
             if ($user->role == 'admin') {
-                return redirect()->route('admin.katalog');
+                return redirect()->route('admin.profile');
             } else {
                 return redirect()->route('katalog');
             }

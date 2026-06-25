@@ -103,6 +103,15 @@ class AdminController extends Controller
             ->limit(3)
             ->get();
 
+        // Buku yang sedang dipinjam
+        $bukuSedangDipinjam = Peminjaman::with('buku')
+            ->whereMonth('tanggal_pinjam', $bulan)
+            ->whereYear('tanggal_pinjam', $tahun)
+            ->where('status', 'dipinjam')
+            ->orderBy('tanggal_pinjam', 'desc')
+            ->limit(10)
+            ->get();
+
         // Daftar bulan-tahun yang tersedia (untuk dropdown)
         $availableMonths = Peminjaman::selectRaw('YEAR(tanggal_pinjam) as tahun, MONTH(tanggal_pinjam) as bulan')
             ->groupByRaw('YEAR(tanggal_pinjam), MONTH(tanggal_pinjam)')
@@ -112,7 +121,7 @@ class AdminController extends Controller
         return view('admin.pages.manage-data', compact(
             'books',
             'totalDipinjam', 'sudahKembali', 'sedangDipinjam', 'totalDenda',
-            'bukuTerpopuler', 'anggotaAktif', 'availableMonths',
+            'bukuTerpopuler', 'anggotaAktif', 'bukuSedangDipinjam', 'availableMonths',
             'bulan', 'tahun'
         ));
     }

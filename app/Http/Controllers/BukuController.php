@@ -268,14 +268,8 @@ class BukuController extends Controller
                 return back()->with('error', 'User not found. Please log in again.');
             }
 
-            // CEK 1: Apakah user masih memiliki buku yang belum dikembalikan (status: dipinjam)
-            $unreturnedBooks = Peminjaman::where('id_pengguna', $userId)
-                ->where('status', 'dipinjam')
-                ->exists();
+            // CEK 1: dihapus sesuai permintaan agar bisa pinjam lebih dari 1 buku
 
-            if ($unreturnedBooks) {
-                return back()->with('error', 'You still have an unreturned book. Please return it before borrowing a new one.');
-            }
 
             // CEK 2: Apakah user memiliki denda yang belum lunas
             $unpaidFines = Peminjaman::where('id_pengguna', $userId)

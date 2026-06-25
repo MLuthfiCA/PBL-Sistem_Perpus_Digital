@@ -38,14 +38,14 @@
                     </div>
                     <ul class="py-2 text-gray-700 text-sm">
                         <li>
-                            <button type="button" @click="selectedCategory = ''; $nextTick(() => { $el.closest('form').submit() })" class="w-full text-left px-5 py-3 hover:bg-red-50 hover:text-burgundy-500 transition-colors {{ !request('category') ? 'font-bold text-burgundy-500 bg-red-50/50' : '' }}">
+                            <button type="button" @click="selectedCategory = ''; $nextTick(() => { $el.closest('form').dispatchEvent(new Event('submit', { cancelable: true, bubbles: true })) })" class="w-full text-left px-5 py-3 hover:bg-red-50 hover:text-burgundy-500 transition-colors {{ !request('category') ? 'font-bold text-burgundy-500 bg-red-50/50' : '' }}">
                                 All Categories
                             </button>
                         </li>
                         @if(isset($categories))
                             @foreach($categories as $cat)
                                 <li>
-                                    <button type="button" @click="selectedCategory = '{{ $cat }}'; $nextTick(() => { $el.closest('form').submit() })" class="w-full text-left px-5 py-3 hover:bg-red-50 hover:text-burgundy-500 transition-colors {{ request('category') == $cat ? 'font-bold text-burgundy-500 bg-red-50/50' : '' }}">
+                                    <button type="button" @click="selectedCategory = '{{ $cat }}'; $nextTick(() => { $el.closest('form').dispatchEvent(new Event('submit', { cancelable: true, bubbles: true })) })" class="w-full text-left px-5 py-3 hover:bg-red-50 hover:text-burgundy-500 transition-colors {{ request('category') == $cat ? 'font-bold text-burgundy-500 bg-red-50/50' : '' }}">
                                         {{ $cat }}
                                     </button>
                                 </li>

@@ -8,6 +8,7 @@
     
     <script src="https://cdn.tailwindcss.com"></script>
     <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <script src="https://unpkg.com/htmx.org@1.9.10"></script>
     
     <!-- Tom Select for advanced multi-select -->
     <link href="https://cdn.jsdelivr.net/npm/tom-select@2.2.2/dist/css/tom-select.default.min.css" rel="stylesheet">
@@ -159,7 +160,7 @@
         }
     </style>
 </head>
-<body class="flex flex-col min-h-screen">
+<body class="flex flex-col min-h-screen" hx-boost="true">
 
     <!-- Background Elements -->
     <div class="fixed inset-0 pointer-events-none z-[-1] overflow-hidden">

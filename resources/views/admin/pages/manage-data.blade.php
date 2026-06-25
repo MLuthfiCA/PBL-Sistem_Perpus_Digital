@@ -2,6 +2,20 @@
 
 @section('content')
 <div class="py-10 space-y-12">
+    @if(session('success'))
+    <div class="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 mb-6 rounded-xl shadow-sm animate-fade-down flex items-start gap-3">
+        <div class="w-6 h-6 rounded-full bg-green-200 text-green-600 flex items-center justify-center flex-shrink-0 mt-0.5">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+            </svg>
+        </div>
+        <div>
+            <h4 class="font-bold text-green-800 text-sm">Success!</h4>
+            <p class="text-xs text-green-700 mt-0.5 leading-relaxed">{{ session('success') }}</p>
+        </div>
+    </div>
+    @endif
+
     @if(isset($db_error))
     <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-6 rounded-xl shadow-sm animate-fade-down" role="alert">
         <p class="font-bold text-sm">Database Error!</p>
@@ -33,7 +47,7 @@
             </div>
             
             <form action="{{ route('admin.manage_data') }}" method="GET" class="flex gap-3">
-                <select name="bulan" class="px-4 py-2 border border-gray-300 rounded-lg text-sm font-bold text-gray-700 bg-white focus:outline-none focus:ring-2 focus:ring-gray-200 cursor-pointer" onchange="this.form.submit()">
+                <select name="bulan" class="px-4 py-2 border border-gray-300 rounded-lg text-sm font-bold text-gray-700 bg-white focus:outline-none focus:ring-2 focus:ring-gray-200 cursor-pointer" onchange="this.form.dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }))">
                     @forelse($availableMonths as $m)
                         @php
                             $namaBulan = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'][$m->bulan - 1];
@@ -94,8 +108,8 @@
             </div>
         </div>
 
-        <!-- 2 SECTIONS: BUKU TERPOPULER & ANGGOTA AKTIF -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <!-- 3 SECTIONS: BUKU TERPOPULER, ANGGOTA AKTIF, BUKU SEDANG DIPINJAM -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
             
             <!-- Buku Paling Sering Dipinjam -->
             <div class="border border-gray-200 rounded-2xl p-6 bg-white shadow-sm">
@@ -146,6 +160,36 @@
                 </div>
             </div>
 
+            <!-- Buku Sedang Dipinjam -->
+            <div class="border border-gray-200 rounded-2xl p-6 bg-white shadow-sm flex flex-col">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="font-bold text-gray-900 text-[16px]">Currently Borrowed</h3>
+                    <a href="{{ route('admin.manage_data', ['status' => 'dipinjam']) }}" class="text-[11px] font-bold text-burgundy-600 hover:text-maroon bg-red-50 px-2 py-1 rounded-md transition-colors">View All &rarr;</a>
+                </div>
+                
+                <div class="space-y-4 overflow-y-auto pr-2 custom-scrollbar" style="max-height: 240px;">
+                    @forelse($bukuSedangDipinjam ?? [] as $bsd)
+                    <div class="flex items-center gap-3">
+                        <div class="w-8 h-10 bg-gray-100 rounded border border-gray-200 flex items-center justify-center overflow-hidden shrink-0">
+                            @if($bsd->buku?->cover)
+                                <img src="{{ asset('images/' . $bsd->buku->cover) }}" class="w-full h-full object-cover">
+                            @else
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                                </svg>
+                            @endif
+                        </div>
+                        <div>
+                            <p class="text-[13.5px] font-bold text-gray-800 line-clamp-1">{{ $bsd->buku?->judul ?? $bsd->snapshot_judul_buku ?? 'Unknown' }}</p>
+                            <p class="text-[11px] font-medium text-red-500 mt-0.5">Due: {{ \Carbon\Carbon::parse($bsd->batas_kembali)->format('d M') }}</p>
+                        </div>
+                    </div>
+                    @empty
+                    <p class="text-sm text-gray-500">No books currently borrowed.</p>
+                    @endforelse
+                </div>
+            </div>
+
         </div>
     </div>
 
@@ -178,7 +222,7 @@
 
                 <!-- Status Filter -->
                 <div class="relative w-full md:w-56">
-                    <select name="status" onchange="this.form.submit()" 
+                    <select name="status" onchange="this.form.dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }))"
                         class="w-full px-4 py-3 bg-white/80 border border-gray-100 rounded-2xl text-sm font-bold text-gray-600 focus:outline-none focus:ring-2 focus:ring-burgundy-500/20 focus:border-burgundy-500 transition-all appearance-none cursor-pointer">
                         <option value="all" {{ request('status') === 'all' ? 'selected' : '' }}>All Status</option>
                         <option value="dipinjam" {{ request('status') === 'dipinjam' ? 'selected' : '' }}>Borrowed (Dipinjam)</option>
