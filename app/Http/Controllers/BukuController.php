@@ -266,9 +266,9 @@ class BukuController extends Controller
                 return back()->with('error', 'You have unpaid late fines. Please contact the library administrator to settle your fines.');
             }
 
-            // Prevent borrowing when stock is empty
-            if ($buku->stok <= 0) {
-                return back()->with('error', 'The book is out of stock. Cannot borrow at this time.');
+            // Prevent borrowing when book is not available or stock is empty
+            if ($buku->status !== 'Tersedia' || $buku->stok <= 0) {
+                return back()->with('error', 'Buku ini sedang tidak tersedia untuk dipinjam.');
             }
 
             $calc = \App\Helpers\HolidayHelper::calculateReturnDate($request->tanggal_pinjam);
