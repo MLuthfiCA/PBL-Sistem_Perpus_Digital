@@ -75,7 +75,10 @@
             @forelse($peminjaman ?? [] as $p)
             @php /** @var \App\Models\Peminjaman $p */ @endphp
             <div class="glass-panel p-6 border-white/60 shadow-lg shadow-red-50 hover:shadow-xl transition-all group border-l-4 border-l-burgundy-500">
-                <h3 class="font-bold text-gray-800 text-lg mb-1">{{ $p->buku?->judul ?? 'Unknown Book' }}</h3>
+                <h3 class="font-bold text-gray-800 text-lg mb-1">
+                    {{ $p->buku?->judul ?? $p->snapshot_judul_buku ?? 'Unknown Book' }}
+                    @if(!$p->buku) <span class="text-red-500 text-xs ml-1">(Deleted)</span> @endif
+                </h3>
                 <p class="text-xs text-gray-400 font-medium mb-4">Book ID: #{{ $p->buku?->buku_id ?? $p->buku?->id ?? 'N/A' }}</p>
                 
                 <div class="flex justify-between items-center text-sm border-t border-red-50 pt-4">
@@ -144,8 +147,11 @@
                         @php /** @var \App\Models\Peminjaman $k */ @endphp
                         <tr class="hover:bg-red-50/30 transition-colors">
                             <td class="px-8 py-6">
-                                <p class="font-bold text-gray-800">{{ $k->buku?->judul ?? 'Unknown Book' }}</p>
-                                <p class="text-[10px] text-gray-400">{{ $k->buku && $k->buku->penulis->isNotEmpty() ? $k->buku->penulis->pluck('nama_penulis')->implode(', ') : 'Unknown Author' }}</p>
+                                <p class="font-bold text-gray-800">
+                                    {{ $k->buku?->judul ?? $k->snapshot_judul_buku ?? 'Unknown Book' }}
+                                    @if(!$k->buku) <span class="text-red-500 text-[10px] ml-1">(Deleted)</span> @endif
+                                </p>
+                                <p class="text-[10px] text-gray-400">{{ $k->buku && $k->buku->penulis->isNotEmpty() ? $k->buku->penulis->pluck('nama_penulis')->implode(', ') : ($k->buku ? 'Unknown Author' : 'Data Removed') }}</p>
                             </td>
                             <td class="px-8 py-6 text-sm text-gray-500 font-medium">#{{ $k->id }}</td>
                             <td class="px-8 py-6 text-center">

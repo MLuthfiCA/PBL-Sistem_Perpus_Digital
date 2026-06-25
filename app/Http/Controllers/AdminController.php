@@ -25,7 +25,18 @@ class AdminController extends Controller
 
     public function profile(\Illuminate\Http\Request $request)
     {
-        return view('admin.pages.profile');
+        $admin = session('user');
+        
+        $totalBuku = \App\Models\Buku::count();
+        $totalUser = User::where('role', 'mahasiswa')->count();
+        $totalPeminjaman = Peminjaman::count();
+        
+        $recentActivities = \App\Models\Riwayat::with('user')
+            ->orderBy('created_at', 'desc')
+            ->limit(5)
+            ->get();
+
+        return view('admin.pages.profile', compact('admin', 'totalBuku', 'totalUser', 'totalPeminjaman', 'recentActivities'));
     }
 
     public function manageData(\Illuminate\Http\Request $request)

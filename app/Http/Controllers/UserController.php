@@ -31,7 +31,7 @@ class UserController extends Controller
             $query->where('role', $roleFilter);
         }
         
-        $users = $query->paginate(10);
+        $users = $query->orderBy('id_pengguna', 'desc')->paginate(10);
         return view('admin.pages.users-index', compact('users', 'search', 'roleFilter'));
     }
 

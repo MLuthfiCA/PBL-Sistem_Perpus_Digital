@@ -76,6 +76,7 @@ Route::prefix('admin')->as('admin.')->group(function () {
     Route::resource('kategori', KategoriController::class);
     Route::resource('penulis', PenulisController::class);
     Route::resource('penerbit', PenerbitController::class);
+    Route::get('/manage-data', [AdminController::class, 'manageData'])->name('manage_data');
 });
 
 // --- GUEST & AUTH ROUTES ---
@@ -496,6 +497,7 @@ Route::prefix('admin')->group(function () {
     // Soft-deleted books (trash) routes
     Route::get('/katalog/trash', [BukuController::class, 'trash'])->name('admin.katalog.trash');
     Route::post('/katalog/{id}/restore', [BukuController::class, 'restore'])->name('admin.katalog.restore');
+    Route::delete('/katalog/{id}/force-delete', [BukuController::class, 'forceDelete'])->name('admin.katalog.force_delete');
 
     // Route detail, edit, update, dan delete
     Route::get('/katalog/{id}', [BukuController::class, 'showAdmin'])->name('admin.katalog.detail');

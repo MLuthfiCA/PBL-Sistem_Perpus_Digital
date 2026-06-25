@@ -20,7 +20,7 @@ class PenerbitController extends Controller
             $query->where('nama_penerbit', 'like', "%$search%");
         }
         
-        $penerbit = $query->paginate(10)->appends(['search' => $search]);
+        $penerbit = $query->orderBy('id_penerbit', 'desc')->paginate(10)->appends(['search' => $search]);
         return view('admin.pages.penerbit', compact('penerbit', 'search'));
     }
 

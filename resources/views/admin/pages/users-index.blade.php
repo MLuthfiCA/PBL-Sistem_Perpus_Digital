@@ -53,9 +53,9 @@
                     <option value="admin" {{ request('role') === 'admin' ? 'selected' : '' }}>Admin</option>
                 </select>
             </div>
-            <div class="flex items-center gap-3">
-                <button type="submit" class="px-6 py-2.5 bg-burgundy-500 text-white rounded-xl hover:bg-maroon">Search</button>
-                <a href="{{ route('admin.users.index') }}" class="px-6 py-2.5 bg-gray-200 text-gray-700 rounded-xl hover:bg-gray-300">Reset</a>
+            <div class="flex flex-col sm:flex-row items-center gap-3 w-full md:w-auto">
+                <button type="submit" class="w-full sm:w-auto px-6 py-2.5 bg-burgundy-500 text-white rounded-xl hover:bg-maroon text-center">Search</button>
+                <a href="{{ route('admin.users.index') }}" class="w-full sm:w-auto px-6 py-2.5 bg-gray-200 text-gray-700 rounded-xl hover:bg-gray-300 text-center">Reset</a>
             </div>
         </div>
     </form>
@@ -85,7 +85,7 @@
                                 {{ $user->role }}
                             </span>
                         </td>
-                        <td class="px-8 py-6 text-right opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                        <td class="px-8 py-6 text-right opacity-100 md:opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                             <a href="{{ route('admin.users.edit', $user->user_id) }}" class="text-blue-500 hover:text-blue-700 font-bold text-xs px-3 mr-2">Edit</a>
                             <form action="{{ route('admin.users.destroy', $user->user_id) }}" method="POST" class="inline" onsubmit="return confirm('Delete this user?')">
                                 @csrf @method('DELETE')

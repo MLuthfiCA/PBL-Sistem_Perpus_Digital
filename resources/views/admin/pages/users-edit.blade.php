@@ -33,7 +33,7 @@
                 <label class="block text-sm font-bold text-gray-700 mb-1">Role</label>
                 <select name="role" class="w-full px-4 py-2.5 border rounded" required>
                     <option value="admin" {{ $user->role == 'admin' ? 'selected' : '' }}>Admin</option>
-                    <option value="student" {{ $user->role == 'student' ? 'selected' : '' }}>Student</option>
+                    <option value="student" {{ $user->role == 'mahasiswa' ? 'selected' : '' }}>Student</option>
                 </select>
             </div>
             <div>

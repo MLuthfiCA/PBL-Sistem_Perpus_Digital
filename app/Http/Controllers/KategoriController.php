@@ -20,7 +20,7 @@ class KategoriController extends Controller
             $query->where('nama_kategori', 'like', "%$search%");
         }
         
-        $kategoris = $query->paginate(10)->appends(['search' => $search]);
+        $kategoris = $query->orderBy('id_kategori', 'desc')->paginate(10)->appends(['search' => $search]);
         return view('admin.pages.kategori', compact('kategoris', 'search'));
     }
 

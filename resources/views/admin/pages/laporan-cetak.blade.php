@@ -142,7 +142,10 @@
                         <div style="font-size: 11px; color:#64748b; margin-top:2px;">{{ $p->user?->email }}</div>
                     </td>
                     <td>
-                        <strong>{{ $p->buku?->judul ?? 'Unknown (Deleted)' }}</strong>
+                        <strong>
+                            {{ $p->buku?->judul ?? $p->snapshot_judul_buku ?? 'Unknown (Deleted)' }}
+                            @if(!$p->buku) <span style="color:#dc2626; font-size:10px;">(Deleted)</span> @endif
+                        </strong>
                         <div style="font-size: 11px; color:#64748b; margin-top:2px;">ISBN: {{ $p->buku?->isbn ?? '-' }}</div>
                     </td>
                     <td>

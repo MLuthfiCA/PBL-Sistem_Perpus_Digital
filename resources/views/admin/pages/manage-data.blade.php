@@ -32,7 +32,7 @@
                 <p class="text-gray-600 mt-1 text-sm font-medium">Summary of digital library book borrowing data</p>
             </div>
             
-            <form action="{{ route('admin.manage-data') }}" method="GET" class="flex gap-3">
+            <form action="{{ route('admin.manage_data') }}" method="GET" class="flex gap-3">
                 <select name="bulan" class="px-4 py-2 border border-gray-300 rounded-lg text-sm font-bold text-gray-700 bg-white focus:outline-none focus:ring-2 focus:ring-gray-200 cursor-pointer" onchange="this.form.submit()">
                     @forelse($availableMonths as $m)
                         @php
@@ -164,7 +164,7 @@
 
         <!-- Search & Filter Bar -->
         <x-ui.glass-card class="p-4 border-white/60 shadow-md">
-            <form action="{{ route('admin.manage-data') }}" method="GET" class="flex flex-col md:flex-row items-center gap-4">
+            <form action="{{ route('admin.manage_data') }}" method="GET" class="flex flex-col md:flex-row items-center gap-4">
                 <!-- Search Input -->
                 <div class="relative w-full md:flex-1">
                     <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 pointer-events-none text-gray-400">
@@ -197,7 +197,7 @@
                         Search
                     </button>
                     @if(request()->filled('search') || request('status') !== 'all')
-                        <a href="{{ route('admin.manage-data') }}" class="px-5 py-3 bg-white border border-gray-100 text-gray-500 rounded-2xl text-sm font-bold hover:bg-gray-50 transition-all transform active:scale-95 flex items-center justify-center">
+                        <a href="{{ route('admin.manage_data') }}" class="px-5 py-3 bg-white border border-gray-100 text-gray-500 rounded-2xl text-sm font-bold hover:bg-gray-50 transition-all transform active:scale-95 flex items-center justify-center">
                             Reset
                         </a>
                     @endif
@@ -230,8 +230,13 @@
                             @endif
                         </div>
                         <div>
-                            <h3 class="font-bold text-gray-800 text-sm line-clamp-1">{{ $b->buku?->judul ?? 'Unknown Book' }}</h3>
-                            <p class="text-[10px] text-gray-400 font-medium mt-0.5">{{ $b->buku && $b->buku->penulis->isNotEmpty() ? $b->buku->penulis->pluck('nama_penulis')->implode(', ') : 'Unknown Author' }}</p>
+                            <h3 class="font-bold text-gray-800 text-sm line-clamp-1">
+                                {{ $b->buku?->judul ?? $b->snapshot_judul_buku ?? 'Unknown Book' }}
+                                @if(!$b->buku) <span class="text-red-500 text-[10px] ml-1">(Deleted)</span> @endif
+                            </h3>
+                            <p class="text-[10px] text-gray-400 font-medium mt-0.5">
+                                {{ $b->buku && $b->buku->penulis->isNotEmpty() ? $b->buku->penulis->pluck('nama_penulis')->implode(', ') : ($b->buku ? 'Unknown Author' : 'Data Removed') }}
+                            </p>
                         </div>
                     </div>
 

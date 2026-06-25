@@ -230,6 +230,26 @@ class BukuController extends Controller
         return redirect()->route('admin.katalog.trash')->with('error', 'Book is not deleted');
     }
 
+    /**
+     * Permanently delete a book and preserve its title in history
+     */
+    public function forceDelete($id)
+    {
+        $buku = Buku::withTrashed()->where('id_buku', $id)->first();
+        if (!$buku) {
+            return redirect()->route('admin.katalog.trash')->with('error', 'Book not found.');
+        }
+
+        // Save snapshot of the book title to all related peminjaman records
+        Peminjaman::where('id_buku', $buku->id_buku)->update([
+            'snapshot_judul_buku' => $buku->judul
+        ]);
+
+        $buku->forceDelete();
+
+        return redirect()->route('admin.katalog.trash')->with('success', 'Book permanently deleted!');
+    }
+
     public function storePeminjaman(Request $request)
     {
         $request->validate([

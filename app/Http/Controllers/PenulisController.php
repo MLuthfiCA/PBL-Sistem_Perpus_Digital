@@ -20,7 +20,7 @@ class PenulisController extends Controller
             $query->where('nama_penulis', 'like', "%$search%");
         }
         
-        $penulis = $query->paginate(10)->appends(['search' => $search]);
+        $penulis = $query->orderBy('id_penulis', 'desc')->paginate(10)->appends(['search' => $search]);
         return view('admin.pages.penulis', compact('penulis', 'search'));
     }
 
