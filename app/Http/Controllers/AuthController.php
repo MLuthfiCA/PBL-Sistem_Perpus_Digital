@@ -13,6 +13,7 @@ class AuthController extends Controller
             if (session('user')['role'] === 'admin') {
                 return redirect()->route('admin.katalog');
             }
+
             return redirect()->route('katalog');
         }
 
@@ -26,7 +27,25 @@ class AuthController extends Controller
             'username' => 'required|string|max:255|unique:users,username',
             'email' => 'required|email|max:255|unique:users,email',
             'password' => 'required|string|min:6',
-            'nim' => 'required|string|max:100|unique:users,identity_number',
+            'nim' => [
+                'required',
+                'regex:/^[0-9]{1,12}$/',
+                'unique:users,identity_number',
+            ],
+
+        ], [
+
+            'nama.required' => 'Full name is required.',
+            'username.required' => 'Username is required.',
+            'username.unique' => 'Username is already in use.',
+            'email.required' => 'Email is required.',
+            'email.email' => 'Please enter a valid email address.',
+            'email.unique' => 'Email is already registered.',
+            'password.required' => 'Password is required.',
+            'password.min' => 'Password must be at least 6 characters.',
+            'nim.required' => 'Student ID (NIM) is required.',
+            'nim.regex' => 'Student ID must contain only numbers and a maximum of 12 digits.',
+            'nim.unique' => 'Student ID has already been registered.',
         ]);
 
         User::create([
@@ -39,6 +58,8 @@ class AuthController extends Controller
             'status' => 'active',
         ]);
 
-        return redirect()->route('login')->with('success', 'Registration successful. Please login to your account.');
+        return redirect()
+            ->route('login')
+            ->with('success', 'Registration successful. Please login to your account.');
     }
 }
