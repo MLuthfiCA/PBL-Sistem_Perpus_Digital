@@ -82,7 +82,7 @@ class BukuController extends Controller
             'judul'        => 'required|string|max:255',
             'id_penulis'   => 'required|array',
             'id_penulis.*' => 'exists:penulis,id_penulis',
-            'isbn'         => 'nullable|string|max:50|unique:buku,isbn,' . $id . ',id_buku',
+            'isbn'         => 'nullable|string|max:17|unique:buku,isbn,' . $id . ',id_buku',
             'id_kategori'  => 'required|exists:kategori,id_kategori',
             'id_penerbit'  => 'nullable|exists:penerbit,id_penerbit',
             'tahun_terbit' => 'nullable|string|max:4',
@@ -93,6 +93,8 @@ class BukuController extends Controller
             'status'       => 'required|in:Tersedia,Dipinjam,Hilang,Perawatan',
             'deskripsi'    => 'nullable|string',
             'cover'        => 'nullable|image|max:2048',
+        ], [
+            'isbn.max' => 'ISBN may not be greater than 17 characters.',
         ]);
 
         // Handle cover upload if present
@@ -125,7 +127,7 @@ class BukuController extends Controller
             'judul'        => 'required|string|max:255',
             'id_penulis'   => 'required|array',
             'id_penulis.*' => 'exists:penulis,id_penulis',
-            'isbn'         => 'nullable|string|max:50|unique:buku,isbn',
+            'isbn'         => 'nullable|string|max:17|unique:buku,isbn',
             'id_kategori'  => 'required|exists:kategori,id_kategori',
             'id_penerbit'  => 'nullable|exists:penerbit,id_penerbit',
             'tahun_terbit' => 'nullable|string|max:4',
@@ -136,6 +138,8 @@ class BukuController extends Controller
             'stok'         => 'nullable|integer|min:0',
             'deskripsi'    => 'nullable|string',
             'cover'        => 'nullable|image|max:2048',
+        ], [
+            'isbn.max' => 'ISBN may not be greater than 17 characters.',
         ]);
 
         try {
