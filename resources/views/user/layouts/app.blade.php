@@ -61,28 +61,92 @@
             border-radius: 24px;
         }
 
-        /* Animations */
         @keyframes fadeInUp {
             from { opacity: 0; transform: translateY(20px); }
             to { opacity: 1; transform: translateY(0); }
         }
-
         .animate-fade-up {
             animation: fadeInUp 0.6s ease-out forwards;
             opacity: 0;
         }
-
         .delay-100 { animation-delay: 100ms; }
         .delay-200 { animation-delay: 200ms; }
         .delay-300 { animation-delay: 300ms; }
 
-        /* Custom Scrollbar */
         ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: rgba(128, 0, 32, 0.1); border-radius: 10px; }
+
+        /* ===== TOAST NOTIFICATION ===== */
+        #toast-container {
+            position: fixed;
+            bottom: 1.5rem;
+            right: 1.5rem;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            pointer-events: none;
+            width: 360px;
+            max-width: calc(100vw - 2rem);
+        }
+        .toast {
+            pointer-events: auto;
+            position: relative;
+            display: flex;
+            align-items: flex-start;
+            gap: 0.875rem;
+            padding: 1rem 1.25rem;
+            border-radius: 1rem;
+            box-shadow: 0 20px 60px -10px rgba(0,0,0,0.2), 0 8px 20px -5px rgba(0,0,0,0.08);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid transparent;
+            overflow: hidden;
+            transform: translateX(0);
+            opacity: 1;
+            transition: transform 0.4s cubic-bezier(0.34,1.56,0.64,1), opacity 0.4s ease;
+        }
+        .toast.toast-enter { transform: translateX(110%); opacity: 0; }
+        .toast.toast-exit  { transform: translateX(110%); opacity: 0; }
+        .toast-success { background: rgba(240,253,244,0.97); border-color: rgba(134,239,172,0.6); }
+        .toast-error   { background: rgba(255,241,242,0.97); border-color: rgba(252,165,165,0.6); }
+        .toast-icon {
+            flex-shrink: 0;
+            width: 2rem; height: 2rem;
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .toast-success .toast-icon { background: #dcfce7; color: #16a34a; }
+        .toast-error   .toast-icon { background: #fee2e2; color: #dc2626; }
+        .toast-body { flex: 1; min-width: 0; }
+        .toast-title { font-weight: 700; font-size: 0.8125rem; line-height: 1.3; }
+        .toast-success .toast-title { color: #15803d; }
+        .toast-error   .toast-title { color: #b91c1c; }
+        .toast-msg { font-size: 0.75rem; margin-top: 0.2rem; line-height: 1.5; word-break: break-word; }
+        .toast-success .toast-msg { color: #166534; }
+        .toast-error   .toast-msg { color: #991b1b; }
+        .toast-close {
+            flex-shrink: 0; cursor: pointer; opacity: 0.45;
+            transition: opacity 0.2s; background: none; border: none; padding: 2px; margin-top: 1px;
+        }
+        .toast-close:hover { opacity: 1; }
+        .toast-progress {
+            position: absolute; bottom: 0; left: 0; height: 3px;
+            animation: toast-shrink 4s linear forwards;
+        }
+        .toast-success .toast-progress { background: #22c55e; }
+        .toast-error   .toast-progress { background: #ef4444; }
+        @keyframes toast-shrink { from { width: 100%; } to { width: 0%; } }
+
+        @media (max-width: 480px) {
+            #toast-container { bottom: 0.75rem; right: 0.75rem; left: 0.75rem; width: auto; }
+            .toast { width: 100%; }
+            .glass-panel { border-radius: 16px; }
+        }
     </style>
 </head>
-<body class="flex flex-col min-h-screen" hx-boost="true">
+<body class="flex flex-col min-h-screen">
 
     <!-- Background Elements -->
     <div class="fixed inset-0 pointer-events-none z-[-1] overflow-hidden">
@@ -98,20 +162,20 @@
     @endif
 
     <div class="flex-grow pt-24 transition-all duration-300">
-        <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
             @yield('content')
         </main>
 
         <footer class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-12 animate-fade-up delay-300">
-            <div class="glass-panel p-8 md:p-12 border-white/60 shadow-2xl shadow-red-50">
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12">
+            <div class="glass-panel p-6 sm:p-8 md:p-12 border-white/60 shadow-2xl shadow-red-50">
+                <div class="grid grid-cols-2 lg:grid-cols-4 gap-8 sm:gap-10">
                     <!-- Brand Section -->
-                    <div class="space-y-6">
+                    <div class="col-span-2 space-y-5">
                         <div class="flex items-center gap-3">
                             <img src="{{ asset('images/readspace-library.png') }}" alt="ReadSpace Logo" class="h-10 w-auto">
                             <span class="font-bold text-2xl text-gray-800 tracking-tight">ReadSpace</span>
                         </div>
-                        <p class="text-sm text-gray-500 leading-relaxed">
+                        <p class="text-sm text-gray-500 leading-relaxed max-w-xs">
                             ReadSpace Library is a modern digital literacy platform specifically designed to facilitate Polibatam students in accessing unlimited knowledge.
                         </p>
                         <div class="flex gap-4">
@@ -126,8 +190,8 @@
 
                     <!-- Navigation Links -->
                     <div>
-                        <h4 class="font-bold text-gray-800 mb-6 uppercase text-xs tracking-widest">Quick Menu</h4>
-                        <ul class="space-y-4">
+                        <h4 class="font-bold text-gray-800 mb-4 uppercase text-xs tracking-widest">Quick Menu</h4>
+                        <ul class="space-y-3">
                             <li><a href="{{ route('home') }}" class="text-gray-500 hover:text-burgundy-500 text-sm transition-colors">Home page</a></li>
                             <li><a href="{{ route('katalog') }}" class="text-gray-500 hover:text-burgundy-500 text-sm transition-colors">Book Catalog</a></li>
                             <li><a href="{{ route('search') }}" class="text-gray-500 hover:text-burgundy-500 text-sm transition-colors">Search</a></li>
@@ -135,58 +199,111 @@
                         </ul>
                     </div>
 
-                    <!-- Contact & Location -->
+                    <!-- Operating Hours -->
                     <div>
-                        <h4 class="font-bold text-gray-800 mb-6 uppercase text-xs tracking-widest">Contacts & Locations</h4>
-                        <ul class="space-y-4">
-                            <li class="flex items-start gap-3">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-burgundy-500 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                                </svg>
-                                <span class="text-sm text-gray-500">Ahmad Yani Street, Batam City, Batam,  Kepulauan Riau 29461</span>
-                            </li>
-                            <li class="flex items-center gap-3">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-burgundy-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                                </svg>
-                                <span class="text-sm text-gray-500">library@polibatam.ac.id</span>
-                            </li>
-                        </ul>
-                    </div>
-
-                    <!-- Opening Hours -->
-                    <div>
-                        <h4 class="font-bold text-gray-800 mb-6 uppercase text-xs tracking-widest">Operating Hours</h4>
+                        <h4 class="font-bold text-gray-800 mb-4 uppercase text-xs tracking-widest">Operating Hours</h4>
                         <ul class="space-y-3">
-                            <li class="flex justify-between text-sm">
-                                <span class="text-gray-400">Monday - Friday</span>
-                                <span class="font-bold text-gray-700">08:00 - 20:00</span>
+                            <li class="flex justify-between text-sm gap-2">
+                                <span class="text-gray-400 text-xs">Mon – Fri</span>
+                                <span class="font-bold text-gray-700 text-xs whitespace-nowrap">08:00 – 20:00</span>
                             </li>
                             <li class="flex justify-between text-sm">
-                                <span class="text-gray-400">Saturday</span>
+                                <span class="text-gray-400 text-xs">Saturday</span>
                                 <span class="font-bold text-red-500 uppercase tracking-widest text-[10px]">Closed</span>
                             </li>
                             <li class="flex justify-between text-sm">
-                                <span class="text-gray-400">Sunday</span>
+                                <span class="text-gray-400 text-xs">Sunday</span>
                                 <span class="font-bold text-red-500 uppercase tracking-widest text-[10px]">Closed</span>
                             </li>
                         </ul>
+                        <div class="mt-4 space-y-2">
+                            <div class="flex items-center gap-2 text-xs text-gray-500">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-burgundy-500 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
+                                <span>library@polibatam.ac.id</span>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
                 <!-- Copyright Section -->
-                <div class="mt-12 pt-8 border-t border-red-50 flex flex-col md:flex-row justify-between items-center gap-4">
-                    <p class="text-[11px] font-bold text-gray-400 uppercase tracking-widest">© {{ date('Y') }} Readspace Library. Built for Polibatam.</p>
-                    <div class="flex gap-8">
+                <div class="mt-8 pt-6 border-t border-red-50 flex flex-col sm:flex-row justify-between items-center gap-3">
+                    <p class="text-[11px] font-bold text-gray-400 uppercase tracking-widest text-center sm:text-left">© {{ date('Y') }} Readspace Library. Built for Polibatam.</p>
+                    <div class="flex gap-6">
                         <a href="#" class="text-[11px] font-bold text-gray-400 hover:text-burgundy-500 transition-colors uppercase tracking-widest">Terms</a>
                         <a href="#" class="text-[11px] font-bold text-gray-400 hover:text-burgundy-500 transition-colors uppercase tracking-widest">Privacy</a>
-                        <a href="#" class="text-[11px] font-bold text-gray-400 hover:text-burgundy-500 transition-colors uppercase tracking-widest">Help Center</a>
+                        <a href="#" class="text-[11px] font-bold text-gray-400 hover:text-burgundy-500 transition-colors uppercase tracking-widest">Help</a>
                     </div>
                 </div>
             </div>
         </footer>
     </div>
 
+    <!-- ===== GLOBAL TOAST NOTIFICATION CONTAINER ===== -->
+    <div id="toast-container"></div>
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.3.0/flowbite.min.js"></script>
+
+    <script>
+    (function () {
+        // ===== TOAST SYSTEM =====
+        function showToast(type, title, message) {
+            var container = document.getElementById('toast-container');
+            if (!container) return;
+
+            var toast = document.createElement('div');
+            toast.className = 'toast toast-' + type + ' toast-enter';
+
+            var iconSvg = type === 'success'
+                ? '<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>'
+                : '<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>';
+
+            toast.innerHTML =
+                '<div class="toast-icon">' + iconSvg + '</div>' +
+                '<div class="toast-body"><p class="toast-title">' + title + '</p><p class="toast-msg">' + message + '</p></div>' +
+                '<button class="toast-close" aria-label="Close" onclick="var t=this.closest(\'.toast\');t.classList.add(\'toast-exit\');setTimeout(function(){if(t.parentNode)t.parentNode.removeChild(t);},400);">' +
+                    '<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>' +
+                '</button>' +
+                '<div class="toast-progress"></div>';
+
+            container.appendChild(toast);
+
+            requestAnimationFrame(function () {
+                requestAnimationFrame(function () { toast.classList.remove('toast-enter'); });
+            });
+
+            setTimeout(function () {
+                toast.classList.add('toast-exit');
+                setTimeout(function () { if (toast.parentNode) toast.parentNode.removeChild(toast); }, 400);
+            }, 4000);
+        }
+
+        window.showToast = showToast;
+
+        // Trigger toasts from PHP session
+        @if(session('success'))
+            showToast('success', 'Success!', @json(session('success')));
+        @endif
+        @if(session('error'))
+            showToast('error', 'Failed!', @json(session('error')));
+        @endif
+
+        // ===== SCROLL POSITION PRESERVATION =====
+        var SCROLL_KEY = 'user_scroll_y_' + window.location.pathname;
+        var saved = sessionStorage.getItem(SCROLL_KEY);
+        if (saved !== null) {
+            sessionStorage.removeItem(SCROLL_KEY);
+            requestAnimationFrame(function () {
+                requestAnimationFrame(function () {
+                    window.scrollTo({ top: parseInt(saved, 10), behavior: 'instant' });
+                });
+            });
+        }
+        document.addEventListener('submit', function (e) {
+            if (e.target.method && e.target.method.toLowerCase() === 'post') {
+                sessionStorage.setItem(SCROLL_KEY, window.scrollY.toString());
+            }
+        });
+    })();
+    </script>
 </body>
 </html>

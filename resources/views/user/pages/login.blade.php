@@ -13,7 +13,7 @@
             </p>
         </div>
 
-        <div class="glass-panel p-8 shadow-2xl shadow-red-50 border-white/60">
+        <div class="glass-panel p-6 sm:p-8 shadow-2xl shadow-red-50 border-white/60">
             <form class="space-y-6" action="{{ route('login.post') }}" method="POST">
                 @csrf
 

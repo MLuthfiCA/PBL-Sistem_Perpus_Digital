@@ -1,4 +1,4 @@
-<header class="fixed top-0 left-0 right-0 z-50 px-4 py-4 pointer-events-none" x-data="{ mobileMenuOpen: false }">
+<header class="fixed top-0 left-0 right-0 z-50 px-4 py-4 pointer-events-none" x-data="{ mobileMenuOpen: false, profileDropdownOpen: false }">
     <nav class="max-w-7xl mx-auto glass-panel px-8 py-4 flex items-center justify-between shadow-2xl shadow-red-100 pointer-events-auto border-white/60 relative">
         
         <!-- Logo Section -->
@@ -37,19 +37,21 @@
         </div>
 
         <!-- Action Section -->
-        <div class="flex items-center gap-2 sm:gap-4">
-            <div class="flex items-center gap-4 p-1 pl-4 bg-white/60 rounded-2xl border border-white/80">
+        <div class="flex items-center gap-2 sm:gap-4 relative">
+            <div class="flex items-center gap-4 p-1 pl-4 bg-white/60 rounded-2xl border border-white/80 cursor-pointer hover:bg-white/80 transition-colors" @click="profileDropdownOpen = !profileDropdownOpen" @click.away="profileDropdownOpen = false">
                 <div class="text-right hidden sm:block">
                     <p class="text-xs font-bold text-gray-800 leading-none">{{ session('user')['name'] ?? 'Admin' }}</p>
                     <p class="text-[9px] text-burgundy-500 mt-1 uppercase font-bold tracking-widest">Administrator</p>
                 </div>
-                <button id="dropdownAdminButton" data-dropdown-toggle="dropdownAdmin" class="w-9 h-9 rounded-xl bg-burgundy-500 text-white flex items-center justify-center font-bold text-sm shadow-md transition-transform hover:scale-105">
+                <button class="w-9 h-9 rounded-xl bg-burgundy-500 text-white flex items-center justify-center font-bold text-sm shadow-md transition-transform hover:scale-105 pointer-events-none">
                     {{ substr(session('user')['name'] ?? 'A', 0, 1) }}
                 </button>
             </div>
 
-            <!-- Dropdown menu -->
-            <div id="dropdownAdmin" class="z-50 hidden bg-white/90 backdrop-blur-2xl border border-white/60 divide-y divide-gray-100 rounded-2xl shadow-2xl w-44">
+            <!-- Dropdown menu (Desktop & Mobile) -->
+            <div x-show="profileDropdownOpen" 
+                 x-transition.opacity
+                 class="absolute top-full right-0 mt-3 z-50 bg-white/95 backdrop-blur-2xl border border-white/60 divide-y divide-gray-100 rounded-2xl shadow-2xl w-44" style="display: none;">
                 <ul class="py-2 text-sm text-gray-700">
                     <li><a href="{{ route('admin.profile') }}" class="block px-4 py-2 hover:bg-red-50 hover:text-burgundy-500 transition-colors font-medium">Admin Profile</a></li>
                     <li><a href="{{ route('admin.manage_data') }}" class="block px-4 py-2 hover:bg-red-50 hover:text-burgundy-500 transition-colors font-medium">Manage Data</a></li>
@@ -84,13 +86,25 @@
             <a href="{{ route('admin.katalog') }}" class="px-4 py-2 rounded-xl {{ request()->routeIs('admin.katalog') ? 'bg-burgundy-50 text-burgundy-500 font-bold' : 'text-gray-600 hover:bg-gray-50' }}">Dashboard</a>
             <a href="{{ route('admin.search') }}" class="px-4 py-2 rounded-xl {{ request()->routeIs('admin.search') ? 'bg-burgundy-50 text-burgundy-500 font-bold' : 'text-gray-600 hover:bg-gray-50' }}">Search</a>
             <a href="{{ route('admin.buku.create') }}" class="px-4 py-2 rounded-xl {{ request()->routeIs('admin.buku.create') ? 'bg-burgundy-50 text-burgundy-500 font-bold' : 'text-gray-600 hover:bg-gray-50' }}">Add Book</a>
+            
             <div class="px-4 py-2 font-bold text-gray-800 border-t border-gray-100 mt-2 pt-3">Categories</div>
             <div class="flex flex-col pl-4 gap-1 border-l-2 border-gray-100 ml-4">
                 <a href="{{ route('admin.kategori.index') }}" class="py-2 text-sm text-gray-600 hover:text-burgundy-500">Genres / Categories</a>
                 <a href="{{ route('admin.penulis.index') }}" class="py-2 text-sm text-gray-600 hover:text-burgundy-500">Authors (Penulis)</a>
                 <a href="{{ route('admin.penerbit.index') }}" class="py-2 text-sm text-gray-600 hover:text-burgundy-500">Publishers (Penerbit)</a>
             </div>
+            
             <a href="{{ route('admin.users.index') }}" class="px-4 py-2 mt-2 border-t border-gray-100 pt-3 rounded-xl {{ request()->routeIs('admin.users.index') ? 'bg-burgundy-50 text-burgundy-500 font-bold' : 'text-gray-600 hover:bg-gray-50' }}">User Data</a>
+            
+            <div class="px-4 py-2 font-bold text-gray-800 border-t border-gray-100 mt-2 pt-3">Account</div>
+            <div class="flex flex-col pl-4 gap-1 border-l-2 border-gray-100 ml-4">
+                <a href="{{ route('admin.profile') }}" class="py-2 text-sm text-gray-600 hover:text-burgundy-500">Admin Profile</a>
+                <a href="{{ route('admin.manage_data') }}" class="py-2 text-sm text-gray-600 hover:text-burgundy-500">Manage Data</a>
+                <form method="POST" action="{{ route('logout') }}" class="inline">
+                    @csrf
+                    <button type="submit" class="py-2 text-sm text-red-500 font-bold hover:text-red-700 text-left w-full">Log out</button>
+                </form>
+            </div>
         </div>
     </nav>
 </header>

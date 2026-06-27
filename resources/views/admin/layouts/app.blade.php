@@ -2,6 +2,7 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ReadSpace Library Admin</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
@@ -81,6 +82,71 @@
         ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: rgba(128, 0, 32, 0.1); border-radius: 10px; }
+
+        /* ===== TOAST NOTIFICATION ===== */
+        #toast-container {
+            position: fixed;
+            bottom: 1.5rem;
+            right: 1.5rem;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            pointer-events: none;
+            width: 360px;
+            max-width: calc(100vw - 2rem);
+        }
+        .toast {
+            pointer-events: auto;
+            position: relative;
+            display: flex;
+            align-items: flex-start;
+            gap: 0.875rem;
+            padding: 1rem 1.25rem;
+            border-radius: 1rem;
+            box-shadow: 0 20px 60px -10px rgba(0,0,0,0.2), 0 8px 20px -5px rgba(0,0,0,0.08);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid transparent;
+            overflow: hidden;
+            transform: translateX(0);
+            opacity: 1;
+            transition: transform 0.4s cubic-bezier(0.34,1.56,0.64,1), opacity 0.4s ease;
+        }
+        .toast.toast-enter { transform: translateX(110%); opacity: 0; }
+        .toast.toast-exit  { transform: translateX(110%); opacity: 0; }
+        .toast-success { background: rgba(240,253,244,0.97); border-color: rgba(134,239,172,0.6); }
+        .toast-error   { background: rgba(255,241,242,0.97); border-color: rgba(252,165,165,0.6); }
+        .toast-icon {
+            flex-shrink: 0; width: 2rem; height: 2rem;
+            border-radius: 50%; display: flex; align-items: center; justify-content: center;
+        }
+        .toast-success .toast-icon { background: #dcfce7; color: #16a34a; }
+        .toast-error   .toast-icon { background: #fee2e2; color: #dc2626; }
+        .toast-body { flex: 1; min-width: 0; }
+        .toast-title { font-weight: 700; font-size: 0.8125rem; line-height: 1.3; }
+        .toast-success .toast-title { color: #15803d; }
+        .toast-error   .toast-title { color: #b91c1c; }
+        .toast-msg { font-size: 0.75rem; margin-top: 0.2rem; line-height: 1.5; word-break: break-word; }
+        .toast-success .toast-msg { color: #166534; }
+        .toast-error   .toast-msg { color: #991b1b; }
+        .toast-close {
+            flex-shrink: 0; cursor: pointer; opacity: 0.45;
+            transition: opacity 0.2s; background: none; border: none; padding: 2px; margin-top: 1px;
+        }
+        .toast-close:hover { opacity: 1; }
+        .toast-progress {
+            position: absolute; bottom: 0; left: 0; height: 3px;
+            animation: toast-shrink 4s linear forwards;
+        }
+        .toast-success .toast-progress { background: #22c55e; }
+        .toast-error   .toast-progress { background: #ef4444; }
+        @keyframes toast-shrink { from { width: 100%; } to { width: 0%; } }
+
+        @media (max-width: 480px) {
+            #toast-container { bottom: 0.75rem; right: 0.75rem; left: 0.75rem; width: auto; }
+            .toast { width: 100%; }
+        }
 
         /* Tom Select Customization to match theme */
         .ts-control {
@@ -261,5 +327,64 @@
         </footer>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.3.0/flowbite.min.js"></script>
     </div>
+
+    <!-- GLOBAL TOAST NOTIFICATION CONTAINER -->
+    <div id="toast-container"></div>
+
+    <script>
+    (function () {
+        // ===== TOAST SYSTEM =====
+        function showToast(type, title, message) {
+            var container = document.getElementById('toast-container');
+            if (!container) return;
+            var toast = document.createElement('div');
+            toast.className = 'toast toast-' + type + ' toast-enter';
+            var iconSvg = type === 'success'
+                ? '<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>'
+                : '<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>';
+            toast.innerHTML =
+                '<div class="toast-icon">' + iconSvg + '</div>' +
+                '<div class="toast-body"><p class="toast-title">' + title + '</p><p class="toast-msg">' + message + '</p></div>' +
+                '<button class="toast-close" aria-label="Close" onclick="var t=this.closest(\'.toast\');t.classList.add(\'toast-exit\');setTimeout(function(){if(t.parentNode)t.parentNode.removeChild(t);},400);">' +
+                    '<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>' +
+                '</button>' +
+                '<div class="toast-progress"></div>';
+            container.appendChild(toast);
+            requestAnimationFrame(function () {
+                requestAnimationFrame(function () { toast.classList.remove('toast-enter'); });
+            });
+            setTimeout(function () {
+                toast.classList.add('toast-exit');
+                setTimeout(function () { if (toast.parentNode) toast.parentNode.removeChild(toast); }, 400);
+            }, 4000);
+        }
+        window.showToast = showToast;
+
+        // Trigger toasts from PHP session
+        @if(session('success'))
+            showToast('success', 'Success!', @json(session('success')));
+        @endif
+        @if(session('error'))
+            showToast('error', 'Failed!', @json(session('error')));
+        @endif
+
+        // ===== SCROLL POSITION PRESERVATION =====
+        var SCROLL_KEY = 'admin_scroll_y_' + window.location.pathname;
+        var saved = sessionStorage.getItem(SCROLL_KEY);
+        if (saved !== null) {
+            sessionStorage.removeItem(SCROLL_KEY);
+            requestAnimationFrame(function () {
+                requestAnimationFrame(function () {
+                    window.scrollTo({ top: parseInt(saved, 10), behavior: 'instant' });
+                });
+            });
+        }
+        document.addEventListener('submit', function (e) {
+            if (e.target.method && e.target.method.toLowerCase() === 'post') {
+                sessionStorage.setItem(SCROLL_KEY, window.scrollY.toString());
+            }
+        });
+    })();
+    </script>
 </body>
 </html>

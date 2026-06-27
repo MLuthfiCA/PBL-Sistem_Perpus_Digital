@@ -11,7 +11,7 @@
             <p class="mt-2 text-sm text-gray-500 font-medium">Join our community of readers.</p>
         </div>
 
-        <div class="glass-panel p-8 shadow-2xl shadow-red-50 border-white/60">
+        <div class="glass-panel p-6 sm:p-8 shadow-2xl shadow-red-50 border-white/60">
             <form class="space-y-5" action="{{ route('register.post') }}" method="POST">
                 @csrf
 
