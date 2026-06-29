@@ -178,6 +178,13 @@
                 </table>
             </div>
         </div>
+        
+        {{-- Pagination --}}
+        <div class="mt-6 sm:mt-8 flex justify-center text-gray-700 w-full" x-cloak>
+            @if(isset($pengembalian) && method_exists($pengembalian, 'links'))
+                {{ $pengembalian->links() }}
+            @endif
+        </div>
     </div>
 
 </div>

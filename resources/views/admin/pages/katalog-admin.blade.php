@@ -64,9 +64,26 @@
                             onerror="this.src=this.dataset.fallback" alt="Book Cover">
                     </a>
                     
+                    @php
+                        $statusText = '';
+                        $badgeClass = '';
+                        if ($buku['status'] == 'Tersedia' && ($buku['stok'] ?? 0) > 0) {
+                            $statusText = 'AVAIL';
+                            $badgeClass = 'bg-green-500/10 text-green-600 border border-green-200';
+                        } elseif ($buku['status'] == 'Perawatan') {
+                            $statusText = 'MAINTENANCE';
+                            $badgeClass = 'bg-yellow-500/10 text-yellow-600 border border-yellow-200';
+                        } elseif ($buku['status'] == 'Hilang') {
+                            $statusText = 'LOST';
+                            $badgeClass = 'bg-gray-500/10 text-gray-600 border border-gray-200';
+                        } else {
+                            $statusText = 'BORROWED';
+                            $badgeClass = 'bg-red-500/10 text-red-600 border border-red-200';
+                        }
+                    @endphp
                     <!-- Availability Badge -->
-                    <div class="absolute top-2 sm:top-4 right-2 sm:right-4 px-2 sm:px-3 py-1 sm:py-1.5 rounded-full text-[9px] sm:text-[10px] font-bold uppercase tracking-widest backdrop-blur-xl {{ ($buku['status'] == 'Tersedia' && ($buku['stok'] ?? 0) > 0) ? 'bg-green-500/10 text-green-600 border border-green-200' : 'bg-red-500/10 text-red-600 border border-red-200' }}">
-                        {{ ($buku['status'] == 'Tersedia' && ($buku['stok'] ?? 0) > 0) ? 'AVAIL' : 'BORROWED' }}
+                    <div class="absolute top-2 sm:top-4 right-2 sm:right-4 px-2 sm:px-3 py-1 sm:py-1.5 rounded-full text-[9px] sm:text-[10px] font-bold uppercase tracking-widest backdrop-blur-xl {{ $badgeClass }}">
+                        {{ $statusText }}
                     </div>
 
                     <!-- Admin Action Overlay (Desktop only) -->
@@ -170,10 +187,32 @@
                                 </div>
                             </td>
                             <td class="px-4 sm:px-8 py-4 sm:py-6">
+                                @php
+                                    $dotClass = '';
+                                    $textClass = '';
+                                    $text = '';
+                                    if ($buku['status'] == 'Tersedia' && ($buku['stok'] ?? 0) > 0) {
+                                        $dotClass = 'bg-green-500 shadow-lg shadow-green-200';
+                                        $textClass = 'text-green-600';
+                                        $text = 'Available';
+                                    } elseif ($buku['status'] == 'Perawatan') {
+                                        $dotClass = 'bg-yellow-500 shadow-lg shadow-yellow-200';
+                                        $textClass = 'text-yellow-600';
+                                        $text = 'Maintenance';
+                                    } elseif ($buku['status'] == 'Hilang') {
+                                        $dotClass = 'bg-gray-500 shadow-lg shadow-gray-200';
+                                        $textClass = 'text-gray-600';
+                                        $text = 'Lost';
+                                    } else {
+                                        $dotClass = 'bg-red-400 shadow-lg shadow-red-100';
+                                        $textClass = 'text-red-400';
+                                        $text = 'Borrowed';
+                                    }
+                                @endphp
                                 <div class="flex items-center gap-2">
-                                    <div class="w-2 h-2 rounded-full {{ ($buku['status'] == 'Tersedia' && ($buku['stok'] ?? 0) > 0) ? 'bg-green-500 shadow-lg shadow-green-200' : 'bg-red-400 shadow-lg shadow-red-100' }}"></div>
-                                    <span class="text-xs sm:text-sm font-bold {{ ($buku['status'] == 'Tersedia' && ($buku['stok'] ?? 0) > 0) ? 'text-green-600' : 'text-red-400' }}">
-                                        {{ ($buku['status'] == 'Tersedia' && ($buku['stok'] ?? 0) > 0) ? 'Available' : 'Borrowed' }}
+                                    <div class="w-2 h-2 rounded-full {{ $dotClass }}"></div>
+                                    <span class="text-xs sm:text-sm font-bold {{ $textClass }}">
+                                        {{ $text }}
                                     </span>
                                 </div>
                             </td>

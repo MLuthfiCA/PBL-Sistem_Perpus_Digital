@@ -67,9 +67,26 @@
                     class="h-4/5 object-contain shadow-2xl transform group-hover:scale-110 group-hover:rotate-2 transition-transform duration-700"
                     onerror="this.src='{{ asset('images/readspace-library.png') }}'">
                 
+                @php
+                    $statusText = '';
+                    $badgeClass = '';
+                    if ($buku->status == 'Tersedia' && ($buku->stok ?? 0) > 0) {
+                        $statusText = 'AVAILABLE';
+                        $badgeClass = 'bg-green-500/10 text-green-600 border border-green-200';
+                    } elseif ($buku->status == 'Perawatan') {
+                        $statusText = 'MAINTENANCE';
+                        $badgeClass = 'bg-yellow-500/10 text-yellow-600 border border-yellow-200';
+                    } elseif ($buku->status == 'Hilang') {
+                        $statusText = 'LOST';
+                        $badgeClass = 'bg-gray-500/10 text-gray-600 border border-gray-200';
+                    } else {
+                        $statusText = 'BORROWED';
+                        $badgeClass = 'bg-red-500/10 text-red-600 border border-red-200';
+                    }
+                @endphp
                 <!-- Availability Badge -->
-                <div class="absolute top-4 right-4 px-3 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-widest backdrop-blur-xl {{ $buku->status == 'Tersedia' ? 'bg-green-500/10 text-green-600 border border-green-200' : 'bg-red-500/10 text-red-600 border border-red-200' }}">
-                    {{ $buku->status == 'Tersedia' ? 'AVAILABLE' : 'BORROWED' }}
+                <div class="absolute top-4 right-4 px-3 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-widest backdrop-blur-xl {{ $badgeClass }}">
+                    {{ $statusText }}
                 </div>
 
                 <!-- Admin Action Overlay (Desktop only) -->

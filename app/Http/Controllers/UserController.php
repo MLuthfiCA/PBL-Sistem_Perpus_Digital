@@ -53,7 +53,7 @@ class UserController extends Controller
 
         $validated = $request->validate([
             'nama' => 'required|string|max:255',
-            'identity_number' => 'required|string|max:255|unique:users,identity_number',
+            'identity_number' => 'required|regex:/^[0-9]+$/|max:255|unique:users,identity_number',
             'username' => 'required|string|max:255|unique:users,username',
             'email' => 'required|email|max:255|unique:users,email',
             'password' => 'required|string|min:6',
@@ -81,7 +81,7 @@ class UserController extends Controller
         $user = User::findOrFail($id);
         $validated = $request->validate([
             'nama' => 'required|string|max:255',
-            'identity_number' => 'required|string|max:255|unique:users,identity_number,' . $id . ',id_pengguna',
+            'identity_number' => 'required|regex:/^[0-9]+$/|max:255|unique:users,identity_number,' . $id . ',id_pengguna',
             'username' => 'required|string|max:255|unique:users,username,' . $id . ',id_pengguna',
             'email' => 'required|email|max:255|unique:users,email,' . $id . ',id_pengguna',
             'password' => 'nullable|string|min:6',

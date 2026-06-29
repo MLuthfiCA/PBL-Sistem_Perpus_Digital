@@ -286,7 +286,7 @@ class BukuController extends Controller
 
             // Prevent borrowing when book is not available or stock is empty
             if ($buku->status !== 'Tersedia' || $buku->stok <= 0) {
-                return back()->with('error', 'Buku ini sedang tidak tersedia untuk dipinjam.');
+                return back()->with('error', 'This book is currently unavailable for borrowing.');
             }
 
             $calc = \App\Helpers\HolidayHelper::calculateReturnDate($request->tanggal_pinjam);
@@ -319,7 +319,7 @@ class BukuController extends Controller
                 'user_agent' => $request->userAgent(),
             ]);
 
-            return redirect()->back()->with('success', 'Borrowing successfully submitted! Please contact the admin.');
+            return redirect()->route('profile')->with('success', 'Borrowing successfully submitted! Please contact the admin.');
         } catch (\Exception $e) {
             Log::error('Borrowing error: ' . $e->getMessage());
             return back()->with('error', 'There is an error: ' . $e->getMessage());

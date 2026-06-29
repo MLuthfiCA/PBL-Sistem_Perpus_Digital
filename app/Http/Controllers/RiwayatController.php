@@ -30,7 +30,7 @@ class RiwayatController extends Controller
                 ->where('status', 'dikembalikan')
                 ->with('buku')
                 ->orderBy('updated_at', 'desc')
-                ->get();
+                ->paginate(10);
         } catch (\Exception $e) {
             // Jika database error, gunakan empty collection
             $peminjaman = collect([]);

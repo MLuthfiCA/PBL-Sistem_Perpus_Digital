@@ -392,7 +392,7 @@ Route::get('/pengajuan', function (Request $request) {
     if ($bukuId) {
         $buku = Buku::find($bukuId);
         if (!$buku || $buku->status !== 'Tersedia' || $buku->stok <= 0) {
-            return redirect()->back()->with('error', 'Buku ini tidak tersedia untuk dipinjam.');
+            return redirect()->back()->with('error', 'This book is not available for borrowing.');
         }
     }
 

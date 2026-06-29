@@ -15,7 +15,7 @@
             </div>
             <div>
                 <label class="block text-sm font-bold text-gray-700 mb-1">Student ID (NIM)</label>
-                <input type="text" name="identity_number" class="w-full px-4 py-2.5 border rounded" value="{{ $user->identity_number }}" placeholder="Enter Student ID (NIM)" required>
+                <input type="text" name="identity_number" inputmode="numeric" pattern="[0-9]*" oninput="this.value = this.value.replace(/[^0-9]/g, '');" class="w-full px-4 py-2.5 border rounded" value="{{ $user->identity_number }}" placeholder="Enter Student ID (NIM)" required>
             </div>
             <div>
                 <label class="block text-sm font-bold text-gray-700 mb-1">Username</label>
