@@ -23,43 +23,40 @@ class AuthController extends Controller
     public function register(Request $request)
     {
         $request->validate([
-            'nama' => 'required|string|max:255',
-            'username' => 'required|string|max:255|unique:users,username',
-            'email' => 'required|email|max:255|unique:users,email',
-            'password' => 'required|string|min:6',
-            'nim' => [
+            'nama'     => 'required|string|max:255',
+            'email'    => 'required|email|max:255|unique:users,email',
+            'password' => ['required', 'string', 'min:8', 'max:12', 'regex:/^\S+$/'],
+            'nim'      => [
                 'required',
                 'regex:/^[0-9]{1,12}$/',
                 'unique:users,identity_number',
             ],
 
         ], [
-
-            'nama.required' => 'Full name is required.',
-            'username.required' => 'Username is required.',
-            'username.unique' => 'Username is already in use.',
-            'email.required' => 'Email is required.',
-            'email.email' => 'Please enter a valid email address.',
-            'email.unique' => 'Email is already registered.',
+            'nama.required'     => 'Nama lengkap wajib diisi.',
+            'email.required'    => 'Email wajib diisi.',
+            'email.email'       => 'Format email tidak valid.',
+            'email.unique'      => 'Email sudah terdaftar.',
             'password.required' => 'Password is required.',
-            'password.min' => 'Password must be at least 6 characters.',
-            'nim.required' => 'Student ID (NIM) is required.',
-            'nim.regex' => 'Student ID must contain only numbers and a maximum of 12 digits.',
-            'nim.unique' => 'Student ID has already been registered.',
+            'password.min'      => 'Password must be at least 8 characters.',
+            'password.max'      => 'Password must not exceed 12 characters.',
+            'password.regex'    => 'Password must not contain spaces.',
+            'nim.required'      => 'NIM (Student ID) wajib diisi.',
+            'nim.regex'         => 'NIM hanya boleh angka dan maksimal 12 digit.',
+            'nim.unique'        => 'NIM sudah terdaftar.',
         ]);
 
         User::create([
-            'nama' => $request->nama,
-            'username' => $request->username,
-            'email' => $request->email,
-            'password' => $request->password,
+            'nama'            => $request->nama,
+            'email'           => $request->email,
+            'password'        => $request->password,
             'identity_number' => $request->nim,
-            'role' => 'mahasiswa',
-            'status' => 'active',
+            'role'            => 'mahasiswa',
+            'status'          => 'active',
         ]);
 
         return redirect()
             ->route('login')
-            ->with('success', 'Registration successful. Please login to your account.');
+            ->with('success', 'Registrasi berhasil. Silakan login dengan NIM dan password Anda.');
     }
 }

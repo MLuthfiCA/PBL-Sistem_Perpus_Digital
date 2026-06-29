@@ -49,6 +49,11 @@
                             </svg>
                             Apply for Loan
                         </a>
+                        @if(!session()->has('user'))
+                        <p class="text-[11px] text-center text-gray-500 mt-3 font-medium">
+                            Please <a href="{{ route('login') }}" class="text-burgundy-500 hover:underline font-bold">log in</a> first to borrow this book.
+                        </p>
+                        @endif
                     @else
                         <button disabled
                             class="w-full flex items-center justify-center gap-2 px-6 py-3 sm:py-4 bg-gray-100 text-gray-400 rounded-xl sm:rounded-2xl font-bold border border-gray-200 cursor-not-allowed text-sm sm:text-base">

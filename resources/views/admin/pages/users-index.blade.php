@@ -77,12 +77,10 @@
                     <tr class="group hover:bg-red-50/30 transition-colors duration-300">
                         <td class="px-4 sm:px-8 py-4 sm:py-6">
                             <p class="font-bold text-gray-700 text-sm">{{ $user->full_name }}</p>
-                            <p class="text-xs text-gray-500 mt-0.5">ID: {{ $user->identity_number }}</p>
-                            <p class="text-[10px] sm:hidden text-gray-400 font-medium mt-1">@ {{ $user->username }}</p>
+                            <p class="text-xs text-gray-500 mt-0.5">NIM/NIK: {{ $user->identity_number }}</p>
                         </td>
                         <td class="px-4 sm:px-8 py-4 sm:py-6">
                             <p class="text-xs sm:text-sm font-medium text-gray-600">{{ $user->email }}</p>
-                            <p class="text-xs text-gray-400 font-medium mt-0.5 hidden sm:block">@ {{ $user->username }}</p>
                         </td>
                         <td class="px-4 sm:px-8 py-4 sm:py-6">
                             <span class="px-2 sm:px-3 py-1 sm:py-1.5 rounded-lg text-[9px] sm:text-[10px] font-bold uppercase border whitespace-nowrap {{ $user->role === 'admin' ? 'bg-burgundy-50/80 text-burgundy-600 border-burgundy-100' : 'bg-white/80 text-gray-500 border-red-50' }}">

@@ -16,11 +16,10 @@ class UserController extends Controller
         
         $query = User::query();
         
-        // Search by name, username, email, or identity number
+        // Search by name, email, or identity number
         if ($search) {
             $query->where(function($q) use ($search) {
                 $q->where('nama', 'like', "%$search%")
-                  ->orWhere('username', 'like', "%$search%")
                   ->orWhere('email', 'like', "%$search%")
                   ->orWhere('identity_number', 'like', "%$search%");
             });
@@ -52,20 +51,20 @@ class UserController extends Controller
         }
 
         $validated = $request->validate([
-            'nama' => 'required|string|max:255',
+            'nama'            => 'required|string|max:255',
             'identity_number' => 'required|regex:/^[0-9]+$/|max:255|unique:users,identity_number',
-            'username' => 'required|string|max:255|unique:users,username',
-            'email' => 'required|email|max:255|unique:users,email',
-            'password' => 'required|string|min:6',
-            'role' => 'required|in:admin,mahasiswa',
-            'status' => 'required|in:active,inactive,suspended',
+            'email'           => 'required|email|max:255|unique:users,email',
+            'password'        => ['required', 'string', 'min:8', 'max:12', 'regex:/^\S+$/'],
+            'role'            => 'required|in:admin,mahasiswa',
+            'status'          => 'required|in:active,inactive,suspended',
         ], [
-            'identity_number.unique' => 'Student ID sudah terdaftar. Tidak bisa menambahkan data dengan Student ID yang sama.',
+            'identity_number.unique' => 'NIM/NIK sudah terdaftar.',
+            'identity_number.regex'  => 'NIM/NIK hanya boleh berisi angka.',
         ]);
 
         $validated['password'] = Hash::make($validated['password']);
         User::create($validated);
-        return redirect()->route('admin.users.index')->with('success', 'User added successfully');
+        return redirect()->route('admin.users.index')->with('success', 'User berhasil ditambahkan');
     }
 
     // Update existing user
@@ -80,13 +79,15 @@ class UserController extends Controller
 
         $user = User::findOrFail($id);
         $validated = $request->validate([
-            'nama' => 'required|string|max:255',
+            'nama'            => 'required|string|max:255',
             'identity_number' => 'required|regex:/^[0-9]+$/|max:255|unique:users,identity_number,' . $id . ',id_pengguna',
-            'username' => 'required|string|max:255|unique:users,username,' . $id . ',id_pengguna',
-            'email' => 'required|email|max:255|unique:users,email,' . $id . ',id_pengguna',
-            'password' => 'nullable|string|min:6',
-            'role' => 'required|in:admin,mahasiswa',
-            'status' => 'required|in:active,inactive,suspended',
+            'email'           => 'required|email|max:255|unique:users,email,' . $id . ',id_pengguna',
+            'password'        => ['nullable', 'string', 'min:8', 'max:12', 'regex:/^\S+$/'],
+            'role'            => 'required|in:admin,mahasiswa',
+            'status'          => 'required|in:active,inactive,suspended',
+        ], [
+            'identity_number.unique' => 'NIM/NIK sudah terdaftar.',
+            'identity_number.regex'  => 'NIM/NIK hanya boleh berisi angka.',
         ]);
 
         if (!empty($validated['password'])) {
@@ -96,7 +97,7 @@ class UserController extends Controller
         }
 
         $user->update($validated);
-        return redirect()->route('admin.users.index')->with('success', 'User updated successfully');
+        return redirect()->route('admin.users.index')->with('success', 'User berhasil diperbarui');
     }
 
     public function show($id)
@@ -115,6 +116,6 @@ class UserController extends Controller
     {
         $user = User::findOrFail($id);
         $user->delete();
-        return redirect()->route('admin.users.index')->with('success', 'User deleted successfully');
+        return redirect()->route('admin.users.index')->with('success', 'User berhasil dihapus');
     }
 }

@@ -111,8 +111,14 @@
                     </div>
                 </div>
                 
-                <a href="{{ route('admin.katalog.detail', $buku['id']) }}" class="font-bold text-gray-800 line-clamp-2 mb-1 text-sm sm:text-base sm:text-lg hover:text-burgundy-500 transition-colors block leading-snug">{{ $buku['judul'] }}</a>
-                <p class="text-[11px] sm:text-xs text-gray-400 mb-3 sm:mb-6 font-medium line-clamp-1">{{ $buku['penulis'] }}</p>
+                <a href="{{ route('admin.katalog.detail', $buku['id']) }}" class="group/title relative block">
+                    <span class="font-bold text-gray-800 line-clamp-2 mb-1 text-sm sm:text-base sm:text-lg group-hover/title:text-burgundy-500 transition-colors leading-snug">{{ $buku['judul'] }}</span>
+                    <span class="pointer-events-none absolute -top-10 left-1/2 -translate-x-1/2 whitespace-normal w-max break-words rounded-lg bg-gray-800 px-2.5 py-1.5 text-[11px] font-medium text-white opacity-0 group-hover/title:opacity-100 transition-opacity duration-200 shadow-lg z-50 max-w-[200px] text-center leading-tight after:content-[''] after:absolute after:left-1/2 after:-translate-x-1/2 after:top-full after:border-4 after:border-transparent after:border-t-gray-800">{{ $buku['judul'] }}</span>
+                </a>
+                <div class="relative group/author inline-block w-full">
+                    <p class="text-[11px] sm:text-xs text-gray-400 mb-3 sm:mb-6 font-medium line-clamp-1">{{ $buku['penulis'] }}</p>
+                    <span class="pointer-events-none absolute -top-10 left-1/2 -translate-x-1/2 whitespace-normal w-max break-words rounded-lg bg-gray-700 px-2.5 py-1.5 text-[11px] font-medium text-white opacity-0 group-hover/author:opacity-100 transition-opacity duration-200 shadow-lg z-50 max-w-[200px] text-center leading-tight after:content-[''] after:absolute after:left-1/2 after:-translate-x-1/2 after:top-full after:border-4 after:border-transparent after:border-t-gray-700">{{ $buku['penulis'] }}</span>
+                </div>
                 
                 <div class="mt-auto pt-3 sm:pt-5 border-t border-red-50 flex items-center justify-between gap-1">
                     <span class="px-1.5 sm:px-2 py-1 rounded bg-white/80 text-[9px] sm:text-[10px] font-bold text-burgundy-500 uppercase tracking-tighter border border-red-100 truncate max-w-[50%] sm:max-w-[60%]">{{ $buku['genre'] }}</span>
@@ -169,8 +175,14 @@
                                              onerror="this.src=this.dataset.fallback">
                                     </a>
                                     <div class="min-w-0">
-                                        <a href="{{ route('admin.katalog.detail', $buku['id']) }}" class="font-bold text-gray-800 hover:text-burgundy-500 transition-colors text-sm line-clamp-1">{{ $buku['judul'] }}</a>
-                                        <p class="text-xs text-gray-400 font-medium line-clamp-1">{{ $buku['penulis'] }}</p>
+                                        <div class="relative group/title inline-block max-w-full">
+                                            <a href="{{ route('admin.katalog.detail', $buku['id']) }}" class="font-bold text-gray-800 hover:text-burgundy-500 transition-colors text-sm line-clamp-1 block">{{ $buku['judul'] }}</a>
+                                            <span class="pointer-events-none absolute -top-10 left-0 whitespace-normal w-max break-words rounded-lg bg-gray-800 px-2.5 py-1.5 text-[11px] font-medium text-white opacity-0 group-hover/title:opacity-100 transition-opacity duration-200 shadow-lg z-50 max-w-[250px] after:content-[''] after:absolute after:left-4 after:top-full after:border-4 after:border-transparent after:border-t-gray-800">{{ $buku['judul'] }}</span>
+                                        </div>
+                                        <div class="relative group/author inline-block max-w-full">
+                                            <p class="text-xs text-gray-400 font-medium line-clamp-1">{{ $buku['penulis'] }}</p>
+                                            <span class="pointer-events-none absolute -top-10 left-0 whitespace-normal w-max break-words rounded-lg bg-gray-700 px-2.5 py-1.5 text-[11px] font-medium text-white opacity-0 group-hover/author:opacity-100 transition-opacity duration-200 shadow-lg z-50 max-w-[250px] after:content-[''] after:absolute after:left-4 after:top-full after:border-4 after:border-transparent after:border-t-gray-700">{{ $buku['penulis'] }}</span>
+                                        </div>
                                         <div class="sm:hidden mt-1 flex gap-1 items-center">
                                             <span class="inline-block px-2 py-0.5 rounded bg-white/80 text-[9px] font-bold text-burgundy-500 uppercase border border-red-100 shrink-0">{{ $buku['genre'] }}</span>
                                             <span class="text-[9px] font-bold text-gray-400 shrink-0">Stok: {{ $buku['stok'] }}</span>

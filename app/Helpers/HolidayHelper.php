@@ -35,8 +35,7 @@ class HolidayHelper
      */
     public static function calculateReturnDate($tanggalPinjam)
     {
-        // Default standard loan period is 7 days
-        $date = date('Y-m-d', strtotime($tanggalPinjam . ' + 7 days'));
+        $date = $tanggalPinjam;
         
         $year = date('Y', strtotime($date));
         $holidays = self::getIndonesianHolidays($year);
@@ -45,18 +44,19 @@ class HolidayHelper
         $allHolidays = array_merge($holidays, $nextHolidays);
         
         $extended = false;
-        $originalDate = $date;
+        $originalDate = date('Y-m-d', strtotime($tanggalPinjam . ' + 7 days'));
+        $addedDays = 0;
         
-        while (true) {
+        while ($addedDays < 7) {
+            $date = date('Y-m-d', strtotime($date . ' + 1 day'));
             $dayOfWeek = date('N', strtotime($date)); // 1 (Mon) - 7 (Sun)
-            $isSunday = ($dayOfWeek == 7);
+            $isWeekend = ($dayOfWeek >= 6);
             $isHoliday = in_array($date, $allHolidays);
             
-            if ($isSunday || $isHoliday) {
-                $date = date('Y-m-d', strtotime($date . ' + 1 day'));
-                $extended = true;
+            if (!$isWeekend && !$isHoliday) {
+                $addedDays++;
             } else {
-                break;
+                $extended = true;
             }
         }
         

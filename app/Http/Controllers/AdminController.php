@@ -49,7 +49,7 @@ class AdminController extends Controller
             $query->where(function ($q) use ($search) {
                 $q->whereHas('user', function ($uq) use ($search) {
                     $uq->where('nama', 'like', "%{$search}%")
-                       ->orWhere('username', 'like', "%{$search}%")
+                       ->orWhere('identity_number', 'like', "%{$search}%")
                        ->orWhere('email', 'like', "%{$search}%");
                 })->orWhereHas('buku', function ($bq) use ($search) {
                     $bq->where('judul', 'like', "%{$search}%");

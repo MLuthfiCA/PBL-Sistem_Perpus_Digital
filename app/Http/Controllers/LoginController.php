@@ -5,45 +5,47 @@ namespace App\Http\Controllers;
 // Import yang wajib ada agar tidak muncul error "Class not imported"
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use App\Models\User;
 
 class LoginController extends Controller
 {
     public function login(Request $request)
     {
         $request->validate([
-            'username' => 'required',
-            'password' => 'required',
-            'role'     => 'required'
+            'identity_number' => 'required',
+            'password'        => 'required',
+            'role'            => 'required'
         ]);
 
         // Map form role ke database role
         $roleMap = [
             'mahasiswa' => 'mahasiswa',
-            'student' => 'mahasiswa',
-            'admin' => 'admin'
+            'student'   => 'mahasiswa',
+            'admin'     => 'admin'
         ];
 
         $databaseRole = $roleMap[$request->role] ?? $request->role;
 
-        // MELAKUKAN LOGIN ASLI KE DATABASE
-        // Try dengan username terlebih dahulu
-        if (Auth::attempt(['username' => $request->username, 'password' => $request->password])) {
+        // Cari user berdasarkan identity_number (NIM/NIK)
+        $user = User::where('identity_number', $request->identity_number)->first();
+
+        if ($user && Auth::attempt(['identity_number' => $request->identity_number, 'password' => $request->password])) {
             $user = Auth::user();
 
             // Verify role matches
             if ($user->role !== $databaseRole) {
                 Auth::logout();
-                return back()->withErrors(['login_error' => 'Username and role do not match.']);
+                return back()->withErrors(['login_error' => 'NIM/NIK dan role tidak sesuai.']);
             }
-            
+
             // Verify account status
             if ($user->status === 'inactive' || $user->status === 'suspended') {
                 Auth::logout();
-                return back()->withErrors(['login_error' => 'Your account is ' . $user->status . '. Please contact the administrator.']);
+                return back()->withErrors(['login_error' => 'Akun Anda berstatus ' . $user->status . '. Hubungi administrator.']);
             }
 
             /** @var \App\Models\User $user */
-$user = Auth::user();
+            $user = Auth::user();
 
             // Ambil data buku yang terlambat
             $booksOverdue = $user->peminjaman()
@@ -61,27 +63,26 @@ $user = Auth::user();
             // Hitung total denda
             $totalDenda = $booksOverdue->sum('denda');
 
-            // Simpan data esensial ke session agar sesuai dengan arsitektur saat ini
+            // Simpan data esensial ke session
             session(['user' => [
-                'id' => $user->id_pengguna,
-                'name' => $user->nama,
-                'nim' => $user->identity_number,
-                'role' => $user->role,
-                'username' => $user->username,
-                'email' => $user->email,
+                'id'           => $user->id_pengguna,
+                'name'         => $user->nama,
+                'nim'          => $user->identity_number,
+                'role'         => $user->role,
+                'email'        => $user->email,
                 'overdue_books' => $booksOverdue,
-                'total_denda' => $totalDenda,
+                'total_denda'  => $totalDenda,
             ]]);
 
             // Catat Riwayat Login
             \App\Models\Riwayat::create([
-                'id_pengguna' => $user->id_pengguna,
+                'id_pengguna'  => $user->id_pengguna,
                 'id_peminjaman' => null,
-                'tanggal' => now()->toDateString(),
-                'aktivitas' => 'Login',
-                'deskripsi' => 'User berhasil login ke sistem.',
-                'ip_address' => $request->ip(),
-                'user_agent' => $request->userAgent(),
+                'tanggal'      => now()->toDateString(),
+                'aktivitas'    => 'Login',
+                'deskripsi'    => 'User berhasil login ke sistem.',
+                'ip_address'   => $request->ip(),
+                'user_agent'   => $request->userAgent(),
             ]);
 
             if ($user->role == 'admin') {
@@ -91,7 +92,7 @@ $user = Auth::user();
             }
         }
 
-        // Jika username/password salah
-        return back()->withErrors(['login_error' => 'Incorrect username or password. Please try again.']);
+        // Jika NIM/NIK atau password salah
+        return back()->withErrors(['login_error' => 'NIM/NIK atau password salah. Silakan coba lagi.']);
     }
 }

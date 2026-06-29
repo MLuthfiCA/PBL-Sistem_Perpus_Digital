@@ -29,30 +29,46 @@
                 </div>
                 @endif
 
-                <div class="space-y-5">
-                    <div>
-                        <label for="username" class="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2 ml-1">Username</label>
-                        <input id="username" name="username" type="text" required 
+                <div class="space-y-5" x-data="{ role: 'mahasiswa' }">
+                    <!-- Dynamic Identity Number Input -->
+                    <div x-show="role === 'mahasiswa'">
+                        <label for="nim" class="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2 ml-1">Student ID (NIM)</label>
+                        <input id="nim" name="identity_number" type="text" inputmode="numeric" pattern="[0-9]*"
+                            oninput="this.value = this.value.replace(/[^0-9]/g, '');"
+                            x-bind:disabled="role !== 'mahasiswa'"
+                            value="{{ old('identity_number') }}" required 
                             class="appearance-none relative block w-full px-4 py-4 border border-white bg-white/50 rounded-2xl placeholder-gray-400 text-gray-800 focus:outline-none focus:ring-4 focus:ring-red-100 focus:border-burgundy-500 transition-all sm:text-sm font-medium" 
-                            placeholder="Enter your username">
+                            placeholder="Enter your Student ID">
                     </div>
+
+                    <div x-show="role === 'admin'" x-cloak>
+                        <label for="nik" class="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2 ml-1">Admin ID (NIK)</label>
+                        <input id="nik" name="identity_number" type="text" inputmode="numeric" pattern="[0-9]*"
+                            oninput="this.value = this.value.replace(/[^0-9]/g, '');"
+                            x-bind:disabled="role !== 'admin'"
+                            value="{{ old('identity_number') }}" required 
+                            class="appearance-none relative block w-full px-4 py-4 border border-white bg-white/50 rounded-2xl placeholder-gray-400 text-gray-800 focus:outline-none focus:ring-4 focus:ring-red-100 focus:border-burgundy-500 transition-all sm:text-sm font-medium" 
+                            placeholder="Enter your Admin ID">
+                    </div>
+
+                    <!-- Password Input -->
                     <div>
                         <label for="password" class="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2 ml-1">Password</label>
                         <input id="password" name="password" type="password" required 
                             class="appearance-none relative block w-full px-4 py-4 border border-white bg-white/50 rounded-2xl placeholder-gray-400 text-gray-800 focus:outline-none focus:ring-4 focus:ring-red-100 focus:border-burgundy-500 transition-all sm:text-sm font-medium" 
                             placeholder="••••••••">
                     </div>
+                    
+                    <!-- Role Selection (moved to bottom) -->
                     <div>
                         <label for="role" class="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2 ml-1">Login As</label>
-                        <select id="role" name="role" required 
+                        <select id="role" name="role" x-model="role" required 
                             class="appearance-none relative block w-full px-4 py-4 border border-white bg-white/50 rounded-2xl text-gray-800 focus:outline-none focus:ring-4 focus:ring-red-100 focus:border-burgundy-500 transition-all sm:text-sm font-medium">
                             <option value="mahasiswa">User / Student</option>
                             <option value="admin">Library Admin</option>
                         </select>
                     </div>
                 </div>
-
-
 
                 <div>
                     <button type="submit" class="group relative w-full flex justify-center py-4 px-4 border border-transparent text-sm font-bold rounded-2xl text-white bg-burgundy-500 hover:bg-maroon focus:outline-none focus:ring-4 focus:ring-red-100 transition-all shadow-lg shadow-red-100 transform active:scale-95">

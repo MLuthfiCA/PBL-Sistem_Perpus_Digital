@@ -17,9 +17,9 @@ return new class extends Migration
             $table->string('password');
             $table->enum('role', ['admin', 'mahasiswa'])->default('mahasiswa');
 
-            // === Kolom tambahan (dipertahankan dari database lama) ===
+            // === Kolom tambahan ===
+            // identity_number: NIM untuk mahasiswa, NIK untuk admin
             $table->string('identity_number')->unique()->nullable();
-            $table->string('username')->nullable();
             $table->enum('status', ['active', 'inactive', 'suspended'])->default('active');
 
             $table->timestamps();

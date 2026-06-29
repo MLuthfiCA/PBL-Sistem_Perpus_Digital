@@ -117,7 +117,7 @@ class Peminjaman extends Model
         }
 
         if ($reference->greaterThan($due)) {
-            return $due->diffInDays($reference);
+            return $due->diffInWeekdays($reference);
         }
         return 0;
     }
