@@ -19,7 +19,11 @@
             <h2 class="text-xl sm:text-2xl font-bold text-gray-800">{{ session('user.name', 'Nama User') }}</h2>
             <p class="text-gray-500 font-medium text-sm sm:text-base">{{ session('user.email', 'email@student.polibatam.ac.id') }}</p>
             <div class="mt-3 inline-block px-3 sm:px-4 py-1.5 rounded-lg bg-burgundy-50 text-burgundy-600 border border-burgundy-100 text-xs font-bold uppercase tracking-widest">
-                {{ session('user.role', 'Mahasiswa') }}
+                @php
+                    $roleRaw = session('user.role', 'Student');
+                    $roleDisplay = strtolower($roleRaw) === 'mahasiswa' ? 'Student' : $roleRaw;
+                @endphp
+                {{ $roleDisplay }}
             </div>
         </div>
     </div>
@@ -84,11 +88,11 @@
                 <div class="flex justify-between items-center text-sm border-t border-red-50 pt-3 sm:pt-4">
                     <div>
                         <p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Borrow Date</p>
-                        <p class="font-bold text-gray-700 text-xs sm:text-sm">{{ optional($p->tanggal_pinjam)->format('Y-m-d') }}</p>
+                        <p class="font-bold text-gray-700 text-xs sm:text-sm">{{ optional($p->tanggal_pinjam)->format('d M Y') }}</p>
                     </div>
                     <div class="text-right">
                         <p class="text-[10px] text-red-400 font-bold uppercase tracking-wider">Return Limit</p>
-                        <p class="font-bold text-red-600 text-xs sm:text-sm">{{ optional($p->batas_kembali)->format('Y-m-d') }}</p>
+                        <p class="font-bold text-red-600 text-xs sm:text-sm">{{ optional($p->batas_kembali)->format('d M Y') }}</p>
                     </div>
                 </div>
 
@@ -120,70 +124,148 @@
         </div>
     </div>
 
-    <!-- Return History -->
-    <div class="space-y-4 sm:space-y-6 animate-fade-up delay-300">
-        <h2 class="text-xl sm:text-2xl font-bold text-gray-800 flex items-center gap-3">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 sm:h-6 w-5 sm:w-6 text-green-500 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-            Return History
-        </h2>
-        
-        <div class="glass-panel overflow-hidden border border-white/60 shadow-xl shadow-red-50">
-            <div class="overflow-x-auto">
-                <table class="w-full text-left border-collapse min-w-[500px]">
-                    <thead class="bg-red-50/50 text-gray-400 text-[10px] font-bold uppercase tracking-widest">
-                        <tr>
-                            <th class="px-4 sm:px-8 py-4 sm:py-5">Book title</th>
-                            <th class="px-4 sm:px-8 py-4 sm:py-5 hidden sm:table-cell">Borrow ID</th>
-                            <th class="px-4 sm:px-8 py-4 sm:py-5 text-center">Fine</th>
-                            <th class="px-4 sm:px-8 py-4 sm:py-5 text-right">Return Date</th>
-                        </tr>
-                    </thead>
-                    <tbody class="divide-y divide-red-50">
-                        @forelse($pengembalian ?? [] as $k)
-                        @php /** @var \App\Models\Peminjaman $k */ @endphp
-                        <tr class="hover:bg-red-50/30 transition-colors">
-                            <td class="px-4 sm:px-8 py-4 sm:py-6">
-                                <p class="font-bold text-gray-800 text-sm line-clamp-1">
-                                    {{ $k->buku?->judul ?? $k->snapshot_judul_buku ?? 'Unknown Book' }}
-                                    @if(!$k->buku) <span class="text-red-500 text-[10px] ml-1">(Deleted)</span> @endif
-                                </p>
-                                <p class="text-[10px] text-gray-400 line-clamp-1">{{ $k->buku && $k->buku->penulis->isNotEmpty() ? $k->buku->penulis->pluck('nama_penulis')->implode(', ') : ($k->buku ? 'Unknown Author' : 'Data Removed') }}</p>
-                                <span class="sm:hidden text-[9px] font-bold text-gray-400">#{{ $k->id }}</span>
-                            </td>
-                            <td class="px-4 sm:px-8 py-4 sm:py-6 text-sm text-gray-500 font-medium hidden sm:table-cell">#{{ $k->id }}</td>
-                            <td class="px-4 sm:px-8 py-4 sm:py-6 text-center">
-                                <div class="flex flex-col items-center">
-                                    <span class="font-bold text-xs sm:text-sm {{ $k->denda > 0 ? 'text-red-500' : 'text-gray-400' }}">
-                                        Rp {{ number_format($k->denda, 0, ',', '.') }}
-                                    </span>
-                                    @if($k->denda > 0)
-                                        <span class="text-[8px] font-bold {{ $k->status_denda === 'lunas' ? 'text-green-600' : 'text-red-400' }}">{{ $k->status_denda === 'lunas' ? 'LUNAS' : 'BELUM LUNAS' }}</span>
-                                    @endif
-                                </div>
-                            </td>
-                            <td class="px-4 sm:px-8 py-4 sm:py-6 text-right">
-                                <span class="px-2 sm:px-3 py-1 sm:py-1.5 rounded-lg bg-green-50 text-green-600 text-[10px] font-bold uppercase tracking-widest border border-green-100 whitespace-nowrap">
-                                    {{ optional($k->tanggal_kembali)->format('Y-m-d') }}
-                                </span>
-                            </td>
-                        </tr>
-                        @empty
-                        <tr>
-                            <td colspan="4" class="px-8 py-10 text-center text-gray-400 font-medium">There is no return history yet.</td>
-                        </tr>
-                        @endforelse
-                    </tbody>
-                </table>
+    <!-- Return History / Borrowing History Dropdown Tabs -->
+    <div class="space-y-4 sm:space-y-6 animate-fade-up delay-300" x-data="{ activeTab: 'return' }">
+        <!-- Tab Header -->
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <h2 class="text-xl sm:text-2xl font-bold text-gray-800 flex items-center gap-3">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 sm:h-6 w-5 sm:w-6 text-green-500 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <span x-text="activeTab === 'return' ? 'Return History' : 'Borrowing History'"></span>
+            </h2>
+            <!-- Dropdown Tab Switcher -->
+            <div class="flex bg-gray-100 rounded-xl p-1 gap-1 w-full sm:w-auto">
+                <button @click="activeTab = 'return'"
+                    :class="activeTab === 'return' ? 'bg-white text-burgundy-600 shadow-sm font-bold' : 'text-gray-500 font-semibold hover:text-gray-700'"
+                    class="flex-1 sm:flex-none px-4 py-2 rounded-lg text-xs transition-all duration-200 flex items-center justify-center gap-1.5">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    Return History
+                </button>
+                <button @click="activeTab = 'borrow'"
+                    :class="activeTab === 'borrow' ? 'bg-white text-burgundy-600 shadow-sm font-bold' : 'text-gray-500 font-semibold hover:text-gray-700'"
+                    class="flex-1 sm:flex-none px-4 py-2 rounded-lg text-xs transition-all duration-200 flex items-center justify-center gap-1.5">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                    </svg>
+                    Borrowing History
+                </button>
             </div>
         </div>
         
-        {{-- Pagination --}}
-        <div class="mt-6 sm:mt-8 flex justify-center text-gray-700 w-full" x-cloak>
-            @if(isset($pengembalian) && method_exists($pengembalian, 'links'))
-                {{ $pengembalian->links() }}
-            @endif
+        <!-- Return History Tab -->
+        <div x-show="activeTab === 'return'" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 translate-y-2" x-transition:enter-end="opacity-100 translate-y-0">
+            <div class="glass-panel overflow-hidden border border-white/60 shadow-xl shadow-red-50">
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse min-w-[500px]">
+                        <thead class="bg-red-50/50 text-gray-400 text-[10px] font-bold uppercase tracking-widest">
+                            <tr>
+                                <th class="px-4 sm:px-8 py-4 sm:py-5">Book title</th>
+                                <th class="px-4 sm:px-8 py-4 sm:py-5 hidden sm:table-cell">Borrow ID</th>
+                                <th class="px-4 sm:px-8 py-4 sm:py-5 text-center">Fine</th>
+                                <th class="px-4 sm:px-8 py-4 sm:py-5 text-right">Return Date</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-red-50">
+                            @forelse($pengembalian ?? [] as $k)
+                            @php /** @var \App\Models\Peminjaman $k */ @endphp
+                            <tr class="hover:bg-red-50/30 transition-colors">
+                                <td class="px-4 sm:px-8 py-4 sm:py-6">
+                                    <p class="font-bold text-gray-800 text-sm line-clamp-1">
+                                        {{ $k->buku?->judul ?? $k->snapshot_judul_buku ?? 'Unknown Book' }}
+                                        @if(!$k->buku) <span class="text-red-500 text-[10px] ml-1">(Deleted)</span> @endif
+                                    </p>
+                                    <p class="text-[10px] text-gray-400 line-clamp-1">{{ $k->buku && $k->buku->penulis->isNotEmpty() ? $k->buku->penulis->pluck('nama_penulis')->implode(', ') : ($k->buku ? 'Unknown Author' : 'Data Removed') }}</p>
+                                    <span class="sm:hidden text-[9px] font-bold text-gray-400">#{{ $k->id }}</span>
+                                </td>
+                                <td class="px-4 sm:px-8 py-4 sm:py-6 text-sm text-gray-500 font-medium hidden sm:table-cell">#{{ $k->id }}</td>
+                                <td class="px-4 sm:px-8 py-4 sm:py-6 text-center">
+                                    <div class="flex flex-col items-center">
+                                        <span class="font-bold text-xs sm:text-sm {{ $k->denda > 0 ? 'text-red-500' : 'text-gray-400' }}">
+                                            Rp {{ number_format($k->denda, 0, ',', '.') }}
+                                        </span>
+                                        @if($k->denda > 0)
+                                            <span class="text-[8px] font-bold {{ $k->status_denda === 'lunas' ? 'text-green-600' : 'text-red-400' }}">{{ $k->status_denda === 'lunas' ? 'PAID' : 'UNPAID' }}</span>
+                                        @endif
+                                    </div>
+                                </td>
+                                <td class="px-4 sm:px-8 py-4 sm:py-6 text-right">
+                                    <span class="px-2 sm:px-3 py-1 sm:py-1.5 rounded-lg bg-green-50 text-green-600 text-[10px] font-bold uppercase tracking-widest border border-green-100 whitespace-nowrap">
+                                        {{ optional($k->tanggal_kembali)->format('d M Y') }}
+                                    </span>
+                                </td>
+                            </tr>
+                            @empty
+                            <tr>
+                                <td colspan="4" class="px-8 py-10 text-center text-gray-400 font-medium">There is no return history yet.</td>
+                            </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            {{-- Pagination --}}
+            <div class="mt-6 sm:mt-8 flex justify-center text-gray-700 w-full" x-cloak>
+                @if(isset($pengembalian) && method_exists($pengembalian, 'links'))
+                    {{ $pengembalian->links() }}
+                @endif
+            </div>
+        </div>
+
+        <!-- Borrowing History Tab -->
+        <div x-show="activeTab === 'borrow'" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 translate-y-2" x-transition:enter-end="opacity-100 translate-y-0" style="display:none;">
+            <div class="glass-panel overflow-hidden border border-white/60 shadow-xl shadow-red-50">
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse min-w-[500px]">
+                        <thead class="bg-red-50/50 text-gray-400 text-[10px] font-bold uppercase tracking-widest">
+                            <tr>
+                                <th class="px-4 sm:px-8 py-4 sm:py-5">Book title</th>
+                                <th class="px-4 sm:px-8 py-4 sm:py-5 hidden sm:table-cell">Borrow ID</th>
+                                <th class="px-4 sm:px-8 py-4 sm:py-5 text-center">Fine</th>
+                                <th class="px-4 sm:px-8 py-4 sm:py-5 text-right">Loan Date</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-red-50">
+                            @forelse($pengembalian ?? [] as $k)
+                            @php /** @var \App\Models\Peminjaman $k */ @endphp
+                            <tr class="hover:bg-red-50/30 transition-colors">
+                                <td class="px-4 sm:px-8 py-4 sm:py-6">
+                                    <p class="font-bold text-gray-800 text-sm line-clamp-1">
+                                        {{ $k->buku?->judul ?? $k->snapshot_judul_buku ?? 'Unknown Book' }}
+                                        @if(!$k->buku) <span class="text-red-500 text-[10px] ml-1">(Deleted)</span> @endif
+                                    </p>
+                                    <p class="text-[10px] text-gray-400 line-clamp-1">{{ $k->buku && $k->buku->penulis->isNotEmpty() ? $k->buku->penulis->pluck('nama_penulis')->implode(', ') : ($k->buku ? 'Unknown Author' : 'Data Removed') }}</p>
+                                    <span class="sm:hidden text-[9px] font-bold text-gray-400">#{{ $k->id }}</span>
+                                </td>
+                                <td class="px-4 sm:px-8 py-4 sm:py-6 text-sm text-gray-500 font-medium hidden sm:table-cell">#{{ $k->id }}</td>
+                                <td class="px-4 sm:px-8 py-4 sm:py-6 text-center">
+                                    <div class="flex flex-col items-center">
+                                        <span class="font-bold text-xs sm:text-sm {{ $k->denda > 0 ? 'text-red-500' : 'text-gray-400' }}">
+                                            Rp {{ number_format($k->denda, 0, ',', '.') }}
+                                        </span>
+                                        @if($k->denda > 0)
+                                            <span class="text-[8px] font-bold {{ $k->status_denda === 'lunas' ? 'text-green-600' : 'text-red-400' }}">{{ $k->status_denda === 'lunas' ? 'PAID' : 'UNPAID' }}</span>
+                                        @endif
+                                    </div>
+                                </td>
+                                <td class="px-4 sm:px-8 py-4 sm:py-6 text-right">
+                                    <span class="px-2 sm:px-3 py-1 sm:py-1.5 rounded-lg bg-burgundy-50 text-burgundy-600 text-[10px] font-bold uppercase tracking-widest border border-burgundy-100 whitespace-nowrap">
+                                        {{ optional($k->tanggal_pinjam)->format('d M Y') }}
+                                    </span>
+                                </td>
+                            </tr>
+                            @empty
+                            <tr>
+                                <td colspan="4" class="px-8 py-10 text-center text-gray-400 font-medium">There is no borrowing history yet.</td>
+                            </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
+            </div>
         </div>
     </div>
 

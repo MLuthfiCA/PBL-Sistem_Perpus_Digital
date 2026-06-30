@@ -32,9 +32,41 @@
             <a href="{{ route('admin.users.index') }}" class="w-full lg:w-auto px-4 sm:px-6 py-2.5 sm:py-3 rounded-xl bg-burgundy-500 text-white font-bold hover:bg-maroon transition-colors text-xs sm:text-sm text-center shadow-lg shadow-red-100">
                 Manage Users
             </a>
-            <a href="{{ route('admin.manage_data') }}" class="w-full lg:w-auto px-4 sm:px-6 py-2.5 sm:py-3 rounded-xl bg-burgundy-500 text-white font-bold hover:bg-maroon transition-colors text-xs sm:text-sm text-center shadow-lg shadow-red-100">
-                Manage Data
-            </a>
+            <!-- Manage Data Dropdown -->
+            <div class="relative w-full lg:w-auto" x-data="{ open: false }" @click.away="open = false">
+                <button @click="open = !open" class="w-full lg:w-auto px-4 sm:px-6 py-2.5 sm:py-3 rounded-xl bg-burgundy-500 text-white font-bold hover:bg-maroon transition-colors text-xs sm:text-sm text-center shadow-lg shadow-red-100 flex items-center justify-center gap-2">
+                    Manage Data
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 transition-transform duration-200" :class="open ? 'rotate-180' : ''" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                    </svg>
+                </button>
+                <div x-show="open"
+                     x-transition:enter="transition ease-out duration-150"
+                     x-transition:enter-start="opacity-0 scale-95 -translate-y-1"
+                     x-transition:enter-end="opacity-100 scale-100 translate-y-0"
+                     x-transition:leave="transition ease-in duration-100"
+                     x-transition:leave-start="opacity-100 scale-100 translate-y-0"
+                     x-transition:leave-end="opacity-0 scale-95 -translate-y-1"
+                     class="absolute top-full left-0 lg:left-auto lg:right-0 mt-2 w-48 bg-white/95 backdrop-blur-2xl border border-gray-100 rounded-2xl shadow-2xl z-50 overflow-hidden"
+                     style="display:none;">
+                    <a href="{{ route('admin.manage_data') }}#borrowing-report"
+                       class="flex items-center gap-2.5 px-4 py-3 text-sm font-semibold text-gray-700 hover:bg-red-50 hover:text-burgundy-600 transition-colors">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-burgundy-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                        </svg>
+                        Borrowing Report
+                    </a>
+                    <div class="border-t border-gray-50"></div>
+                    <a href="{{ route('admin.manage_data') }}#active-loans"
+                       onclick="setTimeout(()=>document.getElementById('active-loans')?.scrollIntoView({behavior:'smooth'}),200)"
+                       class="flex items-center gap-2.5 px-4 py-3 text-sm font-semibold text-gray-700 hover:bg-red-50 hover:text-burgundy-600 transition-colors">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-burgundy-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                        </svg>
+                        Active Loans
+                    </a>
+                </div>
+            </div>
             <a href="{{ route('admin.buku.create') }}" class="w-full lg:w-auto px-4 sm:px-6 py-2.5 sm:py-3 rounded-xl border-2 border-burgundy-500 text-burgundy-600 font-bold hover:bg-red-50 transition-colors text-xs sm:text-sm text-center">
                 + Add Book
             </a>

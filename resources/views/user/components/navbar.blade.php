@@ -38,7 +38,7 @@
             <div class="flex items-center gap-4 p-1 pl-4 bg-white/60 rounded-2xl border border-white/80">
                 <div class="text-right hidden sm:block">
                     <p class="text-xs font-bold text-gray-800 leading-none">{{ session('user')['name'] }}</p>
-                    <p class="text-[9px] text-gray-400 mt-1 uppercase font-bold tracking-widest">{{ session('user')['role'] }}</p>
+                    <p class="text-[9px] text-gray-400 mt-1 uppercase font-bold tracking-widest">{{ strtolower(session('user')['role']) === 'mahasiswa' ? 'Student' : session('user')['role'] }}</p>
                 </div>
                 <button id="dropdownUserButton" data-dropdown-toggle="dropdownUser" class="w-9 h-9 rounded-xl bg-burgundy-500 text-white flex items-center justify-center font-bold text-sm shadow-md transition-transform hover:scale-105">
                     {{ substr(session('user')['name'], 0, 1) }}

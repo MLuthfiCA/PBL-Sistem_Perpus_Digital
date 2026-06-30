@@ -25,7 +25,7 @@
     </div>
 
     <!-- LAPORAN PEMINJAMAN SECTION -->
-    <div class="space-y-4 sm:space-y-6 animate-fade-up delay-150">
+    <div id="borrowing-report" class="space-y-4 sm:space-y-6 animate-fade-up delay-150">
         <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-3 sm:gap-4">
             <div>
                 <h2 class="text-xl sm:text-2xl font-bold text-gray-900">Borrowing Report</h2>
@@ -180,7 +180,7 @@
     </div>
 
     <!-- ACTIVE LOANS SECTION -->
-    <div class="space-y-4 sm:space-y-6 animate-fade-up delay-200">
+    <div id="active-loans" class="space-y-4 sm:space-y-6 animate-fade-up delay-200">
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4">
             <h2 class="text-xl sm:text-2xl font-bold text-gray-800 flex items-center gap-2 sm:gap-3">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 sm:h-6 sm:w-6 text-burgundy-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -242,8 +242,8 @@
             <div class="hidden md:grid grid-cols-12 gap-4 px-6 sm:px-8 py-4 sm:py-5 border-b border-gray-100 bg-gray-50/30 text-[10px] sm:text-[11px] font-bold text-gray-400 uppercase tracking-wider">
                 <div class="col-span-4 lg:col-span-3">Book information</div>
                 <div class="col-span-3">Borrower</div>
-                <div class="col-span-2">Due Date</div>
-                <div class="col-span-2">Fine & Status</div>
+                <div class="col-span-3">Borrow Date &amp; Due Date</div>
+                <div class="col-span-1">Fine &amp; Status</div>
                 <div class="col-span-1 lg:col-span-2 text-right">Actions</div>
             </div>
 
@@ -291,8 +291,12 @@
                         </div>
                     </div>
 
-                    <!-- Due Date & Status Mobile Grid -->
+                    <!-- Borrow Date & Due Date Mobile Grid -->
                     <div class="col-span-1 md:hidden grid grid-cols-2 gap-2 mt-1 py-2 border-y border-dashed border-gray-100">
+                        <div>
+                            <span class="text-[9px] font-bold text-gray-400 uppercase block mb-1">Borrow Date</span>
+                            <p class="font-bold text-gray-700 text-xs">{{ \Carbon\Carbon::parse($b->tanggal_pinjam)->format('d M Y') }}</p>
+                        </div>
                         <div>
                             <span class="text-[9px] font-bold text-gray-400 uppercase block mb-1">Due Date</span>
                             @php
@@ -302,7 +306,7 @@
                             @endphp
                             <p class="font-bold {{ $textColor }} text-xs">{{ \Carbon\Carbon::parse($b->batas_kembali)->format('d M Y') }}</p>
                         </div>
-                        <div>
+                        <div class="col-span-2 mt-1">
                             <span class="text-[9px] font-bold text-gray-400 uppercase block mb-1">Fine</span>
                             @php $calculated_denda = $b->calculateDenda(); @endphp
                             @if($calculated_denda > 0)
@@ -318,22 +322,29 @@
                         </div>
                     </div>
 
-                    <!-- Due Date (Desktop Only) -->
-                    <div class="hidden md:flex col-span-2 items-center">
-                        @php
-                            $isPast = \Carbon\Carbon::parse($b->batas_kembali)->isPast();
-                            $isReturned = $b->status === 'dikembalikan';
-                            $dotColor = $isReturned ? 'bg-gray-400' : ($isPast ? 'bg-red-500 animate-pulse' : 'bg-green-500');
-                            $textColor = $isReturned ? 'text-gray-400' : ($isPast ? 'text-red-600' : 'text-gray-600');
-                        @endphp
-                        <div class="flex items-center gap-2">
-                            <span class="w-1.5 h-1.5 rounded-full {{ $dotColor }} shrink-0"></span>
-                            <p class="font-bold {{ $textColor }} text-xs">{{ \Carbon\Carbon::parse($b->batas_kembali)->format('d M Y') }}</p>
+                    <!-- Borrow Date & Due Date (Desktop Only) -->
+                    <div class="hidden md:flex col-span-3 items-center">
+                        <div class="flex flex-col gap-1">
+                            <div class="flex items-center gap-1.5">
+                                <span class="text-[9px] font-bold text-gray-400 uppercase w-16">Borrow</span>
+                                <p class="font-bold text-gray-600 text-xs">{{ \Carbon\Carbon::parse($b->tanggal_pinjam)->format('d M Y') }}</p>
+                            </div>
+                            <div class="flex items-center gap-1.5">
+                                @php
+                                    $isPast = \Carbon\Carbon::parse($b->batas_kembali)->isPast();
+                                    $isReturned = $b->status === 'dikembalikan';
+                                    $dotColor = $isReturned ? 'bg-gray-400' : ($isPast ? 'bg-red-500 animate-pulse' : 'bg-green-500');
+                                    $textColor = $isReturned ? 'text-gray-400' : ($isPast ? 'text-red-600' : 'text-gray-600');
+                                @endphp
+                                <span class="text-[9px] font-bold text-gray-400 uppercase w-16">Due</span>
+                                <span class="w-1.5 h-1.5 rounded-full {{ $dotColor }} shrink-0"></span>
+                                <p class="font-bold {{ $textColor }} text-xs">{{ \Carbon\Carbon::parse($b->batas_kembali)->format('d M Y') }}</p>
+                            </div>
                         </div>
                     </div>
 
                     <!-- Fine & Status (Desktop Only) -->
-                    <div class="hidden md:flex col-span-2 flex-col justify-center gap-1">
+                    <div class="hidden md:flex col-span-1 flex-col justify-center gap-1">
                         @php
                             $calculated_denda = $b->calculateDenda();
                         @endphp
@@ -362,18 +373,22 @@
                             <!-- Display block on mobile, inline on desktop -->
                             <div class="w-full md:w-auto">
                             @if(!$b->is_diambil)
-                                <form action="{{ route('admin.peminjaman.acc_ambil', $b->id) }}" method="POST" onsubmit="return confirm('Confirm book has been picked up by student?')">
+                                <button type="button"
+                                    onclick="showConfirmModal('confirm-pickup-{{ $b->id }}')"
+                                    class="text-xs sm:text-[10px] font-bold text-burgundy-600 bg-red-50 hover:bg-red-100 border border-burgundy-200 px-4 py-2.5 sm:py-2 rounded-xl sm:rounded-lg transition-all shadow-sm w-full md:w-auto whitespace-nowrap text-center">
+                                    Acc Pick Up
+                                </button>
+                                <form id="confirm-pickup-{{ $b->id }}" action="{{ route('admin.peminjaman.acc_ambil', $b->id) }}" method="POST" class="hidden">
                                     @csrf
-                                    <button type="submit" class="text-xs sm:text-[10px] font-bold text-burgundy-600 bg-red-50 hover:bg-red-100 border border-burgundy-200 px-4 py-2.5 sm:py-2 rounded-xl sm:rounded-lg transition-all shadow-sm w-full md:w-auto whitespace-nowrap text-center">
-                                        Acc Pick Up
-                                    </button>
                                 </form>
                             @else
-                                <form action="{{ route('admin.peminjaman.acc', $b->id) }}" method="POST" onsubmit="return confirm('Confirm this book has been returned?')">
+                                <button type="button"
+                                    onclick="showConfirmModal('confirm-return-{{ $b->id }}')"
+                                    class="text-xs sm:text-[10px] font-bold text-white bg-burgundy-500 hover:bg-maroon px-4 py-2.5 sm:py-2 rounded-xl sm:rounded-lg transition-all shadow-md shadow-red-50 w-full md:w-auto whitespace-nowrap text-center">
+                                    Confirm Return
+                                </button>
+                                <form id="confirm-return-{{ $b->id }}" action="{{ route('admin.peminjaman.acc', $b->id) }}" method="POST" class="hidden">
                                     @csrf
-                                    <button type="submit" class="text-xs sm:text-[10px] font-bold text-white bg-burgundy-500 hover:bg-maroon px-4 py-2.5 sm:py-2 rounded-xl sm:rounded-lg transition-all shadow-md shadow-red-50 w-full md:w-auto whitespace-nowrap text-center">
-                                        Confirm Return
-                                    </button>
                                 </form>
                             @endif
                             </div>
@@ -414,4 +429,69 @@
         @endif
     </div>
 </div>
+
+<!-- Custom Confirm Modal -->
+<div id="custom-confirm-modal" class="fixed inset-0 z-[999] flex items-center justify-center bg-black/40 backdrop-blur-sm hidden">
+    <div class="bg-white rounded-2xl shadow-2xl p-6 sm:p-8 w-full max-w-sm mx-4 animate-fade-up">
+        <div class="flex items-center justify-center w-12 h-12 rounded-full bg-red-50 mx-auto mb-4">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-burgundy-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+        </div>
+        <h3 id="modal-title" class="text-base font-bold text-gray-800 text-center mb-2">Confirm Action</h3>
+        <p id="modal-message" class="text-sm text-gray-500 text-center mb-6">Are you sure you want to proceed?</p>
+        <div class="flex gap-3">
+            <button onclick="cancelConfirmModal()" class="flex-1 px-4 py-2.5 rounded-xl border border-gray-200 text-gray-600 font-bold text-sm hover:bg-gray-50 transition-colors">
+                Cancel
+            </button>
+            <button id="modal-confirm-btn" onclick="submitConfirmModal()" class="flex-1 px-4 py-2.5 rounded-xl bg-burgundy-500 text-white font-bold text-sm hover:bg-maroon transition-colors shadow-md">
+                Confirm
+            </button>
+        </div>
+    </div>
+</div>
+
+<script>
+    let pendingFormId = null;
+
+    function showConfirmModal(formId) {
+        pendingFormId = formId;
+        const isPickup = formId.startsWith('confirm-pickup-');
+        document.getElementById('modal-title').textContent = isPickup ? 'Confirm Book Pick Up' : 'Confirm Book Return';
+        document.getElementById('modal-message').textContent = isPickup
+            ? 'Confirm that the book has been picked up by the student?'
+            : 'Confirm that this book has been returned?';
+        document.getElementById('custom-confirm-modal').classList.remove('hidden');
+    }
+
+    function cancelConfirmModal() {
+        pendingFormId = null;
+        document.getElementById('custom-confirm-modal').classList.add('hidden');
+    }
+
+    function submitConfirmModal() {
+        if (pendingFormId) {
+            document.getElementById(pendingFormId).submit();
+        }
+        cancelConfirmModal();
+    }
+
+    // Close modal when clicking backdrop
+    document.getElementById('custom-confirm-modal').addEventListener('click', function(e) {
+        if (e.target === this) cancelConfirmModal();
+    });
+
+    // Auto-scroll to hash section on page load
+    document.addEventListener('DOMContentLoaded', function() {
+        const hash = window.location.hash;
+        if (hash) {
+            const target = document.querySelector(hash);
+            if (target) {
+                setTimeout(() => {
+                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }, 400);
+            }
+        }
+    });
+</script>
 @endsection
