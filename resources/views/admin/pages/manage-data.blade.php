@@ -223,9 +223,12 @@
                         </div>
                     </div>
     
-                    <!-- Action Buttons -->
-                    <button type="submit" class="px-4 sm:px-6 py-2.5 sm:py-3 bg-burgundy-500 text-white rounded-xl sm:rounded-2xl text-xs sm:text-sm font-bold shadow-md hover:bg-maroon transition-all transform active:scale-95 whitespace-nowrap">
-                        Search
+                    <!-- Filter Button (Funnel Icon) -->
+                    <button type="submit" title="Filter" class="px-3 sm:px-4 py-2.5 sm:py-3 bg-burgundy-500 text-white rounded-xl sm:rounded-2xl text-xs sm:text-sm font-bold shadow-md hover:bg-maroon transition-all transform active:scale-95 flex items-center gap-1.5">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2a1 1 0 01-.293.707L13 13.414V19a1 1 0 01-.553.894l-4 2A1 1 0 017 21v-7.586L3.293 6.707A1 1 0 013 6V4z"/>
+                        </svg>
+                        <span class="hidden sm:inline">Filter</span>
                     </button>
                     @if(request()->filled('search') || request('status') !== 'all')
                         <a href="{{ route('admin.manage_data') }}" class="px-4 sm:px-5 py-2.5 sm:py-3 bg-white border border-gray-100 text-gray-500 rounded-xl sm:rounded-2xl text-xs sm:text-sm font-bold hover:bg-gray-50 transition-all transform active:scale-95 flex items-center justify-center">
@@ -324,21 +327,23 @@
 
                     <!-- Borrow Date & Due Date (Desktop Only) -->
                     <div class="hidden md:flex col-span-3 items-center">
+                        @php
+                            $bIsLate = $b->status === 'dipinjam' && \Carbon\Carbon::parse($b->batas_kembali)->isPast();
+                            $bIsReturned = $b->status === 'dikembalikan';
+                            $borrowDot  = $bIsReturned ? 'bg-gray-300' : ($bIsLate ? 'bg-red-500' : 'bg-emerald-500');
+                            $dueDot     = $bIsReturned ? 'bg-gray-300' : ($bIsLate ? 'bg-red-500 animate-pulse' : 'bg-amber-400');
+                            $dueText    = $bIsReturned ? 'text-gray-400' : ($bIsLate ? 'text-red-600 font-extrabold' : 'text-gray-600');
+                        @endphp
                         <div class="flex flex-col gap-1">
                             <div class="flex items-center gap-1.5">
                                 <span class="text-[9px] font-bold text-gray-400 uppercase w-16">Borrow</span>
+                                <span class="w-2 h-2 rounded-full {{ $borrowDot }} shrink-0"></span>
                                 <p class="font-bold text-gray-600 text-xs">{{ \Carbon\Carbon::parse($b->tanggal_pinjam)->format('d M Y') }}</p>
                             </div>
                             <div class="flex items-center gap-1.5">
-                                @php
-                                    $isPast = \Carbon\Carbon::parse($b->batas_kembali)->isPast();
-                                    $isReturned = $b->status === 'dikembalikan';
-                                    $dotColor = $isReturned ? 'bg-gray-400' : ($isPast ? 'bg-red-500 animate-pulse' : 'bg-green-500');
-                                    $textColor = $isReturned ? 'text-gray-400' : ($isPast ? 'text-red-600' : 'text-gray-600');
-                                @endphp
                                 <span class="text-[9px] font-bold text-gray-400 uppercase w-16">Due</span>
-                                <span class="w-1.5 h-1.5 rounded-full {{ $dotColor }} shrink-0"></span>
-                                <p class="font-bold {{ $textColor }} text-xs">{{ \Carbon\Carbon::parse($b->batas_kembali)->format('d M Y') }}</p>
+                                <span class="w-2 h-2 rounded-full {{ $dueDot }} shrink-0"></span>
+                                <p class="font-bold {{ $dueText }} text-xs">{{ \Carbon\Carbon::parse($b->batas_kembali)->format('d M Y') }}</p>
                             </div>
                         </div>
                     </div>
@@ -370,21 +375,34 @@
                     <!-- Actions -->
                     <div class="col-span-1 md:col-span-1 lg:col-span-2 flex items-center justify-end md:justify-end w-full">
                         @if($b->status === 'dipinjam')
-                            <!-- Display block on mobile, inline on desktop -->
-                            <div class="w-full md:w-auto">
+                            <div class="w-full md:w-auto flex flex-col gap-1.5">
                             @if(!$b->is_diambil)
+                                {{-- STEP 1: Acc Pick Up --}}
                                 <button type="button"
-                                    onclick="showConfirmModal('confirm-pickup-{{ $b->id }}')"
-                                    class="text-xs sm:text-[10px] font-bold text-burgundy-600 bg-red-50 hover:bg-red-100 border border-burgundy-200 px-4 py-2.5 sm:py-2 rounded-xl sm:rounded-lg transition-all shadow-sm w-full md:w-auto whitespace-nowrap text-center">
+                                    onclick="showConfirmModal('confirm-pickup-{{ $b->id }}', false)"
+                                    class="text-xs sm:text-[10px] font-bold text-burgundy-600 bg-red-50 hover:bg-red-100 border border-burgundy-200 px-4 py-2 rounded-xl sm:rounded-lg transition-all shadow-sm w-full md:w-auto whitespace-nowrap text-center">
                                     Acc Pick Up
                                 </button>
                                 <form id="confirm-pickup-{{ $b->id }}" action="{{ route('admin.peminjaman.acc_ambil', $b->id) }}" method="POST" class="hidden">
                                     @csrf
                                 </form>
-                            @else
+                                {{-- Cancel loan (no fine, book never picked up) --}}
+                                @php $bCancelLate = \Carbon\Carbon::parse($b->batas_kembali)->isPast(); @endphp
+                                @if($bCancelLate)
                                 <button type="button"
-                                    onclick="showConfirmModal('confirm-return-{{ $b->id }}')"
-                                    class="text-xs sm:text-[10px] font-bold text-white bg-burgundy-500 hover:bg-maroon px-4 py-2.5 sm:py-2 rounded-xl sm:rounded-lg transition-all shadow-md shadow-red-50 w-full md:w-auto whitespace-nowrap text-center">
+                                    onclick="showConfirmModal('cancel-loan-{{ $b->id }}', false, true)"
+                                    class="text-[9px] font-bold text-gray-400 hover:text-red-500 underline text-center transition-colors">
+                                    Cancel Loan
+                                </button>
+                                <form id="cancel-loan-{{ $b->id }}" action="{{ route('admin.peminjaman.cancel', $b->id) }}" method="POST" class="hidden">
+                                    @csrf
+                                </form>
+                                @endif
+                            @else
+                                {{-- STEP 2: Confirm Pick Up (book received by student) → then Return --}}
+                                <button type="button"
+                                    onclick="showConfirmModal('confirm-return-{{ $b->id }}', false)"
+                                    class="text-xs sm:text-[10px] font-bold text-white bg-burgundy-500 hover:bg-maroon px-4 py-2 rounded-xl sm:rounded-lg transition-all shadow-md shadow-red-50 w-full md:w-auto whitespace-nowrap text-center">
                                     Confirm Return
                                 </button>
                                 <form id="confirm-return-{{ $b->id }}" action="{{ route('admin.peminjaman.acc', $b->id) }}" method="POST" class="hidden">
@@ -454,13 +472,30 @@
 <script>
     let pendingFormId = null;
 
-    function showConfirmModal(formId) {
+    function showConfirmModal(formId, isPickup, isCancel) {
         pendingFormId = formId;
-        const isPickup = formId.startsWith('confirm-pickup-');
-        document.getElementById('modal-title').textContent = isPickup ? 'Confirm Book Pick Up' : 'Confirm Book Return';
-        document.getElementById('modal-message').textContent = isPickup
-            ? 'Confirm that the book has been picked up by the student?'
-            : 'Confirm that this book has been returned?';
+        isCancel = isCancel || false;
+        isPickup = formId.startsWith('confirm-pickup-');
+
+        const title   = isCancel ? 'Cancel Loan?' : (isPickup ? 'Confirm Book Pick Up' : 'Confirm Book Return');
+        const message = isCancel
+            ? 'This loan will be cancelled. Since the book was never picked up, no fine will be charged.'
+            : (isPickup
+                ? 'Confirm that the book has been picked up by the student?'
+                : 'Confirm that this book has been returned?');
+
+        document.getElementById('modal-title').textContent   = title;
+        document.getElementById('modal-message').textContent = message;
+
+        const confirmBtn = document.getElementById('modal-confirm-btn');
+        if (isCancel) {
+            confirmBtn.className = 'flex-1 px-4 py-2.5 rounded-xl bg-red-500 text-white font-bold text-sm hover:bg-red-600 transition-colors shadow-md';
+            confirmBtn.textContent = 'Yes, Cancel';
+        } else {
+            confirmBtn.className = 'flex-1 px-4 py-2.5 rounded-xl bg-burgundy-500 text-white font-bold text-sm hover:bg-maroon transition-colors shadow-md';
+            confirmBtn.textContent = 'Confirm';
+        }
+
         document.getElementById('custom-confirm-modal').classList.remove('hidden');
     }
 

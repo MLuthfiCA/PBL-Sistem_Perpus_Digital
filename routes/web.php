@@ -518,6 +518,7 @@ Route::prefix('admin')->group(function () {
     Route::post('/peminjaman/{id}/acc-ambil', [AdminController::class, 'accPengambilan'])->name('admin.peminjaman.acc_ambil');
     Route::post('/peminjaman/{id}/acc', [AdminController::class, 'accPengembalian'])->name('admin.peminjaman.acc');
     Route::post('/peminjaman/{id}/bayar', [AdminController::class, 'bayarDenda'])->name('admin.peminjaman.bayar');
+    Route::post('/peminjaman/{id}/cancel', [AdminController::class, 'cancelPeminjaman'])->name('admin.peminjaman.cancel');
 
     // Route Export Laporan
     Route::get('/laporan/export', [AdminController::class, 'exportLaporan'])->name('admin.laporan.export');

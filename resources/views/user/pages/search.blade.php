@@ -40,7 +40,7 @@
                 <button type="button" @click="showFilters = !showFilters"
                     class="h-full min-h-[50px] sm:min-h-0 sm:aspect-square w-full sm:w-auto px-4 sm:px-0 bg-white/70 backdrop-blur-xl border border-white shadow-2xl shadow-red-50 rounded-2xl sm:rounded-3xl text-gray-700 hover:text-burgundy-500 hover:bg-white transition-all focus:outline-none focus:ring-4 focus:ring-red-100 flex items-center justify-center gap-2 sm:gap-0 relative">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 sm:h-6 w-5 sm:w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2a1 1 0 01-.293.707L13 13.414V19a1 1 0 01-.553.894l-4 2A1 1 0 017 21v-7.586L3.293 6.707A1 1 0 013 6V4z"/>
                     </svg>
                     <span class="sm:hidden text-sm font-bold">Filter</span>
                     {{-- Badge jumlah kategori terpilih --}}

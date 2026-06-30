@@ -193,6 +193,47 @@ class AdminController extends Controller
         return redirect()->back()->with('success', 'Book pickup confirmed!');
     }
 
+
+    public function cancelPeminjaman($id)
+    {
+        $peminjaman = Peminjaman::findOrFail($id);
+
+        // Only cancel if not yet picked up
+        if ($peminjaman->is_diambil) {
+            return redirect()->back()->with('error', 'Cannot cancel: book has already been picked up.');
+        }
+
+        // Return stock, no fine
+        $peminjaman->update([
+            'status'         => 'dikembalikan',
+            'tanggal_kembali'=> now(),
+            'denda'          => 0,
+            'status_denda'   => 'lunas',
+        ]);
+
+        if ($peminjaman->id_buku) {
+            DB::table('buku')
+                ->where('id_buku', $peminjaman->id_buku)
+                ->update([
+                    'stok'       => DB::raw('stok + 1'),
+                    'status'     => 'Tersedia',
+                    'updated_at' => now(),
+                ]);
+        }
+
+        \App\Models\Riwayat::create([
+            'id_pengguna'   => $peminjaman->id_pengguna,
+            'id_peminjaman' => $peminjaman->id_peminjaman,
+            'tanggal'       => now()->toDateString(),
+            'aktivitas'     => 'Peminjaman Dibatalkan',
+            'deskripsi'     => 'Peminjaman otomatis dibatalkan karena buku tidak diambil sebelum batas waktu. Tidak ada denda.',
+            'ip_address'    => request()->ip(),
+            'user_agent'    => request()->userAgent(),
+        ]);
+
+        return redirect()->back()->with('success', 'Borrowing cancelled. No fine applied since the book was never picked up.');
+    }
+
     public function exportLaporan(\Illuminate\Http\Request $request)
     {
         $bulan = (int) $request->input('bulan', now()->month);

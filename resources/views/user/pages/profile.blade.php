@@ -77,43 +77,153 @@
         
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
             @forelse($peminjaman ?? [] as $p)
-            @php /** @var \App\Models\Peminjaman $p */ @endphp
-            <div class="glass-panel p-4 sm:p-6 border-white/60 shadow-lg shadow-red-50 hover:shadow-xl transition-all group border-l-4 border-l-burgundy-500">
-                <h3 class="font-bold text-gray-800 text-base sm:text-lg mb-1 leading-snug">
-                    {{ $p->buku?->judul ?? $p->snapshot_judul_buku ?? 'Unknown Book' }}
-                    @if(!$p->buku) <span class="text-red-500 text-xs ml-1">(Deleted)</span> @endif
-                </h3>
-                <p class="text-xs text-gray-400 font-medium mb-3 sm:mb-4">Book ID: #{{ $p->buku?->buku_id ?? $p->buku?->id ?? 'N/A' }}</p>
-                
-                <div class="flex justify-between items-center text-sm border-t border-red-50 pt-3 sm:pt-4">
-                    <div>
-                        <p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Borrow Date</p>
-                        <p class="font-bold text-gray-700 text-xs sm:text-sm">{{ optional($p->tanggal_pinjam)->format('d M Y') }}</p>
+            @php
+                /** @var \App\Models\Peminjaman $p */
+                $calc_denda = $p->calculateDenda();
+                $overdueDays = $p->calculateOverdueDays();
+                $isLate = $overdueDays > 0;
+                $batasKembali = $p->batas_kembali;
+                $isPast = $batasKembali && \Carbon\Carbon::parse($batasKembali)->isPast();
+                // Circle colors: both red if overdue, else green for borrow, yellow for due
+                $circleGreen  = $isLate ? 'bg-red-500 shadow-red-200' : 'bg-emerald-500 shadow-emerald-200';
+                $circleYellow = $isLate ? 'bg-red-500 shadow-red-200' : 'bg-amber-400 shadow-amber-200';
+                $modalId = 'loan-modal-' . $p->id_peminjaman;
+            @endphp
+            <!-- Card: click to open detail modal -->
+            <div onclick="document.getElementById('{{ $modalId }}').classList.remove('hidden'); document.getElementById('{{ $modalId }}').classList.add('flex')"
+                 class="glass-panel p-4 sm:p-5 border-white/60 shadow-lg shadow-red-50 hover:shadow-xl hover:-translate-y-0.5 transition-all group border-l-4 {{ $isLate ? 'border-l-red-500' : 'border-l-burgundy-500' }} cursor-pointer select-none">
+                <!-- Book title -->
+                <div class="flex items-start justify-between gap-2 mb-3">
+                    <div class="min-w-0">
+                        <h3 class="font-bold text-gray-800 text-sm sm:text-base leading-snug line-clamp-2">
+                            {{ $p->buku?->judul ?? $p->snapshot_judul_buku ?? 'Unknown Book' }}
+                            @if(!$p->buku) <span class="text-red-500 text-[10px] ml-1">(Deleted)</span> @endif
+                        </h3>
+                        <p class="text-[10px] text-gray-400 font-medium mt-0.5">Book ID: #{{ $p->buku?->id_buku ?? 'N/A' }}</p>
                     </div>
-                    <div class="text-right">
-                        <p class="text-[10px] text-red-400 font-bold uppercase tracking-wider">Return Limit</p>
-                        <p class="font-bold text-red-600 text-xs sm:text-sm">{{ optional($p->batas_kembali)->format('d M Y') }}</p>
+                    @if($isLate)
+                    <span class="flex-shrink-0 px-2 py-0.5 rounded-full bg-red-100 text-red-600 text-[9px] font-bold uppercase tracking-widest border border-red-200">OVERDUE</span>
+                    @elseif($p->is_diambil)
+                    <span class="flex-shrink-0 px-2 py-0.5 rounded-full bg-blue-50 text-blue-600 text-[9px] font-bold uppercase tracking-widest border border-blue-100">PICKED UP</span>
+                    @else
+                    <span class="flex-shrink-0 px-2 py-0.5 rounded-full bg-amber-50 text-amber-600 text-[9px] font-bold uppercase tracking-widest border border-amber-100">PENDING</span>
+                    @endif
+                </div>
+                
+                <!-- Dates with circles -->
+                <div class="flex justify-between items-center text-sm border-t border-red-50 pt-3">
+                    <div class="flex items-center gap-2">
+                        <span class="w-2.5 h-2.5 rounded-full {{ $circleGreen }} shadow-sm flex-shrink-0"></span>
+                        <div>
+                            <p class="text-[9px] text-gray-400 font-bold uppercase tracking-wider leading-none">Borrow</p>
+                            <p class="font-bold text-gray-700 text-xs">{{ optional($p->tanggal_pinjam)->format('d M Y') }}</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-2 text-right">
+                        <div>
+                            <p class="text-[9px] {{ $isLate ? 'text-red-400' : 'text-amber-500' }} font-bold uppercase tracking-wider leading-none text-right">Due</p>
+                            <p class="font-bold {{ $isLate ? 'text-red-600' : 'text-amber-600' }} text-xs">{{ optional($batasKembali)->format('d M Y') }}</p>
+                        </div>
+                        <span class="w-2.5 h-2.5 rounded-full {{ $circleYellow }} shadow-sm flex-shrink-0"></span>
                     </div>
                 </div>
 
-                <!-- Late Fine Section -->
-                @php $calculated_denda = $p->calculateDenda(); @endphp
-                @if($calculated_denda > 0)
-                <div class="mt-3 sm:mt-4 p-3 bg-red-50 rounded-xl border border-red-100 flex items-center justify-between">
-                    <div class="flex items-center gap-2">
-                        <div class="w-7 sm:w-8 h-7 sm:h-8 rounded-lg bg-red-500 text-white flex items-center justify-center shadow-lg shadow-red-100 animate-pulse flex-shrink-0">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                            </svg>
-                        </div>
-                        <div class="flex flex-col">
-                            <span class="text-[9px] font-bold text-red-600 uppercase tracking-widest leading-tight">Overdue Fine</span>
-                            <span class="text-[8px] font-bold {{ $p->status_denda === 'lunas' ? 'text-green-600' : 'text-red-400' }} uppercase">{{ $p->status === 'dipinjam' ? 'ONGOING' : ($p->status_denda === 'lunas' ? 'PAID' : 'UNPAID') }}</span>
-                        </div>
+                <!-- Fine bar if overdue -->
+                @if($calc_denda > 0)
+                <div class="mt-3 p-2.5 bg-red-50 rounded-xl border border-red-100 flex items-center justify-between gap-2">
+                    <div class="flex items-center gap-1.5">
+                        <span class="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse flex-shrink-0"></span>
+                        <span class="text-[9px] font-bold text-red-600 uppercase tracking-widest">Fine · {{ $overdueDays }}d late</span>
                     </div>
-                    <span class="font-bold text-red-700 text-xs sm:text-sm">Rp {{ number_format($calculated_denda, 0, ',', '.') }}</span>
+                    <span class="font-bold text-red-700 text-xs">Rp {{ number_format($calc_denda, 0, ',', '.') }}</span>
                 </div>
                 @endif
+                
+                <!-- Tap hint -->
+                <p class="text-center text-[9px] text-gray-300 mt-2 font-medium tracking-wide group-hover:text-gray-400 transition-colors">TAP FOR DETAILS</p>
+            </div>
+
+            <!-- Detail Modal -->
+            <div id="{{ $modalId }}" class="fixed inset-0 z-[999] items-center justify-center bg-black/50 backdrop-blur-sm hidden p-4"
+                 onclick="if(event.target===this){this.classList.add('hidden');this.classList.remove('flex')}">
+                <div class="bg-white rounded-3xl shadow-2xl w-full max-w-sm overflow-hidden animate-fade-up">
+                    <!-- Modal Header -->
+                    <div class="bg-gradient-to-r {{ $isLate ? 'from-red-500 to-rose-600' : 'from-burgundy-500 to-maroon' }} px-6 py-5 text-white">
+                        <div class="flex items-start justify-between gap-3">
+                            <div class="min-w-0">
+                                <p class="text-[10px] font-bold uppercase tracking-widest opacity-70 mb-1">Loan Details</p>
+                                <h3 class="font-bold text-base leading-snug line-clamp-2">{{ $p->buku?->judul ?? $p->snapshot_judul_buku ?? 'Unknown Book' }}</h3>
+                            </div>
+                            <button onclick="document.getElementById('{{ $modalId }}').classList.add('hidden');document.getElementById('{{ $modalId }}').classList.remove('flex');"
+                                    class="w-8 h-8 rounded-xl bg-white/20 hover:bg-white/30 flex items-center justify-center transition-colors flex-shrink-0">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Modal Body -->
+                    <div class="p-5 space-y-3">
+                        <!-- Borrow Date -->
+                        <div class="flex items-center justify-between p-3 rounded-xl bg-emerald-50 border border-emerald-100">
+                            <div class="flex items-center gap-2.5">
+                                <span class="w-3 h-3 rounded-full {{ $isLate ? 'bg-red-500' : 'bg-emerald-500' }} shadow-sm"></span>
+                                <span class="text-xs font-bold text-gray-600 uppercase tracking-wide">Borrow Date</span>
+                            </div>
+                            <span class="text-sm font-bold text-gray-800">{{ optional($p->tanggal_pinjam)->format('d M Y') }}</span>
+                        </div>
+
+                        <!-- Due Date -->
+                        <div class="flex items-center justify-between p-3 rounded-xl {{ $isLate ? 'bg-red-50 border border-red-200' : 'bg-amber-50 border border-amber-100' }}">
+                            <div class="flex items-center gap-2.5">
+                                <span class="w-3 h-3 rounded-full {{ $isLate ? 'bg-red-500' : 'bg-amber-400' }} shadow-sm"></span>
+                                <span class="text-xs font-bold {{ $isLate ? 'text-red-700' : 'text-gray-600' }} uppercase tracking-wide">Due Date</span>
+                            </div>
+                            <span class="text-sm font-bold {{ $isLate ? 'text-red-700' : 'text-gray-800' }}">{{ optional($batasKembali)->format('d M Y') }}</span>
+                        </div>
+
+                        <!-- Pick Up Date -->
+                        <div class="flex items-center justify-between p-3 rounded-xl bg-blue-50 border border-blue-100">
+                            <div class="flex items-center gap-2.5">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"/>
+                                </svg>
+                                <span class="text-xs font-bold text-gray-600 uppercase tracking-wide">Picked Up</span>
+                            </div>
+                            @if($p->is_diambil)
+                                <span class="text-sm font-bold text-blue-700">Confirmed ✓</span>
+                            @else
+                                <span class="text-sm font-semibold text-gray-400 italic">Not yet</span>
+                            @endif
+                        </div>
+
+                        <!-- Overdue & Fine -->
+                        @if($isLate)
+                        <div class="p-3 rounded-xl bg-red-50 border border-red-200 space-y-2">
+                            <div class="flex items-center justify-between">
+                                <span class="text-xs font-bold text-red-700 uppercase tracking-wide flex items-center gap-1.5">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                    </svg>
+                                    Days Overdue
+                                </span>
+                                <span class="font-bold text-red-700 text-sm">{{ $overdueDays }} day{{ $overdueDays > 1 ? 's' : '' }}</span>
+                            </div>
+                            <div class="flex items-center justify-between border-t border-red-200 pt-2">
+                                <span class="text-xs font-bold text-red-700 uppercase tracking-wide">Accumulated Fine</span>
+                                <span class="font-bold text-red-700 text-base">Rp {{ number_format($calc_denda, 0, ',', '.') }}</span>
+                            </div>
+                            <p class="text-[10px] text-red-400 text-center">Rp 5,000 per overdue working day</p>
+                        </div>
+                        @else
+                        <div class="flex items-center justify-between p-3 rounded-xl bg-gray-50 border border-gray-100">
+                            <span class="text-xs font-bold text-gray-500 uppercase tracking-wide">Fine</span>
+                            <span class="text-sm font-bold text-green-600">None ✓</span>
+                        </div>
+                        @endif
+                    </div>
+                </div>
             </div>
             @empty
             <div class="col-span-full glass-panel p-8 sm:p-10 text-center border-white/60">
