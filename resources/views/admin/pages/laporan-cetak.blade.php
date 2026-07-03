@@ -66,6 +66,7 @@
         }
         .status-dipinjam { background-color: #fee2e2; color: #dc2626; }
         .status-dikembalikan { background-color: #dcfce7; color: #16a34a; }
+        .status-dibatalkan { background-color: #f1f5f9; color: #64748b; }
         
         .no-print {
             margin-bottom: 30px;
@@ -156,7 +157,7 @@
                         {{ $p->tanggal_kembali ? \Carbon\Carbon::parse($p->tanggal_kembali)->format('d M Y') : '-' }}
                     </td>
                     <td>
-                        <span class="status-badge status-{{ strtolower($p->status) }}">{{ $p->status === 'dipinjam' ? 'Borrowed' : 'Returned' }}</span>
+                        <span class="status-badge status-{{ strtolower($p->status) }}">{{ $p->status === 'dipinjam' ? 'Borrowed' : ($p->status === 'dibatalkan' ? 'Cancelled' : 'Returned') }}</span>
                     </td>
                     <td>
                         @if($p->denda > 0)

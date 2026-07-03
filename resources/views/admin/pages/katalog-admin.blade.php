@@ -6,12 +6,26 @@
 <div class="py-6 sm:py-10 space-y-6 sm:space-y-10" 
      x-data="{ 
          showModal: {{ session('success') ? 'true' : 'false' }}, 
-         view: new URLSearchParams(window.location.search).get('view') || 'grid',
+         view: localStorage.getItem('catalog_admin_view') || new URLSearchParams(window.location.search).get('view') || 'grid',
+         init() {
+            window.addEventListener('pageshow', () => {
+                this.view = localStorage.getItem('catalog_admin_view') || this.view;
+            });
+         },
          setView(v) {
             this.view = v;
+            localStorage.setItem('catalog_admin_view', v);
             const url = new URL(window.location.href);
             url.searchParams.set('view', v);
             history.replaceState(null, '', url.toString());
+
+            document.querySelectorAll('.pagination a').forEach(link => {
+                try {
+                    let linkUrl = new URL(link.href);
+                    linkUrl.searchParams.set('view', v);
+                    link.href = linkUrl.toString();
+                } catch(e) {}
+            });
          }
      }">
     

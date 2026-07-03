@@ -44,10 +44,10 @@ class HolidayHelper
         $allHolidays = array_merge($holidays, $nextHolidays);
         
         $extended = false;
-        $originalDate = date('Y-m-d', strtotime($tanggalPinjam . ' + 7 days'));
+        $originalDate = date('Y-m-d', strtotime($tanggalPinjam . ' + 5 days'));
         $addedDays = 0;
         
-        while ($addedDays < 7) {
+        while ($addedDays < 5) {
             $date = date('Y-m-d', strtotime($date . ' + 1 day'));
             $dayOfWeek = date('N', strtotime($date)); // 1 (Mon) - 7 (Sun)
             $isWeekend = ($dayOfWeek >= 6);

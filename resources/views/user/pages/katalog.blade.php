@@ -7,14 +7,28 @@
 --}}
 <div class="py-6 sm:py-10 space-y-6 sm:space-y-10"
      x-data="{
-        view: new URLSearchParams(window.location.search).get('view') || 'grid',
+        view: localStorage.getItem('catalog_view') || new URLSearchParams(window.location.search).get('view') || 'grid',
         showFilters: false,
         selectedCategories: {{ json_encode($categories) }},
+        init() {
+            window.addEventListener('pageshow', () => {
+                this.view = localStorage.getItem('catalog_view') || this.view;
+            });
+        },
         setView(v) {
             this.view = v;
+            localStorage.setItem('catalog_view', v);
             const url = new URL(window.location.href);
             url.searchParams.set('view', v);
             history.replaceState(null, '', url.toString());
+            
+            document.querySelectorAll('.pagination a').forEach(link => {
+                try {
+                    let linkUrl = new URL(link.href);
+                    linkUrl.searchParams.set('view', v);
+                    link.href = linkUrl.toString();
+                } catch(e) {}
+            });
         },
         toggleCategory(cat) {
             if (this.selectedCategories.includes(cat)) {
@@ -60,6 +74,7 @@
             <template x-for="cat in selectedCategories" :key="cat">
                 <input type="hidden" name="categories[]" :value="cat" />
             </template>
+            <input type="hidden" name="view" x-bind:value="view" />
 
             <div class="relative">
                 <input type="text" name="query" value="{{ request('query') }}"
@@ -127,7 +142,7 @@
                         $statusText = '';
                         $badgeClass = '';
                         if ($buku['status'] == 'Tersedia' && ($buku['stok'] ?? 0) > 0) {
-                            $statusText = 'AVAIL';
+                            $statusText = 'AVAILABLE';
                             $badgeClass = 'bg-green-500/10 text-green-600 border border-green-200';
                         } elseif ($buku['status'] == 'Perawatan') {
                             $statusText = 'MAINTENANCE';

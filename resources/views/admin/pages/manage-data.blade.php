@@ -215,6 +215,7 @@
                             <option value="all" {{ request('status') === 'all' ? 'selected' : '' }}>All Status</option>
                             <option value="dipinjam" {{ request('status') === 'dipinjam' ? 'selected' : '' }}>Borrowed</option>
                             <option value="dikembalikan" {{ request('status') === 'dikembalikan' ? 'selected' : '' }}>Returned</option>
+                            <option value="dibatalkan" {{ request('status') === 'dibatalkan' ? 'selected' : '' }}>Cancelled</option>
                         </select>
                         <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 sm:px-4 text-gray-400">
                             <svg class="fill-current h-3 w-3 sm:h-4 sm:w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
@@ -304,7 +305,7 @@
                             <span class="text-[9px] font-bold text-gray-400 uppercase block mb-1">Due Date</span>
                             @php
                                 $isPast = \Carbon\Carbon::parse($b->batas_kembali)->isPast();
-                                $isReturned = $b->status === 'dikembalikan';
+                                $isReturned = in_array($b->status, ['dikembalikan', 'dibatalkan']);
                                 $textColor = $isReturned ? 'text-gray-400' : ($isPast ? 'text-red-600' : 'text-gray-700');
                             @endphp
                             <p class="font-bold {{ $textColor }} text-xs">{{ \Carbon\Carbon::parse($b->batas_kembali)->format('d M Y') }}</p>
@@ -412,7 +413,7 @@
                             </div>
                         @else
                             <div class="w-full md:w-auto flex flex-col items-center md:items-end">
-                                <span class="text-xs sm:text-[10px] font-bold text-gray-400 bg-gray-50 px-4 py-2.5 sm:py-2 rounded-xl sm:rounded-lg border border-gray-100 uppercase text-center w-full md:w-auto">Returned</span>
+                                <span class="text-xs sm:text-[10px] font-bold text-gray-400 bg-gray-50 px-4 py-2.5 sm:py-2 rounded-xl sm:rounded-lg border border-gray-100 uppercase text-center w-full md:w-auto">{{ $b->status === 'dibatalkan' ? 'Cancelled' : 'Returned' }}</span>
                                 <!-- Show mark paid button on mobile if needed -->
                                 @if($calculated_denda > 0 && $b->status === 'dikembalikan' && $b->status_denda === 'belum_lunas')
                                     <form action="{{ route('admin.peminjaman.bayar', $b->id) }}" method="POST" class="md:hidden mt-2 w-full">

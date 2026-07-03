@@ -157,8 +157,8 @@ class AdminController extends Controller
             'id_pengguna' => $peminjaman->id_pengguna,
             'id_peminjaman' => $peminjaman->id_peminjaman,
             'tanggal' => now()->toDateString(),
-            'aktivitas' => 'Pengembalian Buku',
-            'deskripsi' => 'Buku telah dikembalikan ke perpustakaan. Denda: Rp ' . number_format($denda, 0, ',', '.'),
+            'aktivitas' => 'Book Return',
+            'deskripsi' => 'The book has been returned to the library. Fine: Rp ' . number_format($denda, 0, ',', '.'),
             'ip_address' => request()->ip(),
             'user_agent' => request()->userAgent(),
         ]);
@@ -184,8 +184,8 @@ class AdminController extends Controller
             'id_pengguna' => $peminjaman->id_pengguna,
             'id_peminjaman' => $peminjaman->id_peminjaman,
             'tanggal' => now()->toDateString(),
-            'aktivitas' => 'Buku Diambil',
-            'deskripsi' => 'Buku telah diambil secara fisik oleh mahasiswa.',
+            'aktivitas' => 'Book Picked Up',
+            'deskripsi' => 'The book has been physically picked up by the user.',
             'ip_address' => request()->ip(),
             'user_agent' => request()->userAgent(),
         ]);
@@ -205,7 +205,7 @@ class AdminController extends Controller
 
         // Return stock, no fine
         $peminjaman->update([
-            'status'         => 'dikembalikan',
+            'status'         => 'dibatalkan',
             'tanggal_kembali'=> now(),
             'denda'          => 0,
             'status_denda'   => 'lunas',
@@ -225,8 +225,8 @@ class AdminController extends Controller
             'id_pengguna'   => $peminjaman->id_pengguna,
             'id_peminjaman' => $peminjaman->id_peminjaman,
             'tanggal'       => now()->toDateString(),
-            'aktivitas'     => 'Peminjaman Dibatalkan',
-            'deskripsi'     => 'Peminjaman otomatis dibatalkan karena buku tidak diambil sebelum batas waktu. Tidak ada denda.',
+            'aktivitas'     => 'Loan Cancelled',
+            'deskripsi'     => 'The loan was cancelled because the book was not picked up. No fine applies.',
             'ip_address'    => request()->ip(),
             'user_agent'    => request()->userAgent(),
         ]);

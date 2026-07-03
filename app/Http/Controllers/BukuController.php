@@ -275,13 +275,19 @@ class BukuController extends Controller
             // CEK 1: dihapus sesuai permintaan agar bisa pinjam lebih dari 1 buku
 
 
-            // CEK 2: Apakah user memiliki denda yang belum lunas
+            // CEK 2: Apakah user memiliki denda yang belum lunas atau buku yang overdue
             $unpaidFines = Peminjaman::where('id_pengguna', $userId)
                 ->where('status_denda', 'belum_lunas')
                 ->exists();
 
-            if ($unpaidFines) {
-                return back()->with('error', 'You have unpaid late fines. Please contact the library administrator to settle your fines.');
+            $hasOverdueBooks = Peminjaman::where('id_pengguna', $userId)
+                ->where('status', 'dipinjam')
+                ->whereNotNull('batas_kembali')
+                ->whereDate('batas_kembali', '<', now()->toDateString())
+                ->exists();
+
+            if ($unpaidFines || $hasOverdueBooks) {
+                return back()->with('error', 'You have overdue books or unpaid fines. Please resolve them before borrowing.');
             }
 
             // Prevent borrowing when book is not available or stock is empty
@@ -313,8 +319,8 @@ class BukuController extends Controller
                 'id_pengguna' => $userId,
                 'id_peminjaman' => $peminjaman->id,
                 'tanggal' => now()->toDateString(),
-                'aktivitas' => 'Pengajuan Peminjaman',
-                'deskripsi' => 'User mengajukan peminjaman buku: ' . $buku->judul,
+                'aktivitas' => 'Loan Request',
+                'deskripsi' => 'User submitted a loan request for the book: ' . $buku->judul,
                 'ip_address' => $request->ip(),
                 'user_agent' => $request->userAgent(),
             ]);

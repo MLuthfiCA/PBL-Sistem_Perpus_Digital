@@ -80,13 +80,13 @@ class LoginController extends Controller
                 'id_peminjaman' => null,
                 'tanggal'      => now()->toDateString(),
                 'aktivitas'    => 'Login',
-                'deskripsi'    => 'User berhasil login ke sistem.',
+                'deskripsi'    => 'User successfully logged into the system.',
                 'ip_address'   => $request->ip(),
                 'user_agent'   => $request->userAgent(),
             ]);
 
             if ($user->role == 'admin') {
-                return redirect()->route('admin.profile');
+                return redirect()->route('admin.katalog');
             } else {
                 return redirect()->route('katalog');
             }

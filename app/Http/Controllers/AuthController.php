@@ -57,6 +57,6 @@ class AuthController extends Controller
 
         return redirect()
             ->route('login')
-            ->with('success', 'Registrasi berhasil. Silakan login dengan NIM dan password Anda.');
+            ->with('success', 'Registration successful. Please login with your Student ID and password.');
     }
 }
