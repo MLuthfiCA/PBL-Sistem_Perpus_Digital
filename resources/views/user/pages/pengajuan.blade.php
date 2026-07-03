@@ -39,7 +39,7 @@
                             class="w-full p-3 sm:p-4 bg-white/50 border border-white rounded-xl sm:rounded-2xl focus:ring-4 focus:ring-red-100 focus:outline-none transition-all font-medium text-gray-700 shadow-sm text-sm">
                     </div>
                     <div class="space-y-2">
-                        <label class="block text-xs font-bold text-gray-400 uppercase tracking-widest ml-1">Return Date</label>
+                        <label class="block text-xs font-bold text-gray-400 uppercase tracking-widest ml-1">Max Return Date</label>
                         <input type="date" id="tanggal_kembali" readonly
                             class="w-full p-3 sm:p-4 bg-red-50/30 border border-white rounded-xl sm:rounded-2xl font-medium text-gray-400 cursor-not-allowed text-sm">
                     </div>

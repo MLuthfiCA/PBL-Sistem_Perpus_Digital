@@ -23,9 +23,6 @@
                 <a href="{{ route('katalog') }}" class="px-5 py-2 rounded-xl transition-all duration-300 {{ request()->routeIs('katalog') ? 'bg-burgundy-500 text-white shadow-lg shadow-red-100' : 'text-gray-500 hover:text-burgundy-500 hover:bg-white/80' }} font-medium text-sm">
                     Catalog
                 </a>
-                <a href="{{ route('search') }}" class="px-5 py-2 rounded-xl transition-all duration-300 {{ request()->routeIs('search') ? 'bg-burgundy-500 text-white shadow-lg shadow-red-100' : 'text-gray-500 hover:text-burgundy-500 hover:bg-white/80' }} font-medium text-sm">
-                    Search
-                </a>
             @endif
             <a href="{{ route('about') }}" class="px-5 py-2 rounded-xl transition-all duration-300 {{ request()->routeIs('about') ? 'bg-burgundy-500 text-white shadow-lg shadow-red-100' : 'text-gray-500 hover:text-burgundy-500 hover:bg-white/80' }} font-medium text-sm">
                 About
@@ -92,7 +89,6 @@
                 <a href="{{ route('admin.users.index') }}" class="px-4 py-2 rounded-xl {{ request()->routeIs('admin.users.index') ? 'bg-burgundy-50 text-burgundy-500 font-bold' : 'text-gray-600 hover:bg-gray-50' }}">User Data</a>
             @else
                 <a href="{{ route('katalog') }}" class="px-4 py-2 rounded-xl {{ request()->routeIs('katalog') ? 'bg-burgundy-50 text-burgundy-500 font-bold' : 'text-gray-600 hover:bg-gray-50' }}">Catalog</a>
-                <a href="{{ route('search') }}" class="px-4 py-2 rounded-xl {{ request()->routeIs('search') ? 'bg-burgundy-50 text-burgundy-500 font-bold' : 'text-gray-600 hover:bg-gray-50' }}">Search</a>
             @endif
             <a href="{{ route('about') }}" class="px-4 py-2 rounded-xl {{ request()->routeIs('about') ? 'bg-burgundy-50 text-burgundy-500 font-bold' : 'text-gray-600 hover:bg-gray-50' }}">About</a>
         </div>

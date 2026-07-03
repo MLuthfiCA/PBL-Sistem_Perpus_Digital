@@ -13,43 +13,6 @@ use App\Http\Controllers\PenulisController;
 use App\Http\Controllers\PenerbitController;
 use App\Models\Buku;
 
-// Temporary diagnostic code
-try {
-    $diag = [];
-    $diag['tables_in_db'] = \Illuminate\Support\Facades\DB::select("SELECT name, type FROM sqlite_master");
-    
-    // Check table 'penulis' details
-    try {
-        $diag['penulis_columns'] = \Illuminate\Support\Facades\Schema::getColumnListing('penulis');
-        $diag['penulis_count'] = \Illuminate\Support\Facades\DB::table('penulis')->count();
-    } catch (\Exception $e) {
-        $diag['penulis_error'] = $e->getMessage();
-    }
-    
-    // Check table 'buku' columns
-    try {
-        $diag['buku_columns'] = \Illuminate\Support\Facades\Schema::getColumnListing('buku');
-    } catch (\Exception $e) {
-        $diag['buku_error'] = $e->getMessage();
-    }
-
-    // Run git commands
-    $diag['git_status'] = shell_exec("git status 2>&1");
-    $diag['git_diff'] = shell_exec("git diff 2>&1");
-
-    // Run database updates for book covers
-    try {
-        \Illuminate\Support\Facades\DB::table('buku')->where('judul', 'Laskar Pelangi')->update(['cover' => 'Laskar_pelangi_sampul.jpg']);
-        \Illuminate\Support\Facades\DB::table('buku')->where('judul', 'Bumi')->update(['cover' => 'cover_buku_bumi.jpg']);
-        \Illuminate\Support\Facades\DB::table('buku')->where('judul', 'Filosofi Teras')->update(['cover' => 'filosofi_teras.webp']);
-    } catch (\Exception $e) {
-        $diag['db_update_error'] = $e->getMessage();
-    }
-
-    file_put_contents(storage_path('logs/debug_out.json'), json_encode($diag, JSON_PRETTY_PRINT));
-} catch (\Exception $e) {
-    file_put_contents(storage_path('logs/debug_out.json'), json_encode(['error' => $e->getMessage()], JSON_PRETTY_PRINT));
-}
 
 Route::get('/', function () {
     if (session()->has('user')) {
@@ -241,61 +204,6 @@ Route::get('/logout', function (Request $request) {
 
 // --- USER / MAHASISWA ROUTES ---
 Route::get('/katalog', function (Request $request) {
-    $query = $request->input('query');
-
-    $statusMap = [
-        'available' => 'Tersedia',
-        'borrowed' => 'Dipinjam',
-        'lost' => 'Hilang',
-        'maintenance' => 'Perawatan',
-    ];
-
-    $bukuQuery = Buku::where('tampil_katalog', true);
-
-    if ($query) {
-        $keywords = explode(' ', $query);
-        foreach ($keywords as $word) {
-            if (!empty(trim($word))) {
-                $bukuQuery->where(function ($q) use ($word) {
-                    $q->where('judul', 'like', '%' . $word . '%')
-                      ->orWhereHas('penulis', function($p) use ($word) {
-                          $p->where('nama_penulis', 'like', '%' . $word . '%');
-                      })
-                      ->orWhereHas('kategori', function($k) use ($word) {
-                          $k->where('nama_kategori', 'like', '%' . $word . '%');
-                      })
-                      ->orWhere('lokasi_rak', 'like', '%' . $word . '%');
-                });
-            }
-        }
-    }
-
-    $paginator = $bukuQuery->with('kategori', 'penulis', 'penerbit')->orderBy('id_buku', 'desc')->paginate(8);
-
-    $paginator->getCollection()->transform(function($buku) use ($statusMap) {
-        return [
-            'id' => $buku->id_buku,
-            'buku_id' => $buku->id_buku,
-            'judul' => $buku->judul,
-            'penulis' => $buku->penulis->isNotEmpty() ? $buku->penulis->pluck('nama_penulis')->implode(', ') : 'N/A',
-            'genre' => $buku->kategori ? $buku->kategori->nama_kategori : 'N/A',
-            'isbn' => $buku->isbn,
-            'penerbit' => $buku->penerbit ? $buku->penerbit->nama_penerbit : 'N/A',
-            'tahun_terbit' => $buku->tahun_terbit,
-            'cetakan' => $buku->cetakan,
-            'bahasa' => $buku->bahasa,
-            'status' => $statusMap[$buku->status] ?? $buku->status,
-            'cover' => $buku->cover,
-            'stok' => $buku->stok,
-            'deskripsi' => $buku->deskripsi,
-        ];
-    });
-
-    return view('user.pages.katalog', ['daftarBuku' => $paginator]);
-})->name('katalog');
-
-// Route Search Mahasiswa
-Route::get('/search', function (Request $request) {
     $query      = $request->input('query');
     $categories = $request->input('categories', []);   // multi-kategori (array)
 
@@ -308,7 +216,7 @@ Route::get('/search', function (Request $request) {
 
     $bukuQuery = Buku::where('tampil_katalog', true);
 
-    // Keyword search — OR antar kata (sama seperti admin)
+    // Keyword search — OR antar kata
     if ($query) {
         $keywords = explode(' ', $query);
         $bukuQuery->where(function ($q) use ($keywords) {
@@ -336,16 +244,34 @@ Route::get('/search', function (Request $request) {
         });
     }
 
-    $books = $bukuQuery->with('kategori', 'penulis', 'penerbit')->take(4)->get()->map(function($buku) use ($statusMap) {
-        $buku->status = $statusMap[$buku->status] ?? $buku->status;
-        $buku->penulis_nama = $buku->penulis->isNotEmpty() ? $buku->penulis->pluck('nama_penulis')->implode(', ') : 'N/A';
-        $buku->penerbit_nama = $buku->penerbit ? $buku->penerbit->nama_penerbit : 'N/A';
-        return $buku;
+    $daftarBuku = $bukuQuery->with('kategori', 'penulis', 'penerbit')->orderBy('id_buku', 'desc')->paginate(8);
+
+    $daftarBuku->getCollection()->transform(function($buku) use ($statusMap) {
+        return [
+            'id' => $buku->id_buku,
+            'buku_id' => $buku->id_buku,
+            'judul' => $buku->judul,
+            'penulis' => $buku->penulis->isNotEmpty() ? $buku->penulis->pluck('nama_penulis')->implode(', ') : 'N/A',
+            'genre' => $buku->kategori ? $buku->kategori->nama_kategori : 'N/A',
+            'isbn' => $buku->isbn,
+            'penerbit' => $buku->penerbit ? $buku->penerbit->nama_penerbit : 'N/A',
+            'tahun_terbit' => $buku->tahun_terbit,
+            'cetakan' => $buku->cetakan,
+            'bahasa' => $buku->bahasa,
+            'status' => $statusMap[$buku->status] ?? $buku->status,
+            'cover' => $buku->cover,
+            'stok' => $buku->stok,
+            'deskripsi' => $buku->deskripsi,
+        ];
     });
 
     $allCategories = \App\Models\Kategori::has('buku')->pluck('nama_kategori');
 
-    return view('user.pages.search', compact('books', 'allCategories', 'categories'));
+    return view('user.pages.katalog', compact('daftarBuku', 'allCategories', 'categories'));
+})->name('katalog');
+
+Route::get('/search', function () {
+    return redirect()->route('katalog');
 })->name('search');
 
 Route::get('/katalog/{id}', function ($id) {

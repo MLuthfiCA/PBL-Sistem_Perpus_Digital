@@ -8,11 +8,20 @@
 <div class="py-6 sm:py-10 space-y-6 sm:space-y-10"
      x-data="{
         view: new URLSearchParams(window.location.search).get('view') || 'grid',
+        showFilters: false,
+        selectedCategories: {{ json_encode($categories) }},
         setView(v) {
             this.view = v;
             const url = new URL(window.location.href);
             url.searchParams.set('view', v);
             history.replaceState(null, '', url.toString());
+        },
+        toggleCategory(cat) {
+            if (this.selectedCategories.includes(cat)) {
+                this.selectedCategories = this.selectedCategories.filter(c => c !== cat);
+            } else {
+                this.selectedCategories.push(cat);
+            }
         }
      }">
 
@@ -45,6 +54,65 @@
         </div>
 
     </x-ui.page-header>
+
+    <div class="max-w-6xl mx-auto animate-fade-up delay-100 space-y-4">
+        <form id="catalog-search-form" action="{{ route('katalog') }}" method="GET" class="grid gap-3 sm:grid-cols-[1fr_auto] items-end">
+            <template x-for="cat in selectedCategories" :key="cat">
+                <input type="hidden" name="categories[]" :value="cat" />
+            </template>
+
+            <div class="relative">
+                <input type="text" name="query" value="{{ request('query') }}"
+                    placeholder="Search by title, author, category, or location..."
+                    class="w-full rounded-3xl border border-gray-200 bg-white px-5 py-4 text-sm sm:text-base text-gray-700 shadow-sm outline-none focus:border-burgundy-300 focus:ring-4 focus:ring-red-100 transition-all" />
+                <button type="submit" class="absolute right-2 top-2 bottom-2 inline-flex items-center justify-center rounded-2xl bg-burgundy-500 px-4 text-white text-sm font-bold hover:bg-maroon transition-colors">
+                    Search
+                </button>
+            </div>
+
+            <div class="flex items-center justify-between gap-3">
+                <button type="button" @click="showFilters = !showFilters"
+                    class="w-full rounded-3xl border border-gray-200 bg-white px-5 py-4 text-sm sm:text-base font-bold text-gray-700 shadow-sm transition-all hover:border-burgundy-300 hover:text-burgundy-600">
+                    Filters
+                    <span x-show="selectedCategories.length > 0"
+                          x-text="selectedCategories.length"
+                          class="ml-2 inline-flex h-6 min-w-[24px] items-center justify-center rounded-full bg-burgundy-500 px-2 text-[10px] font-bold text-white"></span>
+                </button>
+            </div>
+
+            <template x-if="showFilters">
+                <div class="sm:col-span-2 rounded-3xl border border-gray-200 bg-white p-5 shadow-sm">
+                    <div class="flex flex-wrap gap-2">
+                        @foreach($allCategories as $category)
+                            <button type="button"
+                                    @click="toggleCategory({{ json_encode($category) }})"
+                                    :class="selectedCategories.includes({{ json_encode($category) }}) ? 'bg-burgundy-500 text-white' : 'bg-gray-100 text-gray-600'"
+                                    class="rounded-full px-4 py-2 text-sm font-semibold transition-all">
+                                {{ $category }}
+                            </button>
+                        @endforeach
+                    </div>
+                    <div class="mt-4 flex flex-wrap gap-2">
+                        <template x-for="cat in selectedCategories" :key="cat">
+                            <span class="inline-flex items-center gap-2 rounded-full bg-burgundy-500/10 px-3 py-2 text-sm font-semibold text-burgundy-700">
+                                <span x-text="cat"></span>
+                                <button type="button"
+                                        @click="selectedCategories = selectedCategories.filter(c => c !== cat)"
+                                        class="rounded-full bg-white p-1 text-burgundy-600 hover:bg-burgundy-500 hover:text-white transition-colors">
+                                    &times;
+                                </button>
+                            </span>
+                        </template>
+                    </div>
+                    <div class="mt-5 text-right">
+                        <button type="submit" form="catalog-search-form" class="rounded-3xl bg-burgundy-500 px-6 py-3 text-sm font-bold text-white hover:bg-maroon transition-colors">
+                            Apply filters
+                        </button>
+                    </div>
+                </div>
+            </template>
+        </form>
+    </div>
 
     <!-- Grid View -->
     <template x-if="view === 'grid'">

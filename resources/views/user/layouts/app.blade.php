@@ -194,7 +194,6 @@
                         <ul class="space-y-3">
                             <li><a href="{{ route('home') }}" class="text-gray-500 hover:text-burgundy-500 text-sm transition-colors">Home page</a></li>
                             <li><a href="{{ route('katalog') }}" class="text-gray-500 hover:text-burgundy-500 text-sm transition-colors">Book Catalog</a></li>
-                            <li><a href="{{ route('search') }}" class="text-gray-500 hover:text-burgundy-500 text-sm transition-colors">Search</a></li>
                             <li><a href="{{ route('about') }}" class="text-gray-500 hover:text-burgundy-500 text-sm transition-colors">About Us</a></li>
                         </ul>
                     </div>
