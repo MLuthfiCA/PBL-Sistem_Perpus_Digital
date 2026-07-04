@@ -88,11 +88,11 @@
                 <div class="space-y-3 sm:space-y-4">
                     <h3 class="font-bold text-gray-800 text-base sm:text-xl line-clamp-2">{{ request('judul') }}</h3>
                     <div class="p-3 sm:p-4 bg-red-50/50 rounded-xl sm:rounded-2xl border border-red-100 text-sm text-burgundy-900 leading-relaxed shadow-sm">
-                        <div class="flex gap-3">
+                    <div class="flex gap-3">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 flex-shrink-0 text-burgundy-500 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                             </svg>
-                            <p class="text-xs sm:text-sm">The standard loan period is <strong>7 working days</strong>. Please return the book before the due date to avoid a late fee of <strong>Rp 5.000 per day</strong>.</p>
+                            <p class="text-xs sm:text-sm">The standard loan period is <strong>5 days(excluding Saturdays and Sundays)</strong>. Please return the book before the due date to avoid a late fee of <strong>Rp 5,000 per day</strong>.</p>
                         </div>
                     </div>
                 </div>
@@ -141,28 +141,26 @@
         const tglKembali = document.getElementById('tanggal_kembali');
 
         if (tglPinjam && tglKembali) {
-            tglPinjam.addEventListener('change', function() {
-                let val = this.value;
-                if (val) {
-                    fetch(`/api/hitung-kembali?tanggal_pinjam=${val}`)
-                        .then(res => res.json())
-                        .then(data => {
-                            tglKembali.value = data.return_date;
-                            
-                            let extensionMsg = document.getElementById('extension-msg');
-                            if (data.extended) {
-                                if (!extensionMsg) {
-                                    extensionMsg = document.createElement('p');
-                                    extensionMsg.id = 'extension-msg';
-                                    extensionMsg.className = 'text-xs text-amber-600 mt-2 font-semibold flex items-center gap-1.5';
-                                    tglKembali.parentNode.appendChild(extensionMsg);
-                                }
-                                extensionMsg.innerHTML = `⚠️ Extended due to Sunday or holiday (originally ${data.original_date})`;
-                            } else {
-                                if (extensionMsg) extensionMsg.remove();
-                            }
-                        });
-                }
+            ['input', 'change'].forEach(evt => {
+                tglPinjam.addEventListener(evt, function() {
+                    let val = this.value;
+                    if (val) {
+                        const dateObj = new Date(val);
+                        const day = dateObj.getDay(); // 0 = Sunday, 6 = Saturday
+                        if (day === 0 || day === 6) {
+                            alert('Sorry, you cannot borrow books on weekends (Saturday/Sunday). Please choose a weekday.');
+                            this.value = '';
+                            tglKembali.value = '';
+                            return;
+                        }
+
+                        fetch(`/api/hitung-kembali?tanggal_pinjam=${val}`)
+                            .then(res => res.json())
+                            .then(data => {
+                                tglKembali.value = data.return_date;
+                            });
+                    }
+                });
             });
         }
     });

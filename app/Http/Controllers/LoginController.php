@@ -35,13 +35,13 @@ class LoginController extends Controller
             // Verify role matches
             if ($user->role !== $databaseRole) {
                 Auth::logout();
-                return back()->withErrors(['login_error' => 'NIM/NIK dan role tidak sesuai.']);
+                return back()->withErrors(['login_error' => 'ID Number and role do not match.']);
             }
 
             // Verify account status
             if ($user->status === 'inactive' || $user->status === 'suspended') {
                 Auth::logout();
-                return back()->withErrors(['login_error' => 'Akun Anda berstatus ' . $user->status . '. Hubungi administrator.']);
+                return back()->withErrors(['login_error' => 'Your account status is ' . $user->status . '. Please contact the administrator.']);
             }
 
             /** @var \App\Models\User $user */
@@ -93,6 +93,6 @@ class LoginController extends Controller
         }
 
         // Jika NIM/NIK atau password salah
-        return back()->withErrors(['login_error' => 'NIM/NIK atau password salah. Silakan coba lagi.']);
+        return back()->withErrors(['login_error' => 'Incorrect ID Number or password. Please try again.']);
     }
 }

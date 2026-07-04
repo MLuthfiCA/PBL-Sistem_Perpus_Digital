@@ -272,8 +272,14 @@ class BukuController extends Controller
                 return back()->with('error', 'User not found. Please log in again.');
             }
 
-            // CEK 1: dihapus sesuai permintaan agar bisa pinjam lebih dari 1 buku
+            // CEK 1: Maksimum 5 buku aktif
+            $activeLoanCount = Peminjaman::where('id_pengguna', $userId)
+                ->where('status', 'dipinjam')
+                ->count();
 
+            if ($activeLoanCount >= 5) {
+                return back()->with('error', 'You have reached the maximum borrowing limit of 5 books. Please return a book before borrowing a new one.');
+            }
 
             // CEK 2: Apakah user memiliki denda yang belum lunas atau buku yang overdue
             $unpaidFines = Peminjaman::where('id_pengguna', $userId)
@@ -288,6 +294,12 @@ class BukuController extends Controller
 
             if ($unpaidFines || $hasOverdueBooks) {
                 return back()->with('error', 'You have overdue books or unpaid fines. Please resolve them before borrowing.');
+            }
+
+            // CEK 3: Tidak boleh pinjam di hari Sabtu/Minggu
+            $dayOfWeek = \Carbon\Carbon::parse($request->tanggal_pinjam)->dayOfWeek;
+            if ($dayOfWeek === \Carbon\Carbon::SATURDAY || $dayOfWeek === \Carbon\Carbon::SUNDAY) {
+                return back()->with('error', 'Borrowing on weekends (Saturday/Sunday) is not allowed.');
             }
 
             // Prevent borrowing when book is not available or stock is empty

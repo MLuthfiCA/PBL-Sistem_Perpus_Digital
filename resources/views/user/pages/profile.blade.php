@@ -28,6 +28,42 @@
         </div>
     </div>
 
+    {{-- Borrowing Limit Widget --}}
+    @php
+        $activeBorrowCount = ($peminjaman ?? collect([]))->count();
+        $maxBorrow = 5;
+        $remaining = max(0, $maxBorrow - $activeBorrowCount);
+        $pct = min(($activeBorrowCount / $maxBorrow) * 100, 100);
+        $barColor = $activeBorrowCount >= 5 ? 'bg-red-500' : ($activeBorrowCount >= 4 ? 'bg-amber-400' : 'bg-burgundy-500');
+        $countColor = $activeBorrowCount >= 5 ? 'text-red-500' : ($activeBorrowCount >= 4 ? 'text-amber-500' : 'text-burgundy-600');
+    @endphp
+    <div class="glass-panel p-4 sm:p-6 border-white/60 animate-fade-up delay-150 shadow-lg shadow-red-50">
+        <div class="flex items-center justify-between mb-3">
+            <div class="flex items-center gap-2.5">
+                <div class="w-8 h-8 rounded-xl bg-burgundy-50 flex items-center justify-center flex-shrink-0">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-burgundy-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                    </svg>
+                </div>
+                <div>
+                    <p class="text-xs font-bold text-gray-700">Borrowing Limit</p>
+                    <p class="text-[10px] text-gray-400">Maximum 5 books at a time</p>
+                </div>
+            </div>
+            <span class="text-2xl font-black {{ $countColor }}">{{ $activeBorrowCount }}<span class="text-sm text-gray-400 font-bold">/5</span></span>
+        </div>
+        <div class="w-full h-2 bg-gray-100 rounded-full overflow-hidden">
+            <div class="h-full rounded-full transition-all duration-700 {{ $barColor }}" style="width: {{ $pct }}%"></div>
+        </div>
+        <p class="text-[10px] text-gray-400 mt-2">
+            @if($remaining > 0)
+                You can still borrow <strong>{{ $remaining }} more book{{ $remaining > 1 ? 's' : '' }}</strong>.
+            @else
+                <span class="text-red-500 font-bold">Borrowing limit reached.</span> Please return a book before borrowing a new one.
+            @endif
+        </p>
+    </div>
+
     @php
         $hasLateBook = false;
         $hasUnpaidFine = false;
@@ -302,9 +338,15 @@
                                     </div>
                                 </td>
                                 <td class="px-4 sm:px-8 py-4 sm:py-6 text-right">
-                                    <span class="px-2 sm:px-3 py-1 sm:py-1.5 rounded-lg bg-green-50 text-green-600 text-[10px] font-bold uppercase tracking-widest border border-green-100 whitespace-nowrap">
-                                        {{ optional($k->tanggal_kembali)->format('d M Y') }}
-                                    </span>
+                                    @if($k->status === 'dibatalkan')
+                                        <span class="px-2 sm:px-3 py-1 sm:py-1.5 rounded-lg bg-gray-100 text-gray-500 text-[10px] font-bold uppercase tracking-widest border border-gray-200 whitespace-nowrap">
+                                            CANCELLED
+                                        </span>
+                                    @else
+                                        <span class="px-2 sm:px-3 py-1 sm:py-1.5 rounded-lg bg-green-50 text-green-600 text-[10px] font-bold uppercase tracking-widest border border-green-100 whitespace-nowrap">
+                                            {{ optional($k->tanggal_kembali)->format('d M Y') }}
+                                        </span>
+                                    @endif
                                 </td>
                             </tr>
                             @empty

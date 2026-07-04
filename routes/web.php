@@ -277,7 +277,19 @@ Route::get('/search', function () {
 Route::get('/katalog/{id}', function ($id) {
     $buku = Buku::with('kategori', 'penulis', 'penerbit')->findOrFail($id);
 
+    // Count active loans for logged-in user
+    $activeLoansCount = 0;
+    if (session()->has('user')) {
+        $userId = session('user')['id'] ?? null;
+        if ($userId) {
+            $activeLoansCount = \App\Models\Peminjaman::where('id_pengguna', $userId)
+                ->where('status', 'dipinjam')
+                ->count();
+        }
+    }
+
     return view('user.pages.detail-buku', [
+        'activeLoansCount' => $activeLoansCount,
         'buku' => [
             'id'           => $buku->id_buku,
             'buku_id'      => $buku->id_buku,
@@ -330,64 +342,13 @@ Route::post('/pengajuan', [BukuController::class, 'storePeminjaman'])->name('pen
 
 
 // --- AREA ADMIN ---
-Route::get('/admin/search', function (Request $request) {
-    $query = $request->input('query');
-    $category = $request->input('category');
-    
-    $statusMap = [
-        'available' => 'Tersedia',
-        'borrowed' => 'Dipinjam',
-        'lost' => 'Hilang',
-        'maintenance' => 'Perawatan',
-    ];
-    
-    $bukuQuery = Buku::query();
-    
-    if ($query) {
-        $keywords = explode(' ', $query);
-        $bukuQuery->where(function ($q) use ($keywords) {
-            foreach ($keywords as $word) {
-                if (!empty(trim($word))) {
-                    $q->orWhere(function ($q2) use ($word) {
-                        $q2->where('judul', 'like', '%' . $word . '%')
-                           ->orWhereHas('penulis', function($p) use ($word) {
-                               $p->where('nama_penulis', 'like', '%' . $word . '%');
-                           })
-                           ->orWhereHas('kategori', function($k) use ($word) {
-                               $k->where('nama_kategori', 'like', '%' . $word . '%');
-                           })
-                           ->orWhereHas('penerbit', function($pb) use ($word) {
-                               $pb->where('nama_penerbit', 'like', '%' . $word . '%');
-                           })
-                           ->orWhere('isbn', 'like', '%' . $word . '%')
-                           ->orWhere('lokasi_rak', 'like', '%' . $word . '%');
-                    });
-                }
-            }
-        });
-    }
-    
-    if ($category) {
-        $bukuQuery->whereHas('kategori', function($q) use ($category) {
-            $q->where('nama_kategori', $category);
-        });
-    }
-    
-    $books = $bukuQuery->with('kategori', 'penulis', 'penerbit')->take(4)->get()->map(function($buku) use ($statusMap) {
-        $buku->status = $statusMap[$buku->status] ?? $buku->status;
-        $buku->penulis_nama = $buku->penulis->isNotEmpty() ? $buku->penulis->pluck('nama_penulis')->implode(', ') : 'N/A';
-        $buku->penerbit_nama = $buku->penerbit ? $buku->penerbit->nama_penerbit : 'N/A';
-        return $buku;
-    });
-    $categories = \App\Models\Kategori::has('buku')->pluck('nama_kategori');
-
-    return view('admin.pages.search', compact('books', 'categories'));
-})->name('admin.search');
-
 Route::prefix('admin')->group(function () {
 
     // DATA BUKU HARUS DI DALAM SINI (Paginated)
-    Route::get('/katalog', function () {
+    Route::get('/katalog', function (Request $request) {
+        $query      = $request->input('query');
+        $categories = $request->input('categories', []);
+
         $statusMap = [
             'available' => 'Tersedia',
             'borrowed' => 'Dipinjam',
@@ -395,7 +356,39 @@ Route::prefix('admin')->group(function () {
             'maintenance' => 'Perawatan',
         ];
 
-        $paginator = Buku::with('kategori', 'penulis', 'penerbit')->orderBy('id_buku', 'desc')->paginate(8);
+        $bukuQuery = Buku::query();
+
+        if ($query) {
+            $keywords = explode(' ', $query);
+            $bukuQuery->where(function ($q) use ($keywords) {
+                foreach ($keywords as $word) {
+                    if (!empty(trim($word))) {
+                        $q->orWhere(function ($q2) use ($word) {
+                            $q2->where('judul', 'like', '%' . $word . '%')
+                               ->orWhereHas('penulis', function($p) use ($word) {
+                                   $p->where('nama_penulis', 'like', '%' . $word . '%');
+                               })
+                               ->orWhereHas('kategori', function($k) use ($word) {
+                                   $k->where('nama_kategori', 'like', '%' . $word . '%');
+                               })
+                               ->orWhereHas('penerbit', function($pb) use ($word) {
+                                   $pb->where('nama_penerbit', 'like', '%' . $word . '%');
+                               })
+                               ->orWhere('isbn', 'like', '%' . $word . '%')
+                               ->orWhere('lokasi_rak', 'like', '%' . $word . '%');
+                        });
+                    }
+                }
+            });
+        }
+
+        if (!empty($categories)) {
+            $bukuQuery->whereHas('kategori', function($q) use ($categories) {
+                $q->whereIn('nama_kategori', $categories);
+            });
+        }
+
+        $paginator = $bukuQuery->with('kategori', 'penulis', 'penerbit')->orderBy('id_buku', 'desc')->paginate(8);
 
         $paginator->getCollection()->transform(function($buku) use ($statusMap) {
             return [
@@ -417,7 +410,9 @@ Route::prefix('admin')->group(function () {
             ];
         });
 
-        return view('admin.pages.katalog-admin', ['Buku' => $paginator]);
+        $categoriesAll = \App\Models\Kategori::has('buku')->pluck('nama_kategori');
+
+        return view('admin.pages.katalog-admin', ['Buku' => $paginator, 'categories' => $categoriesAll, 'selectedCategories' => $categories]);
     })->name('admin.katalog');
 
     // Soft-deleted books (trash) routes

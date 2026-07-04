@@ -65,6 +65,118 @@
         </div>
     </x-ui.page-header>
 
+    <!-- Search Bar -->
+    <div x-data="{
+            showFilters: false,
+            selectedCategories: {{ json_encode($selectedCategories ?? []) }}
+         }"
+         class="max-w-3xl mx-auto mb-8 sm:mb-10 animate-fade-up delay-100 relative z-40">
+
+        <form id="search-form" action="{{ route('admin.katalog') }}" method="GET"
+              class="flex flex-col sm:flex-row gap-3 sm:gap-4 relative items-stretch">
+            
+            <input type="hidden" name="view" :value="view">
+
+            {{-- Hidden inputs untuk multi-kategori --}}
+            <template x-for="cat in selectedCategories" :key="cat">
+                <input type="hidden" name="categories[]" :value="cat">
+            </template>
+
+            <div class="relative w-full group">
+                <input type="text" name="query" value="{{ request('query') }}"
+                    placeholder="Search by title, author or isbn..."
+                    class="w-full pl-6 sm:pl-8 pr-16 sm:pr-20 py-4 sm:py-5 sm:py-6 bg-white/70 backdrop-blur-xl border border-white shadow-2xl shadow-red-50 rounded-2xl sm:rounded-3xl focus:ring-4 focus:ring-red-100 focus:outline-none transition-all text-base sm:text-lg text-gray-700 placeholder-gray-400">
+                <button type="submit"
+                    class="absolute right-2.5 top-2 sm:top-2.5 sm:top-3 bg-burgundy-500 text-white p-2.5 sm:p-3 sm:p-4 rounded-xl sm:rounded-2xl hover:bg-maroon transition-all shadow-lg shadow-red-200 group-hover:scale-105 active:scale-95">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 sm:h-6 w-5 sm:w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                    </svg>
+                </button>
+            </div>
+
+            <div class="relative flex-shrink-0 flex">
+                {{-- Tombol filter (Funnel Icon) --}}
+                <button type="button" @click="showFilters = !showFilters"
+                    class="h-full min-h-[50px] sm:min-h-0 sm:aspect-square w-full sm:w-auto px-4 sm:px-0 bg-white/70 backdrop-blur-xl border border-white shadow-2xl shadow-red-50 rounded-2xl sm:rounded-3xl text-gray-700 hover:text-burgundy-500 hover:bg-white transition-all focus:outline-none focus:ring-4 focus:ring-red-100 flex items-center justify-center gap-2 sm:gap-0 relative">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 sm:h-6 w-5 sm:w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3c2.755 0 5.455.232 8.083.678.533.09.917.556.917 1.096v1.044a2.25 2.25 0 0 1-.659 1.591l-5.432 5.432a2.25 2.25 0 0 0-.659 1.591v2.927a2.25 2.25 0 0 1-1.244 2.013L9.75 21v-6.568a2.25 2.25 0 0 0-.659-1.591L3.659 7.409A2.25 2.25 0 0 1 3 5.818V4.774c0-.54.384-1.006.917-1.096A48.32 48.32 0 0 1 12 3Z" />
+                    </svg>
+                    <span class="sm:hidden text-sm font-bold">Filter</span>
+                    {{-- Badge jumlah kategori terpilih --}}
+                    <span x-show="selectedCategories.length > 0"
+                          x-text="selectedCategories.length"
+                          class="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-burgundy-500 text-white text-[10px] font-bold flex items-center justify-center" style="display:none;">
+                    </span>
+                </button>
+
+                <!-- Dropdown Multi-Kategori -->
+                <div x-show="showFilters" x-transition @click.away="showFilters = false"
+                     style="display: none;"
+                     class="absolute top-full right-0 mt-3 w-64 bg-white rounded-xl shadow-2xl overflow-hidden z-50 border border-gray-100">
+
+                    <div class="bg-burgundy-500 text-white px-5 py-3 font-bold text-sm flex items-center justify-between">
+                        <span>Filter</span>
+                        <button type="button"
+                            @click="selectedCategories = []; $nextTick(() => document.getElementById('search-form').dispatchEvent(new Event('submit', { cancelable: true, bubbles: true })))"
+                            x-show="selectedCategories.length > 0"
+                            class="text-[10px] bg-white/20 hover:bg-white/30 px-2 py-1 rounded-lg transition-colors font-medium">
+                            Reset
+                        </button>
+                    </div>
+
+                    <ul class="py-2 text-gray-700 text-sm max-h-64 overflow-y-auto">
+                        @if(isset($categories))
+                            @foreach($categories as $cat)
+                            <li>
+                                <label class="flex items-center gap-3 w-full px-5 py-3 hover:bg-red-50 hover:text-burgundy-500 transition-colors cursor-pointer"
+                                       :class="selectedCategories.includes('{{ $cat }}') ? 'font-semibold text-burgundy-500 bg-red-50/50' : ''">
+                                    <input type="checkbox"
+                                           class="w-4 h-4 rounded accent-burgundy-500 cursor-pointer"
+                                           value="{{ $cat }}"
+                                           :checked="selectedCategories.includes('{{ $cat }}')"
+                                           @change="
+                                               if ($event.target.checked) {
+                                                   selectedCategories.push('{{ $cat }}');
+                                               } else {
+                                                   selectedCategories = selectedCategories.filter(c => c !== '{{ $cat }}');
+                                               }
+                                           ">
+                                    {{ $cat }}
+                                </label>
+                            </li>
+                            @endforeach
+                        @endif
+                    </ul>
+
+                    {{-- Tombol Apply --}}
+                    <div class="px-5 py-3 border-t border-gray-100">
+                        <button type="button"
+                            @click="showFilters = false; $nextTick(() => document.getElementById('search-form').dispatchEvent(new Event('submit', { cancelable: true, bubbles: true })))"
+                            class="w-full bg-burgundy-500 text-white py-2.5 rounded-xl font-bold text-sm hover:bg-maroon transition-all">
+                            Apply Filter
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </form>
+
+        {{-- Chips kategori terpilih --}}
+        <div x-show="selectedCategories.length > 0" class="mt-3 sm:mt-4 flex flex-wrap gap-2" style="display:none;">
+            <template x-for="cat in selectedCategories" :key="cat">
+                <span class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-burgundy-500/10 text-burgundy-500 border border-burgundy-200 rounded-full text-xs font-semibold">
+                    <span x-text="cat"></span>
+                    <button type="button"
+                        @click="selectedCategories = selectedCategories.filter(c => c !== cat); $nextTick(() => document.getElementById('search-form').dispatchEvent(new Event('submit', { cancelable: true, bubbles: true })))"
+                        class="hover:text-maroon transition-colors">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M6 18L18 6M6 6l12 12"/>
+                        </svg>
+                    </button>
+                </span>
+            </template>
+        </div>
+    </div>
+
     <!-- Grid View -->
     <template x-if="view === 'grid'">
         <div class="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6 lg:gap-8">

@@ -27,7 +27,7 @@ class RiwayatController extends Controller
 
             // Fetch return history (dikembalikan)
             $pengembalian = Peminjaman::where('id_pengguna', $userId)
-                ->where('status', 'dikembalikan')
+                ->whereIn('status', ['dikembalikan', 'dibatalkan'])
                 ->with('buku')
                 ->orderBy('updated_at', 'desc')
                 ->paginate(10);

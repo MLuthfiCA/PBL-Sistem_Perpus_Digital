@@ -12,9 +12,6 @@
             <a href="{{ route('admin.katalog') }}" class="px-5 py-2 rounded-xl transition-all duration-300 {{ request()->routeIs('admin.katalog') ? 'bg-burgundy-500 text-white shadow-lg shadow-red-100' : 'text-gray-500 hover:text-burgundy-500 hover:bg-white/80' }} font-medium text-sm">
                 Dashboard
             </a>
-            <a href="{{ route('admin.search') }}" class="px-5 py-2 rounded-xl transition-all duration-300 {{ request()->routeIs('admin.search') ? 'bg-burgundy-500 text-white shadow-lg shadow-red-100' : 'text-gray-500 hover:text-burgundy-500 hover:bg-white/80' }} font-medium text-sm">
-                Search
-            </a>
             <a href="{{ route('admin.buku.create') }}" class="px-5 py-2 rounded-xl transition-all duration-300 {{ request()->routeIs('admin.buku.create') ? 'bg-burgundy-500 text-white shadow-lg shadow-red-100' : 'text-gray-500 hover:text-burgundy-500 hover:bg-white/80' }} font-medium text-sm">
                 Add Book
             </a>
@@ -69,9 +66,6 @@
              
             <a href="{{ route('admin.katalog') }}" class="px-5 py-3 rounded-xl transition-all duration-300 {{ request()->routeIs('admin.katalog') ? 'bg-burgundy-50 text-burgundy-600 font-bold' : 'text-gray-600 hover:bg-gray-50' }} font-medium text-sm">
                 Dashboard
-            </a>
-            <a href="{{ route('admin.search') }}" class="px-5 py-3 rounded-xl transition-all duration-300 {{ request()->routeIs('admin.search') ? 'bg-burgundy-50 text-burgundy-600 font-bold' : 'text-gray-600 hover:bg-gray-50' }} font-medium text-sm">
-                Search
             </a>
             <a href="{{ route('admin.buku.create') }}" class="px-5 py-3 rounded-xl transition-all duration-300 {{ request()->routeIs('admin.buku.create') ? 'bg-burgundy-50 text-burgundy-600 font-bold' : 'text-gray-600 hover:bg-gray-50' }} font-medium text-sm">
                 Add Book

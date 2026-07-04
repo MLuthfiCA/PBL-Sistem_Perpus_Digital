@@ -33,18 +33,24 @@
             </div>
             
             <form action="{{ route('admin.manage_data') }}" method="GET" class="flex flex-wrap sm:flex-nowrap gap-2 sm:gap-3 w-full sm:w-auto">
+                @php
+                    $uniqueYears = isset($availableMonths) ? $availableMonths->pluck('tahun')->unique() : collect([now()->year]);
+                    if($uniqueYears->isEmpty()) $uniqueYears = collect([now()->year]);
+                    $monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+                @endphp
                 <select name="bulan" class="flex-grow sm:flex-grow-0 px-3 sm:px-4 py-2 border border-gray-300 rounded-lg text-xs sm:text-sm font-bold text-gray-700 bg-white focus:outline-none focus:ring-2 focus:ring-gray-200 cursor-pointer" onchange="this.form.dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }))">
-                    @forelse($availableMonths as $m)
-                        @php
-                            $namaBulan = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'][$m->bulan - 1];
-                            $value = $m->bulan;
-                        @endphp
-                        <option value="{{ $value }}" {{ $bulan == $value ? 'selected' : '' }}>
-                            {{ $namaBulan }} {{ $m->tahun }}
+                    @foreach($monthNames as $index => $namaBulan)
+                        <option value="{{ $index + 1 }}" {{ $bulan == ($index + 1) ? 'selected' : '' }}>
+                            {{ $namaBulan }}
                         </option>
-                    @empty
-                        <option value="{{ now()->month }}">{{ ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'][now()->month - 1] }} {{ now()->year }}</option>
-                    @endforelse
+                    @endforeach
+                </select>
+                <select name="tahun" class="flex-grow sm:flex-grow-0 px-3 sm:px-4 py-2 border border-gray-300 rounded-lg text-xs sm:text-sm font-bold text-gray-700 bg-white focus:outline-none focus:ring-2 focus:ring-gray-200 cursor-pointer" onchange="this.form.dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }))">
+                    @foreach($uniqueYears as $y)
+                        <option value="{{ $y }}" {{ $tahun == $y ? 'selected' : '' }}>
+                            {{ $y }}
+                        </option>
+                    @endforeach
                 </select>
                 <!-- Export button -->
                 <a target="_blank" href="{{ route('admin.laporan.export', ['bulan' => $bulan, 'tahun' => $tahun]) }}" class="px-3 sm:px-4 py-2 bg-white border border-gray-300 text-gray-700 font-bold rounded-lg text-xs sm:text-sm flex items-center justify-center gap-1.5 sm:gap-2 hover:bg-gray-50 transition-colors cursor-pointer shrink-0">
@@ -305,8 +311,9 @@
                             <span class="text-[9px] font-bold text-gray-400 uppercase block mb-1">Due Date</span>
                             @php
                                 $isPast = \Carbon\Carbon::parse($b->batas_kembali)->isPast();
-                                $isReturned = in_array($b->status, ['dikembalikan', 'dibatalkan']);
-                                $textColor = $isReturned ? 'text-gray-400' : ($isPast ? 'text-red-600' : 'text-gray-700');
+                                $isReturned = $b->status === 'dikembalikan';
+                                $isCancelled = $b->status === 'dibatalkan';
+                                $textColor = $isCancelled ? 'text-gray-400 line-through' : ($isReturned ? 'text-gray-400' : ($isPast ? 'text-red-600' : 'text-gray-700'));
                             @endphp
                             <p class="font-bold {{ $textColor }} text-xs">{{ \Carbon\Carbon::parse($b->batas_kembali)->format('d M Y') }}</p>
                         </div>
@@ -331,9 +338,10 @@
                         @php
                             $bIsLate = $b->status === 'dipinjam' && \Carbon\Carbon::parse($b->batas_kembali)->isPast();
                             $bIsReturned = $b->status === 'dikembalikan';
-                            $borrowDot  = $bIsReturned ? 'bg-gray-300' : ($bIsLate ? 'bg-red-500' : 'bg-emerald-500');
-                            $dueDot     = $bIsReturned ? 'bg-gray-300' : ($bIsLate ? 'bg-red-500 animate-pulse' : 'bg-amber-400');
-                            $dueText    = $bIsReturned ? 'text-gray-400' : ($bIsLate ? 'text-red-600 font-extrabold' : 'text-gray-600');
+                            $bIsCancelled = $b->status === 'dibatalkan';
+                            $borrowDot  = ($bIsReturned || $bIsCancelled) ? 'bg-gray-300' : ($bIsLate ? 'bg-red-500' : 'bg-emerald-500');
+                            $dueDot     = ($bIsReturned || $bIsCancelled) ? 'bg-gray-300' : ($bIsLate ? 'bg-red-500 animate-pulse' : 'bg-amber-400');
+                            $dueText    = $bIsCancelled ? 'text-gray-400 line-through' : ($bIsReturned ? 'text-gray-400' : ($bIsLate ? 'text-red-600 font-extrabold' : 'text-gray-600'));
                         @endphp
                         <div class="flex flex-col gap-1">
                             <div class="flex items-center gap-1.5">
@@ -357,11 +365,13 @@
                         @if($calculated_denda > 0)
                             <p class="font-bold text-red-600 text-[11px] lg:text-xs">Rp {{ number_format($calculated_denda, 0, ',', '.') }}</p>
                             @if($b->status === 'dikembalikan' && $b->status_denda === 'belum_lunas')
-                                <form action="{{ route('admin.peminjaman.bayar', $b->id) }}" method="POST">
+                                <button type="button"
+                                    onclick="showPaymentModal('pay-loan-{{ $b->id }}', 'Rp {{ number_format($calculated_denda, 0, '.', '.') }}')"
+                                    class="text-[9px] font-bold text-white bg-red-500 px-2 py-0.5 rounded hover:bg-red-600 transition-colors">
+                                    MARK PAID
+                                </button>
+                                <form id="pay-loan-{{ $b->id }}" action="{{ route('admin.peminjaman.bayar', $b->id) }}" method="POST" class="hidden">
                                     @csrf
-                                    <button type="submit" class="text-[9px] font-bold text-white bg-red-500 px-2 py-0.5 rounded hover:bg-red-600 transition-colors">
-                                        MARK PAID
-                                    </button>
                                 </form>
                             @elseif($b->status === 'dikembalikan' && $b->status_denda === 'lunas')
                                 <span class="text-[9px] font-bold text-green-600 bg-green-50 px-2 py-0.5 rounded border border-green-100 w-fit">PAID</span>
@@ -386,9 +396,10 @@
                                 </button>
                                 <form id="confirm-pickup-{{ $b->id }}" action="{{ route('admin.peminjaman.acc_ambil', $b->id) }}" method="POST" class="hidden">
                                     @csrf
+                                    <input type="hidden" name="_scroll" value="">
                                 </form>
                                 {{-- Cancel loan (no fine, book never picked up) --}}
-                                @php $bCancelLate = \Carbon\Carbon::parse($b->batas_kembali)->isPast(); @endphp
+                                @php $bCancelLate = $b->batas_kembali && \Carbon\Carbon::parse($b->batas_kembali)->isPast(); @endphp
                                 @if($bCancelLate)
                                 <button type="button"
                                     onclick="showConfirmModal('cancel-loan-{{ $b->id }}', false, true)"
@@ -408,20 +419,24 @@
                                 </button>
                                 <form id="confirm-return-{{ $b->id }}" action="{{ route('admin.peminjaman.acc', $b->id) }}" method="POST" class="hidden">
                                     @csrf
+                                    <input type="hidden" name="_scroll" value="">
                                 </form>
                             @endif
                             </div>
                         @else
                             <div class="w-full md:w-auto flex flex-col items-center md:items-end">
-                                <span class="text-xs sm:text-[10px] font-bold text-gray-400 bg-gray-50 px-4 py-2.5 sm:py-2 rounded-xl sm:rounded-lg border border-gray-100 uppercase text-center w-full md:w-auto">{{ $b->status === 'dibatalkan' ? 'Cancelled' : 'Returned' }}</span>
+                                @if($b->status === 'dibatalkan')
+                                    <span class="text-xs sm:text-[10px] font-bold text-red-500 bg-red-50 px-4 py-2.5 sm:py-2 rounded-xl sm:rounded-lg border border-red-100 uppercase text-center w-full md:w-auto">Cancelled</span>
+                                @else
+                                    <span class="text-xs sm:text-[10px] font-bold text-gray-400 bg-gray-50 px-4 py-2.5 sm:py-2 rounded-xl sm:rounded-lg border border-gray-100 uppercase text-center w-full md:w-auto">Returned</span>
+                                @endif
                                 <!-- Show mark paid button on mobile if needed -->
                                 @if($calculated_denda > 0 && $b->status === 'dikembalikan' && $b->status_denda === 'belum_lunas')
-                                    <form action="{{ route('admin.peminjaman.bayar', $b->id) }}" method="POST" class="md:hidden mt-2 w-full">
-                                        @csrf
-                                        <button type="submit" class="text-xs font-bold text-white bg-red-500 hover:bg-red-600 px-4 py-2.5 rounded-xl w-full text-center shadow-sm">
-                                            MARK PAID
-                                        </button>
-                                    </form>
+                                    <button type="button"
+                                        onclick="showPaymentModal('pay-loan-{{ $b->id }}', 'Rp {{ number_format($calculated_denda, 0, '.', '.') }}')"
+                                        class="text-xs font-bold text-white bg-red-500 hover:bg-red-600 px-4 py-2.5 rounded-xl w-full text-center shadow-sm md:hidden mt-2">
+                                        MARK PAID
+                                    </button>
                                 @endif
                             </div>
                         @endif
@@ -470,8 +485,39 @@
     </div>
 </div>
 
+<!-- Payment Verification Modal -->
+<div id="payment-confirm-modal" class="fixed inset-0 z-[1000] flex items-center justify-center bg-black/40 backdrop-blur-sm hidden">
+    <div class="bg-white rounded-2xl shadow-2xl p-6 sm:p-8 w-full max-w-sm mx-4 animate-fade-up">
+        <div class="flex items-center justify-center w-14 h-14 rounded-full bg-green-50 mx-auto mb-4">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
+            </svg>
+        </div>
+        <h3 class="text-base font-bold text-gray-800 text-center mb-1">Confirm Payment</h3>
+        <p class="text-sm text-gray-500 text-center mb-1">Are you sure you want to mark this fine as <strong>PAID</strong>?</p>
+        <p id="payment-amount" class="text-xl font-black text-green-600 text-center mb-6"></p>
+        <p class="text-xs text-gray-400 text-center mb-5">This action cannot be undone. Please verify that cash has been received before confirming.</p>
+        <div class="flex gap-3">
+            <button onclick="cancelPaymentModal()" class="flex-1 px-4 py-2.5 rounded-xl border border-gray-200 text-gray-600 font-bold text-sm hover:bg-gray-50 transition-colors">
+                Cancel
+            </button>
+            <button id="payment-confirm-btn" onclick="submitPaymentModal()" class="flex-1 px-4 py-2.5 rounded-xl bg-green-600 text-white font-bold text-sm hover:bg-green-700 transition-colors shadow-md">
+                Yes, Mark Paid
+            </button>
+        </div>
+    </div>
+</div>
+
 <script>
     let pendingFormId = null;
+    let pendingPayFormId = null;
+
+    // ── Scroll-position preservation ──
+    // Save scroll Y to sessionStorage before submitting any action form
+    function saveScrollAndSubmit(formId) {
+        sessionStorage.setItem('manageDataScroll', window.scrollY);
+        document.getElementById(formId).submit();
+    }
 
     function showConfirmModal(formId, isPickup, isCancel) {
         pendingFormId = formId;
@@ -507,20 +553,51 @@
 
     function submitConfirmModal() {
         if (pendingFormId) {
+            sessionStorage.setItem('manageDataScroll', window.scrollY);
             document.getElementById(pendingFormId).submit();
         }
         cancelConfirmModal();
     }
 
-    // Close modal when clicking backdrop
+    // ── Payment confirmation modal ──
+    function showPaymentModal(formId, amount) {
+        pendingPayFormId = formId;
+        document.getElementById('payment-amount').textContent = amount;
+        document.getElementById('payment-confirm-modal').classList.remove('hidden');
+    }
+
+    function cancelPaymentModal() {
+        pendingPayFormId = null;
+        document.getElementById('payment-confirm-modal').classList.add('hidden');
+    }
+
+    function submitPaymentModal() {
+        if (pendingPayFormId) {
+            sessionStorage.setItem('manageDataScroll', window.scrollY);
+            document.getElementById(pendingPayFormId).submit();
+        }
+        cancelPaymentModal();
+    }
+
+    // Close modals when clicking backdrop
     document.getElementById('custom-confirm-modal').addEventListener('click', function(e) {
         if (e.target === this) cancelConfirmModal();
     });
+    document.getElementById('payment-confirm-modal').addEventListener('click', function(e) {
+        if (e.target === this) cancelPaymentModal();
+    });
 
-    // Auto-scroll to hash section on page load
+    // Restore scroll position after redirect
     document.addEventListener('DOMContentLoaded', function() {
+        const savedY = sessionStorage.getItem('manageDataScroll');
+        if (savedY !== null) {
+            window.scrollTo({ top: parseInt(savedY), behavior: 'instant' });
+            sessionStorage.removeItem('manageDataScroll');
+        }
+
+        // Fallback: auto-scroll to hash section
         const hash = window.location.hash;
-        if (hash) {
+        if (hash && !savedY) {
             const target = document.querySelector(hash);
             if (target) {
                 setTimeout(() => {

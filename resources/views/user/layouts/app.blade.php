@@ -204,22 +204,18 @@
                         <h4 class="font-bold text-gray-800 mb-4 uppercase text-xs tracking-widest">Operating Hours</h4>
                         <ul class="space-y-3">
                             <li class="flex justify-between text-sm gap-2">
-                                <span class="text-gray-400 text-xs">Mon – Fri</span>
+                                <span class="text-gray-400 text-xs">Monday – Friday</span>
                                 <span class="font-bold text-gray-700 text-xs whitespace-nowrap">08:00 – 20:00</span>
                             </li>
                             <li class="flex justify-between text-sm">
-                                <span class="text-gray-400 text-xs">Saturday</span>
-                                <span class="font-bold text-red-500 uppercase tracking-widest text-[10px]">Closed</span>
-                            </li>
-                            <li class="flex justify-between text-sm">
-                                <span class="text-gray-400 text-xs">Sunday</span>
+                                <span class="text-gray-400 text-xs">Saturday - Sunday</span>
                                 <span class="font-bold text-red-500 uppercase tracking-widest text-[10px]">Closed</span>
                             </li>
                         </ul>
                         <div class="mt-4 space-y-2">
                             <div class="flex items-center gap-2 text-xs text-gray-500">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-burgundy-500 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
-                                <span>library@polibatam.ac.id</span>
+                                <span>readspace@gmail.com</span>
                             </div>
                         </div>
                     </div>
