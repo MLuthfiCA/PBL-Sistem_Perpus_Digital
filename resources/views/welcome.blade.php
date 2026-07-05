@@ -118,10 +118,7 @@
                     <h3 class="text-lg sm:text-xl font-bold text-gray-800">Weekly Trends</h3>
                     <p class="text-xs text-gray-400 mt-1 hidden sm:block">Data collected from the last 7 days</p>
                 </div>
-                <select class="text-xs font-bold text-gray-500 bg-white/50 border-none rounded-xl focus:ring-0 flex-shrink-0">
-                    <option>This week</option>
-                    <option>Last week</option>
-                </select>
+                
             </div>
             
             <div class="relative h-52 sm:h-64">

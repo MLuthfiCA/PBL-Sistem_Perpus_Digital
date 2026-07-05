@@ -122,10 +122,6 @@
                     </h3>
                     <p class="text-xs font-semibold text-gray-400 mt-1.5 uppercase tracking-widest ml-7 hidden sm:block">Data from the last 7 days</p>
                 </div>
-                <select class="text-xs font-bold text-gray-500 bg-white/50 border-none rounded-xl focus:ring-0 flex-shrink-0">
-                    <option>This Week</option>
-                    <option>Last Week</option>
-                </select>
             </div>
             
             <div class="relative h-52 sm:h-64">
