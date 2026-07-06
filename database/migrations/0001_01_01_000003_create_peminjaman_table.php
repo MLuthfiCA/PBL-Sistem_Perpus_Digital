@@ -18,7 +18,7 @@ return new class extends Migration
 
             $table->date('tanggal_pinjam');
             $table->date('tanggal_kembali')->nullable();
-            $table->enum('status', ['dipinjam', 'dikembalikan', 'terlambat'])->default('dipinjam');
+            $table->enum('status', ['dipinjam', 'dikembalikan', 'terlambat', 'dibatalkan'])->default('dipinjam');
 
             // === Kolom tambahan dari user (denda) ===
             $table->decimal('denda', 10, 2)->default(0);

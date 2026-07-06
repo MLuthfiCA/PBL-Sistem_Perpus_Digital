@@ -196,19 +196,19 @@ class AdminController extends Controller
 
     public function cancelPeminjaman($id)
     {
-        $peminjaman = Peminjaman::findOrFail($id);
+        $peminjaman = Peminjaman::where('id_peminjaman', $id)->firstOrFail();
 
         // Only cancel if not yet picked up
         if ($peminjaman->is_diambil) {
             return redirect()->back()->with('error', 'Cannot cancel: book has already been picked up.');
         }
 
-        // Return stock, no fine
+        // Set status dibatalkan, reset denda, return stock
         $peminjaman->update([
-            'status'         => 'dibatalkan',
-            'tanggal_kembali'=> now(),
-            'denda'          => 0,
-            'status_denda'   => 'lunas',
+            'status'          => 'dibatalkan',
+            'tanggal_kembali' => now(),
+            'denda'           => 0,
+            'status_denda'    => 'lunas',
         ]);
 
         if ($peminjaman->id_buku) {
@@ -221,15 +221,20 @@ class AdminController extends Controller
                 ]);
         }
 
-        \App\Models\Riwayat::create([
-            'id_pengguna'   => $peminjaman->id_pengguna,
-            'id_peminjaman' => $peminjaman->id_peminjaman,
-            'tanggal'       => now()->toDateString(),
-            'aktivitas'     => 'Loan Cancelled',
-            'deskripsi'     => 'The loan was cancelled because the book was not picked up. No fine applies.',
-            'ip_address'    => request()->ip(),
-            'user_agent'    => request()->userAgent(),
-        ]);
+        try {
+            \App\Models\Riwayat::create([
+                'id_pengguna'   => $peminjaman->id_pengguna,
+                'id_peminjaman' => $peminjaman->id_peminjaman,
+                'tanggal'       => now()->toDateString(),
+                'aktivitas'     => 'Loan Cancelled',
+                'deskripsi'     => 'The loan was cancelled because the book was not picked up. No fine applies.',
+                'ip_address'    => request()->ip(),
+                'user_agent'    => request()->userAgent(),
+            ]);
+        } catch (\Exception $e) {
+            // Log the error but don't block the cancel action
+            \Illuminate\Support\Facades\Log::warning('Riwayat creation failed on cancel: ' . $e->getMessage());
+        }
 
         return redirect()->back()->with('success', 'Borrowing cancelled. No fine applied since the book was never picked up.');
     }

@@ -33,24 +33,18 @@
             </div>
             
             <form action="{{ route('admin.manage_data') }}" method="GET" class="flex flex-wrap sm:flex-nowrap gap-2 sm:gap-3 w-full sm:w-auto">
-                @php
-                    $uniqueYears = isset($availableMonths) ? $availableMonths->pluck('tahun')->unique() : collect([now()->year]);
-                    if($uniqueYears->isEmpty()) $uniqueYears = collect([now()->year]);
-                    $monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
-                @endphp
                 <select name="bulan" class="flex-grow sm:flex-grow-0 px-3 sm:px-4 py-2 border border-gray-300 rounded-lg text-xs sm:text-sm font-bold text-gray-700 bg-white focus:outline-none focus:ring-2 focus:ring-gray-200 cursor-pointer" onchange="this.form.dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }))">
-                    @foreach($monthNames as $index => $namaBulan)
-                        <option value="{{ $index + 1 }}" {{ $bulan == ($index + 1) ? 'selected' : '' }}>
-                            {{ $namaBulan }}
+                    @forelse($availableMonths as $m)
+                        @php
+                            $namaBulan = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'][$m->bulan - 1];
+                            $value = $m->bulan;
+                        @endphp
+                        <option value="{{ $value }}" {{ $bulan == $value ? 'selected' : '' }}>
+                            {{ $namaBulan }} {{ $m->tahun }}
                         </option>
-                    @endforeach
-                </select>
-                <select name="tahun" class="flex-grow sm:flex-grow-0 px-3 sm:px-4 py-2 border border-gray-300 rounded-lg text-xs sm:text-sm font-bold text-gray-700 bg-white focus:outline-none focus:ring-2 focus:ring-gray-200 cursor-pointer" onchange="this.form.dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }))">
-                    @foreach($uniqueYears as $y)
-                        <option value="{{ $y }}" {{ $tahun == $y ? 'selected' : '' }}>
-                            {{ $y }}
-                        </option>
-                    @endforeach
+                    @empty
+                        <option value="{{ now()->month }}">{{ ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'][now()->month - 1] }} {{ now()->year }}</option>
+                    @endforelse
                 </select>
                 <!-- Export button -->
                 <a target="_blank" href="{{ route('admin.laporan.export', ['bulan' => $bulan, 'tahun' => $tahun]) }}" class="px-3 sm:px-4 py-2 bg-white border border-gray-300 text-gray-700 font-bold rounded-lg text-xs sm:text-sm flex items-center justify-center gap-1.5 sm:gap-2 hover:bg-gray-50 transition-colors cursor-pointer shrink-0">
@@ -260,33 +254,51 @@
             <div class="divide-y divide-gray-100">
                 @forelse($books ?? [] as $b)
                 @php /** @var \App\Models\Peminjaman $b */ @endphp
-                <div class="grid grid-cols-1 md:grid-cols-12 gap-3 sm:gap-4 px-4 sm:px-6 md:px-8 py-4 sm:py-5 hover:bg-gray-50/50 transition-colors group">
+                @php $isCancelled = $b->status === 'dibatalkan'; @endphp
+                <div class="grid grid-cols-1 md:grid-cols-12 gap-3 sm:gap-4 px-4 sm:px-6 md:px-8 py-4 sm:py-5 transition-colors group relative
+                    {{ $isCancelled ? 'bg-gray-50 opacity-80 border-l-4 border-l-gray-300' : 'hover:bg-gray-50/50' }}">
                     
                     <!-- Book Info -->
                     <div class="col-span-1 md:col-span-4 lg:col-span-3 flex items-start sm:items-center gap-3 sm:gap-4">
-                        <div class="w-12 h-16 sm:w-12 sm:h-16 bg-gray-100 rounded-md border border-gray-200 flex-shrink-0 flex items-center justify-center text-gray-300 overflow-hidden">
+                        <div class="w-12 h-16 sm:w-12 sm:h-16 bg-gray-100 rounded-md border border-gray-200 flex-shrink-0 flex items-center justify-center text-gray-300 overflow-hidden relative">
                             @if($b->buku?->cover)
-                                <img src="{{ asset('images/' . $b->buku->cover) }}" class="w-full h-full object-cover {{ $b->buku->trashed() ? 'grayscale opacity-60' : '' }}" onerror="this.src='{{ asset('images/readspace-library.png') }}'">
+                                <img src="{{ asset('images/' . $b->buku->cover) }}" class="w-full h-full object-cover {{ ($b->buku->trashed() || $isCancelled) ? 'grayscale opacity-50' : '' }}" onerror="this.src='{{ asset('images/readspace-library.png') }}'">
                             @else
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 sm:h-6 sm:w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 sm:h-6 sm:w-6 {{ $isCancelled ? 'text-gray-300' : '' }}" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
                                 </svg>
                             @endif
+                            {{-- Cancelled overlay icon on cover --}}
+                            @if($isCancelled)
+                            <div class="absolute inset-0 flex items-center justify-center bg-gray-900/20 rounded-md">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-white drop-shadow" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12" />
+                                </svg>
+                            </div>
+                            @endif
                         </div>
                         <div class="min-w-0">
-                            <h3 class="font-bold text-gray-800 text-sm line-clamp-1 leading-snug">
-                                {{ $b->buku?->judul ?? $b->snapshot_judul_buku ?? 'Unknown Book' }}
-                                @if(!$b->buku) <span class="text-red-500 text-[10px] ml-1">(Deleted)</span> @endif
-                            </h3>
-                            <p class="text-[11px] text-gray-400 font-medium mt-0.5 line-clamp-1">
+                            <div class="flex items-center gap-2 flex-wrap">
+                                <h3 class="font-bold {{ $isCancelled ? 'text-gray-400 line-through' : 'text-gray-800' }} text-sm line-clamp-1 leading-snug">
+                                    {{ $b->buku?->judul ?? $b->snapshot_judul_buku ?? 'Unknown Book' }}
+                                    @if(!$b->buku) <span class="text-red-500 text-[10px] ml-1">(Deleted)</span> @endif
+                                </h3>
+                                @if($isCancelled)
+                                <span class="md:hidden inline-flex items-center gap-0.5 text-[9px] font-extrabold text-gray-500 bg-gray-200 border border-gray-300 px-1.5 py-0.5 rounded-md uppercase tracking-wider">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-2.5 w-2.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M6 18L18 6M6 6l12 12"/></svg>
+                                    Cancelled
+                                </span>
+                                @endif
+                            </div>
+                            <p class="text-[11px] {{ $isCancelled ? 'text-gray-300' : 'text-gray-400' }} font-medium mt-0.5 line-clamp-1">
                                 {{ $b->buku && $b->buku->penulis->isNotEmpty() ? $b->buku->penulis->pluck('nama_penulis')->implode(', ') : ($b->buku ? 'Unknown Author' : 'Data Removed') }}
                             </p>
                             <!-- Show borrower on mobile ONLY directly under book info -->
                             <div class="md:hidden mt-2 flex items-center gap-1.5">
-                                <div class="w-4 h-4 rounded-full bg-burgundy-500 text-white flex items-center justify-center text-[8px] font-bold">
+                                <div class="w-4 h-4 rounded-full {{ $isCancelled ? 'bg-gray-400' : 'bg-burgundy-500' }} text-white flex items-center justify-center text-[8px] font-bold">
                                     {{ substr($b->user?->name ?? $b->user?->full_name ?? 'U', 0, 1) }}
                                 </div>
-                                <p class="font-semibold text-gray-600 text-[11px] truncate">{{ $b->user?->name ?? $b->user?->full_name ?? 'Unknown User' }}</p>
+                                <p class="font-semibold {{ $isCancelled ? 'text-gray-400' : 'text-gray-600' }} text-[11px] truncate">{{ $b->user?->name ?? $b->user?->full_name ?? 'Unknown User' }}</p>
                             </div>
                         </div>
                     </div>
@@ -311,9 +323,8 @@
                             <span class="text-[9px] font-bold text-gray-400 uppercase block mb-1">Due Date</span>
                             @php
                                 $isPast = \Carbon\Carbon::parse($b->batas_kembali)->isPast();
-                                $isReturned = $b->status === 'dikembalikan';
-                                $isCancelled = $b->status === 'dibatalkan';
-                                $textColor = $isCancelled ? 'text-gray-400 line-through' : ($isReturned ? 'text-gray-400' : ($isPast ? 'text-red-600' : 'text-gray-700'));
+                                $isReturned = in_array($b->status, ['dikembalikan', 'dibatalkan']);
+                                $textColor = $isReturned ? 'text-gray-400' : ($isPast ? 'text-red-600' : 'text-gray-700');
                             @endphp
                             <p class="font-bold {{ $textColor }} text-xs">{{ \Carbon\Carbon::parse($b->batas_kembali)->format('d M Y') }}</p>
                         </div>
@@ -338,16 +349,15 @@
                         @php
                             $bIsLate = $b->status === 'dipinjam' && \Carbon\Carbon::parse($b->batas_kembali)->isPast();
                             $bIsReturned = $b->status === 'dikembalikan';
-                            $bIsCancelled = $b->status === 'dibatalkan';
-                            $borrowDot  = ($bIsReturned || $bIsCancelled) ? 'bg-gray-300' : ($bIsLate ? 'bg-red-500' : 'bg-emerald-500');
-                            $dueDot     = ($bIsReturned || $bIsCancelled) ? 'bg-gray-300' : ($bIsLate ? 'bg-red-500 animate-pulse' : 'bg-amber-400');
-                            $dueText    = $bIsCancelled ? 'text-gray-400 line-through' : ($bIsReturned ? 'text-gray-400' : ($bIsLate ? 'text-red-600 font-extrabold' : 'text-gray-600'));
+                            $borrowDot  = $isCancelled ? 'bg-gray-300' : ($bIsReturned ? 'bg-gray-300' : ($bIsLate ? 'bg-red-500' : 'bg-emerald-500'));
+                            $dueDot     = $isCancelled ? 'bg-gray-300' : ($bIsReturned ? 'bg-gray-300' : ($bIsLate ? 'bg-red-500 animate-pulse' : 'bg-amber-400'));
+                            $dueText    = $isCancelled ? 'text-gray-400' : ($bIsReturned ? 'text-gray-400' : ($bIsLate ? 'text-red-600 font-extrabold' : 'text-gray-600'));
                         @endphp
                         <div class="flex flex-col gap-1">
                             <div class="flex items-center gap-1.5">
                                 <span class="text-[9px] font-bold text-gray-400 uppercase w-16">Borrow</span>
                                 <span class="w-2 h-2 rounded-full {{ $borrowDot }} shrink-0"></span>
-                                <p class="font-bold text-gray-600 text-xs">{{ \Carbon\Carbon::parse($b->tanggal_pinjam)->format('d M Y') }}</p>
+                                <p class="font-bold {{ $isCancelled ? 'text-gray-400' : 'text-gray-600' }} text-xs">{{ \Carbon\Carbon::parse($b->tanggal_pinjam)->format('d M Y') }}</p>
                             </div>
                             <div class="flex items-center gap-1.5">
                                 <span class="text-[9px] font-bold text-gray-400 uppercase w-16">Due</span>
@@ -362,16 +372,20 @@
                         @php
                             $calculated_denda = $b->calculateDenda();
                         @endphp
-                        @if($calculated_denda > 0)
+                        @if($isCancelled)
+                            {{-- Cancelled: show waived fine info --}}
+                            @if($calculated_denda > 0)
+                                <p class="font-bold text-gray-400 text-[11px] lg:text-xs line-through">Rp {{ number_format($calculated_denda, 0, ',', '.') }}</p>
+                            @endif
+                            <span class="text-[9px] font-bold text-gray-500 bg-gray-100 px-2 py-0.5 rounded border border-gray-200 w-fit">WAIVED</span>
+                        @elseif($calculated_denda > 0)
                             <p class="font-bold text-red-600 text-[11px] lg:text-xs">Rp {{ number_format($calculated_denda, 0, ',', '.') }}</p>
                             @if($b->status === 'dikembalikan' && $b->status_denda === 'belum_lunas')
-                                <button type="button"
-                                    onclick="showPaymentModal('pay-loan-{{ $b->id }}', 'Rp {{ number_format($calculated_denda, 0, '.', '.') }}')"
-                                    class="text-[9px] font-bold text-white bg-red-500 px-2 py-0.5 rounded hover:bg-red-600 transition-colors">
-                                    MARK PAID
-                                </button>
-                                <form id="pay-loan-{{ $b->id }}" action="{{ route('admin.peminjaman.bayar', $b->id) }}" method="POST" class="hidden">
+                                <form action="{{ route('admin.peminjaman.bayar', $b->id) }}" method="POST">
                                     @csrf
+                                    <button type="submit" class="text-[9px] font-bold text-white bg-red-500 px-2 py-0.5 rounded hover:bg-red-600 transition-colors">
+                                        MARK PAID
+                                    </button>
                                 </form>
                             @elseif($b->status === 'dikembalikan' && $b->status_denda === 'lunas')
                                 <span class="text-[9px] font-bold text-green-600 bg-green-50 px-2 py-0.5 rounded border border-green-100 w-fit">PAID</span>
@@ -396,10 +410,9 @@
                                 </button>
                                 <form id="confirm-pickup-{{ $b->id }}" action="{{ route('admin.peminjaman.acc_ambil', $b->id) }}" method="POST" class="hidden">
                                     @csrf
-                                    <input type="hidden" name="_scroll" value="">
                                 </form>
                                 {{-- Cancel loan (no fine, book never picked up) --}}
-                                @php $bCancelLate = $b->batas_kembali && \Carbon\Carbon::parse($b->batas_kembali)->isPast(); @endphp
+                                @php $bCancelLate = \Carbon\Carbon::parse($b->batas_kembali)->isPast(); @endphp
                                 @if($bCancelLate)
                                 <button type="button"
                                     onclick="showConfirmModal('cancel-loan-{{ $b->id }}', false, true)"
@@ -419,24 +432,38 @@
                                 </button>
                                 <form id="confirm-return-{{ $b->id }}" action="{{ route('admin.peminjaman.acc', $b->id) }}" method="POST" class="hidden">
                                     @csrf
-                                    <input type="hidden" name="_scroll" value="">
                                 </form>
                             @endif
                             </div>
                         @else
-                            <div class="w-full md:w-auto flex flex-col items-center md:items-end">
-                                @if($b->status === 'dibatalkan')
-                                    <span class="text-xs sm:text-[10px] font-bold text-red-500 bg-red-50 px-4 py-2.5 sm:py-2 rounded-xl sm:rounded-lg border border-red-100 uppercase text-center w-full md:w-auto">Cancelled</span>
+                            <div class="w-full md:w-auto flex flex-col items-center md:items-end gap-1.5">
+                                @if($isCancelled)
+                                    {{-- Distinct cancelled badge --}}
+                                    <span class="inline-flex items-center justify-center gap-1 text-xs sm:text-[10px] font-extrabold text-gray-600 bg-gray-200 border border-gray-300 px-4 py-2.5 sm:py-2 rounded-xl sm:rounded-lg uppercase text-center w-full md:w-auto tracking-wide shadow-sm">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M6 18L18 6M6 6l12 12"/>
+                                        </svg>
+                                        Cancelled
+                                    </span>
+                                    <span class="text-[9px] font-medium text-gray-400 text-center w-full md:w-auto">Not picked up</span>
+                                    {{-- Show mobile waived fine --}}
+                                    @if($calculated_denda > 0)
+                                    <div class="md:hidden flex flex-col items-center gap-0.5 w-full">
+                                        <p class="text-xs text-gray-400 line-through font-bold">Rp {{ number_format($calculated_denda, 0, ',', '.') }}</p>
+                                        <span class="text-[9px] font-bold text-gray-500 bg-gray-100 border border-gray-200 px-2 py-0.5 rounded">FINE WAIVED</span>
+                                    </div>
+                                    @endif
                                 @else
                                     <span class="text-xs sm:text-[10px] font-bold text-gray-400 bg-gray-50 px-4 py-2.5 sm:py-2 rounded-xl sm:rounded-lg border border-gray-100 uppercase text-center w-full md:w-auto">Returned</span>
-                                @endif
-                                <!-- Show mark paid button on mobile if needed -->
-                                @if($calculated_denda > 0 && $b->status === 'dikembalikan' && $b->status_denda === 'belum_lunas')
-                                    <button type="button"
-                                        onclick="showPaymentModal('pay-loan-{{ $b->id }}', 'Rp {{ number_format($calculated_denda, 0, '.', '.') }}')"
-                                        class="text-xs font-bold text-white bg-red-500 hover:bg-red-600 px-4 py-2.5 rounded-xl w-full text-center shadow-sm md:hidden mt-2">
-                                        MARK PAID
-                                    </button>
+                                    <!-- Show mark paid button on mobile if needed -->
+                                    @if($calculated_denda > 0 && $b->status === 'dikembalikan' && $b->status_denda === 'belum_lunas')
+                                        <form action="{{ route('admin.peminjaman.bayar', $b->id) }}" method="POST" class="md:hidden mt-2 w-full">
+                                            @csrf
+                                            <button type="submit" class="text-xs font-bold text-white bg-red-500 hover:bg-red-600 px-4 py-2.5 rounded-xl w-full text-center shadow-sm">
+                                                MARK PAID
+                                            </button>
+                                        </form>
+                                    @endif
                                 @endif
                             </div>
                         @endif
@@ -485,39 +512,8 @@
     </div>
 </div>
 
-<!-- Payment Verification Modal -->
-<div id="payment-confirm-modal" class="fixed inset-0 z-[1000] flex items-center justify-center bg-black/40 backdrop-blur-sm hidden">
-    <div class="bg-white rounded-2xl shadow-2xl p-6 sm:p-8 w-full max-w-sm mx-4 animate-fade-up">
-        <div class="flex items-center justify-center w-14 h-14 rounded-full bg-green-50 mx-auto mb-4">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
-            </svg>
-        </div>
-        <h3 class="text-base font-bold text-gray-800 text-center mb-1">Confirm Payment</h3>
-        <p class="text-sm text-gray-500 text-center mb-1">Are you sure you want to mark this fine as <strong>PAID</strong>?</p>
-        <p id="payment-amount" class="text-xl font-black text-green-600 text-center mb-6"></p>
-        <p class="text-xs text-gray-400 text-center mb-5">This action cannot be undone. Please verify that cash has been received before confirming.</p>
-        <div class="flex gap-3">
-            <button onclick="cancelPaymentModal()" class="flex-1 px-4 py-2.5 rounded-xl border border-gray-200 text-gray-600 font-bold text-sm hover:bg-gray-50 transition-colors">
-                Cancel
-            </button>
-            <button id="payment-confirm-btn" onclick="submitPaymentModal()" class="flex-1 px-4 py-2.5 rounded-xl bg-green-600 text-white font-bold text-sm hover:bg-green-700 transition-colors shadow-md">
-                Yes, Mark Paid
-            </button>
-        </div>
-    </div>
-</div>
-
 <script>
     let pendingFormId = null;
-    let pendingPayFormId = null;
-
-    // ── Scroll-position preservation ──
-    // Save scroll Y to sessionStorage before submitting any action form
-    function saveScrollAndSubmit(formId) {
-        sessionStorage.setItem('manageDataScroll', window.scrollY);
-        document.getElementById(formId).submit();
-    }
 
     function showConfirmModal(formId, isPickup, isCancel) {
         pendingFormId = formId;
@@ -553,51 +549,20 @@
 
     function submitConfirmModal() {
         if (pendingFormId) {
-            sessionStorage.setItem('manageDataScroll', window.scrollY);
             document.getElementById(pendingFormId).submit();
         }
         cancelConfirmModal();
     }
 
-    // ── Payment confirmation modal ──
-    function showPaymentModal(formId, amount) {
-        pendingPayFormId = formId;
-        document.getElementById('payment-amount').textContent = amount;
-        document.getElementById('payment-confirm-modal').classList.remove('hidden');
-    }
-
-    function cancelPaymentModal() {
-        pendingPayFormId = null;
-        document.getElementById('payment-confirm-modal').classList.add('hidden');
-    }
-
-    function submitPaymentModal() {
-        if (pendingPayFormId) {
-            sessionStorage.setItem('manageDataScroll', window.scrollY);
-            document.getElementById(pendingPayFormId).submit();
-        }
-        cancelPaymentModal();
-    }
-
-    // Close modals when clicking backdrop
+    // Close modal when clicking backdrop
     document.getElementById('custom-confirm-modal').addEventListener('click', function(e) {
         if (e.target === this) cancelConfirmModal();
     });
-    document.getElementById('payment-confirm-modal').addEventListener('click', function(e) {
-        if (e.target === this) cancelPaymentModal();
-    });
 
-    // Restore scroll position after redirect
+    // Auto-scroll to hash section on page load
     document.addEventListener('DOMContentLoaded', function() {
-        const savedY = sessionStorage.getItem('manageDataScroll');
-        if (savedY !== null) {
-            window.scrollTo({ top: parseInt(savedY), behavior: 'instant' });
-            sessionStorage.removeItem('manageDataScroll');
-        }
-
-        // Fallback: auto-scroll to hash section
         const hash = window.location.hash;
-        if (hash && !savedY) {
+        if (hash) {
             const target = document.querySelector(hash);
             if (target) {
                 setTimeout(() => {

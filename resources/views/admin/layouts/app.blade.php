@@ -39,6 +39,9 @@
     </script>
 
     <style>
+        /* Prevent Alpine.js flash of unstyled content */
+        [x-cloak] { display: none !important; }
+
         :root {
             --glass: rgba(255, 255, 255, 0.85);
             --glass-border: rgba(255, 255, 255, 0.5);

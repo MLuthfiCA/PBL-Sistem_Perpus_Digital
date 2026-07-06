@@ -178,6 +178,7 @@
     </div>
 
     <!-- Grid View -->
+    <div x-cloak>
     <template x-if="view === 'grid'">
         <div class="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6 lg:gap-8">
             @forelse($Buku as $index => $buku)
@@ -275,8 +276,10 @@
             @endforelse
         </div>
     </template>
+    </div>
 
     <!-- Table View -->
+    <div x-cloak>
     <template x-if="view === 'table'">
         <x-ui.glass-card class="overflow-hidden border border-white/60 animate-fade-up shadow-2xl shadow-red-50">
             <div class="overflow-x-auto -mx-px">
@@ -383,6 +386,7 @@
             </div>
         </x-ui.glass-card>
     </template>
+    </div>
 
     <div class="mt-6 sm:mt-8 flex justify-center text-gray-700 w-full" x-cloak>
         @if(isset($Buku) && method_exists($Buku, 'links'))

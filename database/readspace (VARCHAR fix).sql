@@ -139,7 +139,7 @@ CREATE TABLE `peminjaman` (
   `id_pengguna` bigint UNSIGNED NOT NULL,
   `tanggal_pinjam` date NOT NULL,
   `tanggal_kembali` date DEFAULT NULL,
-  `status` enum('dipinjam','dikembalikan','terlambat') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'dipinjam',
+  `status` enum('dipinjam','dikembalikan','terlambat','dibatalkan') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'dipinjam',
   `denda` decimal(10,2) NOT NULL DEFAULT '0.00',
   `kode_peminjaman` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `batas_kembali` date DEFAULT NULL,
