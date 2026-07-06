@@ -107,7 +107,7 @@
 
     <div class="mt-4 flex justify-center w-full">
         @if(method_exists($users, 'links'))
-            {{ $users->links() }}
+            {{ $users->links('components.ui.pagination') }}
         @endif
     </div>
 </div>

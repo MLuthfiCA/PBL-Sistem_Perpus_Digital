@@ -93,7 +93,7 @@
 
     <div class="mt-4 flex justify-center w-full">
         @if(method_exists($penulis, 'links'))
-            {{ $penulis->links() }}
+            {{ $penulis->links('components.ui.pagination') }}
         @endif
     </div>
 </div>

@@ -485,7 +485,7 @@
 
         @if(isset($books) && method_exists($books, 'links'))
             <div class="mt-6 sm:mt-8 flex justify-center text-gray-700">
-                {{ $books->links() }}
+                {{ $books->links('components.ui.pagination') }}
             </div>
         @endif
     </div>

@@ -183,6 +183,7 @@
 
 
     <!-- Grid View -->
+    <div x-cloak>
     <template x-if="view === 'grid'">
         <div class="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6 lg:gap-8">
             @foreach($daftarBuku as $index => $buku)
@@ -241,8 +242,10 @@
             @endforeach
         </div>
     </template>
+    </div>
 
     <!-- Table View -->
+    <div x-cloak>
     <template x-if="view === 'table'">
         <x-ui.glass-card class="overflow-hidden border border-white/60 animate-fade-up shadow-2xl shadow-red-50">
             <div class="overflow-x-auto -mx-px">
@@ -329,12 +332,13 @@
             </div>
         </x-ui.glass-card>
     </template>
+    </div>
 
     {{-- Pagination: sertakan ?view= agar state tidak hilang saat ganti halaman --}}
     <div class="mt-6 sm:mt-8 flex justify-center text-gray-700 w-full" x-cloak>
         @if(isset($daftarBuku) && method_exists($daftarBuku, 'links'))
             {{-- append view param ke semua link pagination --}}
-            {{ $daftarBuku->appends(['view' => request('view', 'grid')])->links() }}
+            {{ $daftarBuku->appends(['view' => request('view', 'grid')])->links('components.ui.pagination') }}
         @endif
     </div>
 

@@ -390,7 +390,7 @@
 
     <div class="mt-6 sm:mt-8 flex justify-center text-gray-700 w-full" x-cloak>
         @if(isset($Buku) && method_exists($Buku, 'links'))
-            {{ $Buku->appends(['view' => request('view', 'grid')])->links() }}
+            {{ $Buku->appends(['view' => request('view', 'grid')])->links('components.ui.pagination') }}
         @endif
     </div>
 

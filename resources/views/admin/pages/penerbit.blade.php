@@ -93,7 +93,7 @@
 
     <div class="mt-4 flex justify-center w-full">
         @if(method_exists($penerbit, 'links'))
-            {{ $penerbit->links() }}
+            {{ $penerbit->links('components.ui.pagination') }}
         @endif
     </div>
 </div>
