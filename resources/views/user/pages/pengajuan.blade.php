@@ -42,6 +42,7 @@
                         <label class="block text-xs font-bold text-gray-400 uppercase tracking-widest ml-1">Max Return Date</label>
                         <input type="date" id="tanggal_kembali" readonly
                             class="w-full p-3 sm:p-4 bg-red-50/30 border border-white rounded-xl sm:rounded-2xl font-medium text-gray-400 cursor-not-allowed text-sm">
+                        <p class="text-xs sm:text-sm">The standard loan period is <strong>5 days(excluding Saturdays and Sundays)</strong></p>
                     </div>
                 </div>
 

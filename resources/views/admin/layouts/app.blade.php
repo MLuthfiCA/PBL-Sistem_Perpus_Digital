@@ -373,11 +373,7 @@
         var saved = sessionStorage.getItem(SCROLL_KEY);
         if (saved !== null) {
             sessionStorage.removeItem(SCROLL_KEY);
-            requestAnimationFrame(function () {
-                requestAnimationFrame(function () {
-                    window.scrollTo({ top: parseInt(saved, 10), behavior: 'instant' });
-                });
-            });
+            window.scrollTo({ top: parseInt(saved, 10), behavior: 'instant' });
         }
         document.addEventListener('submit', function (e) {
             if (e.target.method && e.target.method.toLowerCase() === 'post') {

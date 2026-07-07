@@ -1,7 +1,7 @@
 @extends('user.layouts.app')
 
 @section('content')
-<div class="py-6 sm:py-10 space-y-8 sm:space-y-12">
+<div class="py-6 sm:py-10 space-y-8 sm:space-y-12" x-data>
     <!-- Page Header -->
     <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-4 animate-fade-up">
         <div>
@@ -180,7 +180,8 @@
             </div>
 
             <!-- Detail Modal -->
-            <div id="{{ $modalId }}" class="fixed inset-0 z-[999] items-center justify-center bg-black/50 backdrop-blur-sm hidden p-4"
+            <template x-teleport="body">
+            <div id="{{ $modalId }}" class="fixed inset-0 z-[9999] items-center justify-center bg-black/50 backdrop-blur-sm hidden p-4"
                  onclick="if(event.target===this){this.classList.add('hidden');this.classList.remove('flex')}">
                 <div class="bg-white rounded-3xl shadow-2xl w-full max-w-sm overflow-hidden animate-fade-up">
                     <!-- Modal Header -->
@@ -258,9 +259,18 @@
                             <span class="text-sm font-bold text-green-600">None ✓</span>
                         </div>
                         @endif
+
+                        <!-- Return Back Button -->
+                        <div class="mt-4 pt-2 border-t border-gray-100">
+                            <button onclick="document.getElementById('{{ $modalId }}').classList.add('hidden');document.getElementById('{{ $modalId }}').classList.remove('flex');"
+                                    class="w-full py-2.5 rounded-xl bg-gray-100 text-gray-700 font-bold hover:bg-gray-200 transition-colors text-sm">
+                                Return Back
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
+            </template>
             @empty
             <div class="col-span-full glass-panel p-8 sm:p-10 text-center border-white/60">
                 <p class="text-gray-400 font-medium">There are no books currently on loan.</p>

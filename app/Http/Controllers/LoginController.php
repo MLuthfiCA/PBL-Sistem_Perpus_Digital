@@ -85,10 +85,15 @@ class LoginController extends Controller
                 'user_agent'   => $request->userAgent(),
             ]);
 
+            $intended = session()->pull('url.intended', false);
+
             if ($user->role == 'admin') {
+                if ($intended && strpos($intended, '/admin') !== false) {
+                    return redirect()->to($intended);
+                }
                 return redirect()->route('admin.katalog');
             } else {
-                return redirect()->route('katalog');
+                return redirect()->to($intended ?: route('katalog'));
             }
         }
 

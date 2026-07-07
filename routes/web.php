@@ -324,7 +324,10 @@ Route::get('/api/hitung-kembali', function (Request $request) {
 });
 
 Route::get('/pengajuan', function (Request $request) {
-    if (!session()->has('user')) return redirect('/login');
+    if (!session()->has('user')) {
+        session()->put('url.intended', url()->full());
+        return redirect('/login');
+    }
 
     $bukuId = $request->input('id');
     if ($bukuId) {

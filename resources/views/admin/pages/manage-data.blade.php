@@ -549,6 +549,7 @@
 
     function submitConfirmModal() {
         if (pendingFormId) {
+            sessionStorage.setItem('admin_scroll_y_' + window.location.pathname, window.scrollY.toString());
             document.getElementById(pendingFormId).submit();
         }
         cancelConfirmModal();
@@ -559,17 +560,17 @@
         if (e.target === this) cancelConfirmModal();
     });
 
-    // Auto-scroll to hash section on page load
-    document.addEventListener('DOMContentLoaded', function() {
+    // Auto-scroll to hash section on page load (works with HTMX)
+    (function() {
         const hash = window.location.hash;
         if (hash) {
-            const target = document.querySelector(hash);
-            if (target) {
-                setTimeout(() => {
+            setTimeout(() => {
+                const target = document.querySelector(hash);
+                if (target) {
                     target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                }, 400);
-            }
+                }
+            }, 400);
         }
-    });
+    })();
 </script>
 @endsection
