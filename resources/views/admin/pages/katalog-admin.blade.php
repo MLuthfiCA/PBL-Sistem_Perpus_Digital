@@ -195,7 +195,7 @@
                         $statusText = '';
                         $badgeClass = '';
                         if ($buku['status'] == 'Tersedia' && ($buku['stok'] ?? 0) > 0) {
-                            $statusText = 'AVAIL';
+                            $statusText = 'AVAILABLE';
                             $badgeClass = 'bg-green-500/10 text-green-600 border border-green-200';
                         } elseif ($buku['status'] == 'Perawatan') {
                             $statusText = 'MAINTENANCE';

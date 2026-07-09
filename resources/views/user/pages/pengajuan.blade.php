@@ -138,29 +138,45 @@
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        const tglPinjam = document.getElementById('tanggal_pinjam');
+        const tglPinjam  = document.getElementById('tanggal_pinjam');
         const tglKembali = document.getElementById('tanggal_kembali');
 
         if (tglPinjam && tglKembali) {
+            // Set min date to today so browser picker blocks past dates
+            const todayStr = new Date().toLocaleDateString('en-CA'); // YYYY-MM-DD in local time
+            tglPinjam.setAttribute('min', todayStr);
+
             ['input', 'change'].forEach(evt => {
                 tglPinjam.addEventListener(evt, function() {
-                    let val = this.value;
-                    if (val) {
-                        const dateObj = new Date(val);
-                        const day = dateObj.getDay(); // 0 = Sunday, 6 = Saturday
-                        if (day === 0 || day === 6) {
-                            alert('Sorry, you cannot borrow books on weekends (Saturday/Sunday). Please choose a weekday.');
-                            this.value = '';
-                            tglKembali.value = '';
-                            return;
-                        }
+                    const val = this.value;
+                    if (!val) return;
 
-                        fetch(`/api/hitung-kembali?tanggal_pinjam=${val}`)
-                            .then(res => res.json())
-                            .then(data => {
-                                tglKembali.value = data.return_date;
-                            });
+                    // Validate: must not be in the past
+                    const selected = new Date(val + 'T00:00:00');
+                    const today    = new Date();
+                    today.setHours(0, 0, 0, 0);
+                    if (selected < today) {
+                        alert('Sorry, you cannot choose a past date. Please select today or a future date.');
+                        this.value = '';
+                        tglKembali.value = '';
+                        return;
                     }
+
+                    // Validate: must not be weekend
+                    const day = selected.getDay(); // 0 = Sunday, 6 = Saturday
+                    if (day === 0 || day === 6) {
+                        alert('Sorry, you cannot borrow books on weekends (Saturday/Sunday). Please choose a weekday.');
+                        this.value = '';
+                        tglKembali.value = '';
+                        return;
+                    }
+
+                    // Fetch auto-calculated return date
+                    fetch(`/api/hitung-kembali?tanggal_pinjam=${val}`)
+                        .then(res => res.json())
+                        .then(data => {
+                            tglKembali.value = data.return_date;
+                        });
                 });
             });
         }

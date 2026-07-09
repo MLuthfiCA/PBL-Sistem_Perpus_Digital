@@ -257,8 +257,10 @@ class BukuController extends Controller
     public function storePeminjaman(Request $request)
     {
         $request->validate([
-            'buku_id'       => 'required|integer',
-            'tanggal_pinjam' => 'required|date',
+            'buku_id'        => 'required|integer',
+            'tanggal_pinjam' => 'required|date|after_or_equal:today',
+        ], [
+            'tanggal_pinjam.after_or_equal' => 'Borrow date cannot be in the past. Please select today or a future date.',
         ]);
 
         $user = session('user');
@@ -296,8 +298,14 @@ class BukuController extends Controller
                 return back()->with('error', 'You have overdue books or unpaid fines. Please resolve them before borrowing.');
             }
 
-            // CEK 3: Tidak boleh pinjam di hari Sabtu/Minggu
-            $dayOfWeek = \Carbon\Carbon::parse($request->tanggal_pinjam)->dayOfWeek;
+            // CEK 3: Tidak boleh pinjam di hari yang sudah lewat
+            $tglPinjam = \Carbon\Carbon::parse($request->tanggal_pinjam)->startOfDay();
+            if ($tglPinjam->lt(\Carbon\Carbon::today())) {
+                return back()->with('error', 'Borrow date cannot be in the past. Please select today or a future date.');
+            }
+
+            // CEK 4: Tidak boleh pinjam di hari Sabtu/Minggu
+            $dayOfWeek = $tglPinjam->dayOfWeek;
             if ($dayOfWeek === \Carbon\Carbon::SATURDAY || $dayOfWeek === \Carbon\Carbon::SUNDAY) {
                 return back()->with('error', 'Borrowing on weekends (Saturday/Sunday) is not allowed.');
             }

@@ -369,11 +369,26 @@
         @endif
 
         // ===== SCROLL POSITION PRESERVATION =====
+        // Disable browser native scroll restoration so we control it fully
+        if ('scrollRestoration' in history) {
+            history.scrollRestoration = 'manual';
+        }
+
         var SCROLL_KEY = 'admin_scroll_y_' + window.location.pathname;
-        var saved = sessionStorage.getItem(SCROLL_KEY);
-        if (saved !== null) {
+        var savedScrollY = sessionStorage.getItem(SCROLL_KEY);
+        if (savedScrollY !== null) {
             sessionStorage.removeItem(SCROLL_KEY);
-            window.scrollTo({ top: parseInt(saved, 10), behavior: 'instant' });
+            var targetY = parseInt(savedScrollY, 10);
+            // Double rAF ensures we scroll after browser paint + layout
+            requestAnimationFrame(function() {
+                requestAnimationFrame(function() {
+                    window.scrollTo({ top: targetY, behavior: 'instant' });
+                });
+            });
+            // Also restore on window load in case animations shift layout
+            window.addEventListener('load', function() {
+                window.scrollTo({ top: targetY, behavior: 'instant' });
+            }, { once: true });
         }
         document.addEventListener('submit', function (e) {
             if (e.target.method && e.target.method.toLowerCase() === 'post') {
