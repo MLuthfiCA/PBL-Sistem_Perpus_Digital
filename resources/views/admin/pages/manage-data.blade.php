@@ -515,6 +515,14 @@
 <script>
     let pendingFormId = null;
 
+    // ── Use global window.showToast from layout ────────────────────────────
+    function notify(message, type) {
+        if (typeof window.showToast === 'function') {
+            window.showToast(type, type === 'success' ? 'Success!' : 'Error!', message);
+        }
+    }
+
+    // ── Modal logic ───────────────────────────────────────────────────────────
     function showConfirmModal(formId, isPickup, isCancel) {
         pendingFormId = formId;
         isCancel = isCancel || false;
@@ -547,16 +555,102 @@
         document.getElementById('custom-confirm-modal').classList.add('hidden');
     }
 
+    // ── Submit via AJAX (no page refresh) ────────────────────────────────────
     function submitConfirmModal() {
-        if (pendingFormId) {
-            // Save both scroll Y and a flag to scroll to active-loans after redirect
-            var scrollKey = 'admin_scroll_y_' + window.location.pathname;
-            var currentY = window.scrollY;
-            sessionStorage.setItem(scrollKey, currentY.toString());
-            sessionStorage.setItem(scrollKey + '_anchor', 'active-loans');
-            document.getElementById(pendingFormId).submit();
-        }
-        cancelConfirmModal();
+        if (!pendingFormId) { cancelConfirmModal(); return; }
+
+        var form = document.getElementById(pendingFormId);
+        if (!form) { cancelConfirmModal(); return; }
+
+        // Disable confirm button to prevent double-clicks
+        var confirmBtn = document.getElementById('modal-confirm-btn');
+        confirmBtn.disabled = true;
+        confirmBtn.textContent = 'Processing…';
+
+        var formData = new FormData(form);
+        var actionUrl = form.action;
+
+        fetch(actionUrl, {
+            method: 'POST',
+            body: formData,
+            headers: { 'X-Requested-With': 'XMLHttpRequest', 'Accept': 'application/json, text/html' }
+        })
+        .then(function(response) {
+            // Laravel redirects return 302 → fetch follows them and returns the redirect target as 200
+            // We treat any 2xx or 3xx-followed as success
+            if (response.ok || response.redirected) {
+                return { success: true };
+            }
+            return response.text().then(function(t) { return { success: false, text: t }; });
+        })
+        .then(function(result) {
+            cancelConfirmModal();
+            confirmBtn.disabled = false;
+
+            if (result.success) {
+                // Determine the action type from formId
+                var isPickup  = pendingFormId === null ? false : false; // already cancelled above
+                var formType  = form.action;
+
+                var isPickupAction  = actionUrl.includes('acc_ambil');
+                var isReturnAction  = actionUrl.includes('/acc/') || actionUrl.includes('/acc?');
+                var isCancelAction  = actionUrl.includes('cancel');
+
+                // Find the row containing this form
+                var row = form.closest('.grid.grid-cols-1.md\\:grid-cols-12') || form.closest('[class*="grid-cols-12"]');
+                if (!row) {
+                    // Fallback: find the action buttons container
+                    var allRows = document.querySelectorAll('[class*="grid-cols-1 md:grid-cols-12"]');
+                    allRows.forEach(function(r) {
+                        if (r.contains(form)) row = r;
+                    });
+                }
+
+                if (row) {
+                    var actionsDiv = form.closest('div[class*="flex flex-col gap"]') || form.parentElement;
+                    if (isPickupAction) {
+                        // Replace "Acc Pick Up" button with "Confirm Return"
+                        // Extract the loan ID from the form action URL
+                        var idMatch = actionUrl.match(/\/(\d+)\//);
+                        if (!idMatch) idMatch = actionUrl.match(/\/(\d+)$/);
+                        var loanId = idMatch ? idMatch[1] : '';
+
+                        var returnFormId = 'confirm-return-' + loanId;
+                        var returnUrl = actionUrl.replace('acc_ambil', 'acc');
+
+                        actionsDiv.innerHTML =
+                            '<button type="button" onclick="showConfirmModal(\'' + returnFormId + '\', false)" ' +
+                            'class="text-xs sm:text-[10px] font-bold text-white bg-burgundy-500 hover:bg-maroon px-4 py-2 rounded-xl sm:rounded-lg transition-all shadow-md shadow-red-50 w-full md:w-auto whitespace-nowrap text-center">' +
+                            'Confirm Return</button>' +
+                            '<form id="' + returnFormId + '" action="' + returnUrl + '" method="POST" class="hidden">' +
+                            '<input type="hidden" name="_token" value="' + document.querySelector('meta[name=csrf-token]')?.content + '">' +
+                            '</form>';
+
+                        notify('Book pickup confirmed!', 'success');
+                    } else if (isReturnAction || isCancelAction) {
+                        // Replace action cell with a "Returned" or "Cancelled" badge
+                        var badge = isReturnAction
+                            ? '<span class="text-xs sm:text-[10px] font-bold text-gray-400 bg-gray-50 px-4 py-2.5 sm:py-2 rounded-xl sm:rounded-lg border border-gray-100 uppercase text-center w-full md:w-auto">Returned</span>'
+                            : '<span class="inline-flex items-center justify-center gap-1 text-xs sm:text-[10px] font-extrabold text-gray-600 bg-gray-200 border border-gray-300 px-4 py-2.5 sm:py-2 rounded-xl sm:rounded-lg uppercase text-center w-full md:w-auto tracking-wide shadow-sm">Cancelled</span>';
+                        if (actionsDiv) actionsDiv.innerHTML = badge;
+
+                        notify(isReturnAction ? 'Book return confirmed successfully!' : 'Loan cancelled successfully!', 'success');
+                    } else {
+                        notify('Action completed successfully!', 'success');
+                    }
+                } else {
+                    // Couldn't find the row — just show toast
+                    notify('Action completed successfully!', 'success');
+                }
+            } else {
+                notify('Something went wrong. Please try again.', 'error');
+            }
+        })
+        .catch(function() {
+            cancelConfirmModal();
+            confirmBtn.disabled = false;
+            notify('Network error. Please check your connection.', 'error');
+        });
     }
 
     // Close modal when clicking backdrop
@@ -564,7 +658,7 @@
         if (e.target === this) cancelConfirmModal();
     });
 
-    // Auto-scroll: scroll to URL hash if present (no saved position — layout handles restoration)
+    // Auto-scroll: scroll to URL hash if present
     (function() {
         var hash = window.location.hash;
         if (hash) {

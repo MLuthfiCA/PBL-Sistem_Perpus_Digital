@@ -24,23 +24,12 @@
                 <input type="text" name="full_name" value="{{ old('full_name') }}" class="w-full px-4 py-2.5 border rounded" required>
             </div>
             
-            <div x-show="role === 'student'">
-                <label class="block text-sm font-bold text-gray-700 mb-1">Student ID (NIM)</label>
+            <div>
+                <label class="block text-sm font-bold text-gray-700 mb-1" x-text="role === 'student' ? 'Student ID (NIM)' : 'Admin ID (NIK)'"></label>
                 <input type="text" name="identity_number" inputmode="numeric" pattern="[0-9]*" 
                     oninput="this.value = this.value.replace(/[^0-9]/g, '');" 
-                    x-bind:disabled="role !== 'student'"
                     value="{{ old('identity_number') }}" 
-                    placeholder="Enter Student ID" 
-                    class="w-full px-4 py-2.5 border rounded" required>
-            </div>
-
-            <div x-show="role === 'admin'" x-cloak>
-                <label class="block text-sm font-bold text-gray-700 mb-1">Admin ID (NIK)</label>
-                <input type="text" name="identity_number" inputmode="numeric" pattern="[0-9]*" 
-                    oninput="this.value = this.value.replace(/[^0-9]/g, '');" 
-                    x-bind:disabled="role !== 'admin'"
-                    value="{{ old('identity_number') }}" 
-                    placeholder="Enter Admin ID" 
+                    placeholder="Enter ID" 
                     class="w-full px-4 py-2.5 border rounded" required>
             </div>
 
@@ -67,14 +56,14 @@
             <div>
                 <label class="block text-sm font-bold text-gray-700 mb-1">Role</label>
                 <select name="role" x-model="role" class="w-full px-4 py-2.5 border rounded" required>
-                    <option value="student">Student (Mahasiswa)</option>
-                    <option value="admin">Admin</option>
+                    <option value="student" {{ old('role', 'student') === 'student' ? 'selected' : '' }}>Student (Mahasiswa)</option>
+                    <option value="admin" {{ old('role') === 'admin' ? 'selected' : '' }}>Admin</option>
                 </select>
             </div>
             <div>
                 <label class="block text-sm font-bold text-gray-700 mb-1">Status</label>
                 <select name="status" class="w-full px-4 py-2.5 border rounded" required>
-                    <option value="active" {{ old('status') === 'active' ? 'selected' : '' }}>Active</option>
+                    <option value="active" {{ old('status', 'active') === 'active' ? 'selected' : '' }}>Active</option>
                     <option value="inactive" {{ old('status') === 'inactive' ? 'selected' : '' }}>Inactive</option>
                     <option value="suspended" {{ old('status') === 'suspended' ? 'selected' : '' }}>Suspended</option>
                 </select>
