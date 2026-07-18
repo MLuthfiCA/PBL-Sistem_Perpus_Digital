@@ -502,10 +502,10 @@
         <h3 id="modal-title" class="text-base font-bold text-gray-800 text-center mb-2">Confirm Action</h3>
         <p id="modal-message" class="text-sm text-gray-500 text-center mb-6">Are you sure you want to proceed?</p>
         <div class="flex gap-3">
-            <button onclick="cancelConfirmModal()" class="flex-1 px-4 py-2.5 rounded-xl border border-gray-200 text-gray-600 font-bold text-sm hover:bg-gray-50 transition-colors">
+            <button type="button" onclick="cancelConfirmModal(event)" class="flex-1 px-4 py-2.5 rounded-xl border border-gray-200 text-gray-600 font-bold text-sm hover:bg-gray-50 transition-colors">
                 Cancel
             </button>
-            <button id="modal-confirm-btn" onclick="submitConfirmModal()" class="flex-1 px-4 py-2.5 rounded-xl bg-burgundy-500 text-white font-bold text-sm hover:bg-maroon transition-colors shadow-md">
+            <button type="button" id="modal-confirm-btn" onclick="submitConfirmModal(event)" class="flex-1 px-4 py-2.5 rounded-xl bg-burgundy-500 text-white font-bold text-sm hover:bg-maroon transition-colors shadow-md">
                 Confirm
             </button>
         </div>
@@ -550,13 +550,15 @@
         document.getElementById('custom-confirm-modal').classList.remove('hidden');
     }
 
-    function cancelConfirmModal() {
+    function cancelConfirmModal(event) {
+        if (event) event.preventDefault();
         pendingFormId = null;
         document.getElementById('custom-confirm-modal').classList.add('hidden');
     }
 
     // ── Submit via AJAX (no page refresh) ────────────────────────────────────
-    function submitConfirmModal() {
+    function submitConfirmModal(event) {
+        if (event) event.preventDefault();
         if (!pendingFormId) { cancelConfirmModal(); return; }
 
         var form = document.getElementById(pendingFormId);
@@ -638,9 +640,15 @@
                     } else {
                         notify('Action completed successfully!', 'success');
                     }
+                    
+                    // Force reload to update statistics and preserve scroll position
+                    sessionStorage.setItem('admin_scroll_y_' + window.location.pathname, window.scrollY.toString());
+                    setTimeout(() => window.location.reload(), 1000);
                 } else {
                     // Couldn't find the row — just show toast
                     notify('Action completed successfully!', 'success');
+                    sessionStorage.setItem('admin_scroll_y_' + window.location.pathname, window.scrollY.toString());
+                    setTimeout(() => window.location.reload(), 1000);
                 }
             } else {
                 notify('Something went wrong. Please try again.', 'error');
@@ -670,5 +678,18 @@
             }, 300);
         }
     })();
+    // Save scroll position for GET requests (pagination, search, filter)
+    document.addEventListener('click', function(e) {
+        var link = e.target.closest('a[href]');
+        if (link && link.href.includes('manage-data')) {
+            sessionStorage.setItem('admin_scroll_y_' + window.location.pathname, window.scrollY.toString());
+        }
+    });
+    
+    document.addEventListener('submit', function(e) {
+        if (e.target.action && e.target.action.includes('manage-data') && e.target.method.toLowerCase() === 'get') {
+            sessionStorage.setItem('admin_scroll_y_' + window.location.pathname, window.scrollY.toString());
+        }
+    });
 </script>
 @endsection

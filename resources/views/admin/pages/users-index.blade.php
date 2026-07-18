@@ -89,7 +89,7 @@
                         </td>
                         <td class="px-4 sm:px-8 py-4 sm:py-6 text-right opacity-100 md:opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap">
                             <a href="{{ route('admin.users.edit', $user->user_id) }}" class="text-blue-500 hover:text-blue-700 font-bold text-[10px] sm:text-xs px-2 sm:px-3 bg-blue-50 sm:bg-transparent rounded py-1 sm:py-0 mr-1 sm:mr-2">Edit</a>
-                            <form action="{{ route('admin.users.destroy', $user->user_id) }}" method="POST" class="inline" onsubmit="return confirm('Delete this user?')">
+                            <form action="{{ route('admin.users.destroy', $user->user_id) }}" method="POST" class="inline" onsubmit="return confirm('Are you sure you want to delete this user? This action cannot be undone.')">
                                 @csrf @method('DELETE')
                                 <button type="submit" class="text-red-500 hover:text-red-700 font-bold text-[10px] sm:text-xs px-2 sm:px-3 bg-red-50 sm:bg-transparent rounded py-1 sm:py-0">Delete</button>
                             </form>

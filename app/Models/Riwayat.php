@@ -31,7 +31,6 @@ class Riwayat extends Model
         'aktivitas',
         'deskripsi',
         'ip_address',
-        'user_agent',
     ];
 
     // ==============================

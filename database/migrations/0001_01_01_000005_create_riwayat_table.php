@@ -28,7 +28,6 @@ return new class extends Migration
             // === Kolom tambahan (dipertahankan dari database lama) ===
             $table->text('deskripsi')->nullable();
             $table->string('ip_address')->nullable();
-            $table->text('user_agent')->nullable();
 
             $table->timestamps();
             $table->softDeletes();

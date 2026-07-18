@@ -160,7 +160,6 @@ class AdminController extends Controller
             'aktivitas' => 'Book Return',
             'deskripsi' => 'The book has been returned to the library. Fine: Rp ' . number_format($denda, 0, ',', '.'),
             'ip_address' => request()->ip(),
-            'user_agent' => request()->userAgent(),
         ]);
 
         return redirect()->back()->with('success', 'Book return confirmed successfully!');
@@ -187,7 +186,6 @@ class AdminController extends Controller
             'aktivitas' => 'Book Picked Up',
             'deskripsi' => 'The book has been physically picked up by the user.',
             'ip_address' => request()->ip(),
-            'user_agent' => request()->userAgent(),
         ]);
 
         return redirect()->back()->with('success', 'Book pickup confirmed!');
@@ -229,7 +227,6 @@ class AdminController extends Controller
                 'aktivitas'     => 'Loan Cancelled',
                 'deskripsi'     => 'The loan was cancelled because the book was not picked up. No fine applies.',
                 'ip_address'    => request()->ip(),
-                'user_agent'    => request()->userAgent(),
             ]);
         } catch (\Exception $e) {
             // Log the error but don't block the cancel action
